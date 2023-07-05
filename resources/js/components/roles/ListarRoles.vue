@@ -1,0 +1,166 @@
+<template>
+    <div>
+        <div class="container">
+            
+            <!-- The Modal -->
+            <div class="modal" :class="{mostrar:modal}">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{tituloModal}}</h4>
+                        <button type="button" class="btn-close" @click="cerrarModal()"></button>
+                    </div>
+                    <form >
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                        
+                                <input v-model="formularioRolesPermisos.rol" type="text" class="form-control" placeholder="Nombre del Rol2" >
+                                
+                                <div v-for="(permiso, index) in permisos" :key="index">
+                                    
+                                        <input type="checkbox"  v-model="formularioRolesPermisos.selectPermisos" v-bind:value="permiso.name">                         
+                                    
+                                    <label for="">{{ permiso.name }}</label>
+                                </div>                                     
+                                
+                                
+                            
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cerrarModal">Close</button>
+                            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" @click="crear">Guardar</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div> <!-- fin modal -->
+        </div>
+        
+        <div class="container">
+            <h3>Roles de Usuarios </h3><a href="#" class="mx-3" @click="modificar=false; abrirModal();"> + Nuevo</a>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Nombre</th>
+                                <th>Permisos</th>
+                                <th>Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(rolPermiso, index) in rolesPermisos" :key="'a'+index">
+                                <td>{{rolPermiso['rol'].id}}</td>
+                                <td>{{rolPermiso['rol'].name}}</td>                    
+                                <td >
+                                    <span v-for="(permisos, i) in rolPermiso['permisos']" :key ="i" >
+                                        
+                                        <a  href="" class="btn btn-secondary btn-sm m-1">{{ permisos.name }}{{ permisos.acceso }}</a>
+                                    </span>                              
+                                    
+                                </td>
+                                <td>
+                                    <a :href="'roles/editarRole/'+rolPermiso['rol'].id" class="btn btn-warning btn-sm" >Editar</a>                                    
+                                    <a href="#" v-if="rolPermiso['permisos'].length===0" class="btn btn-danger btn-sm" @click="eliminarRole(rolPermiso['rol'].id)">Eliminar</a>
+                                    <a href="#" v-else class="btn btn-secondary btn-sm" @click="revocarPermisosRolId(rolPermiso['rol'].id)">Revocar todo</a>
+                                </td>           
+                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>        
+        </div>
+        
+    </div>
+    
+</template>
+<script>
+//import axios from 'axios';
+
+    export default {
+        data(){
+            return{
+                formularioRolesPermisos:{
+                    rol:'',
+                    selectPermisos:[],
+                },
+                modificar:true,
+                modal:0,
+                tituloModal:'',
+                rolesPermisos:[],
+                permisos:[],
+                errors: []
+            }
+        },
+        methods:{
+
+          async listar(){
+           const respuesta = await axios.get('roles/api');
+            this.rolesPermisos=respuesta.data; 
+                  
+          },
+
+          async allPermisos(){
+            const resultado = await axios.get('roles/all-permisos/api');
+            this.permisos = resultado.data;
+            
+          },
+
+          async crear(){  
+                   
+                const respuesta = await axios.post('roles/guardarApi',this.formularioRolesPermisos);            
+                this.cerrarModal();
+                this.listar();            
+          },
+
+          async revocarPermisosRolId(id){
+            
+            var respuesta = await axios.get('roles/revocarPermisosRolId/'+id);
+            this.listar();
+          },
+
+          async eliminarRole(id){
+            var accion = await axios.get('roles/eliminarRole/'+id);
+            this.listar();
+          },          
+          
+          abrirModal(data={}){
+            this.modal=1;            
+            if(this.modificar== true){                   
+                this.tituloModal="Modificar Rol";
+                this.formularioRolesPermisos.rol=data.name;
+                
+            }else{
+                
+                this.tituloModal="Crear Rol";
+                this.formularioRolesPermisos.rol='';
+            }
+          },
+
+          cerrarModal(){
+            this.modal=0;
+          },
+          
+          
+        },
+        created(){
+            this.listar();
+            this.allPermisos();
+        },
+     
+    }
+
+</script>
+<style>
+.mostrar{
+    display: list-item;
+    opacity: 1;
+    background-color: rgba(27, 27, 23, 0.699);
+}
+</style>

@@ -1,0 +1,114 @@
+.bg-body{
+  background: url("../dist/img/finanzas-empresariales2.jpg") no-repeat;
+    height: auto;
+}
+
+.card-body{
+  transition: 0.5s;
+  opacity: .99;
+}
+
+.card-body:hover{
+  transition: 0.3s ease-in;
+  opacity: .91;
+  background-color: #f0f0f0;
+  box-shadow: 0 0 10px #000;
+}
+
+.tbl tr {background-color: white; height: 24px}
+
+.tbl tr:hover {background-color: #FDEBD0;}
+
+.bg-modulo-card1{
+  background: url("../dist/img/bg1.jpg") no-repeat;
+}
+
+.bg-modulo-card2{
+    background: url("../dist/img/bg1.jpg") no-repeat;
+}
+
+.bg-modulo-card3{
+    background: url("../dist/img/bg1.jpg") no-repeat;
+}
+
+ol{
+  list-style: none;
+  display:grid;
+  grid-template-columns: repeat(7,1fr);
+}
+.first-day{
+  grid-column-start: 3;
+}
+
+#calendar {
+  font-family:Arial;
+  font-size:12px;
+  width: 100%;
+}
+.month {
+  text-align:left;
+  padding:5px 10px;
+  background-color:#003366;
+  color:#fff;
+  font-weight:bold;
+}
+#calendar table{
+  border-collapse: separate;
+}
+#calendar th {
+  background-color:#a2c9dd;
+  color:#fff;
+  width:40px;
+  border: rgb(252, 253, 251) 2px solid;
+  text-align:center;
+}
+#calendar tbody tr {  
+  height: 80px;
+}
+#calendar td {
+  text-align:center;
+  padding:2px 5px;  
+  background-color:rgb(236, 233, 233);
+  border: rgb(252, 253, 251) 2px solid;
+}
+#calendar td:hover {
+  background-color: aquamarine;
+}
+#calendar .hoy {
+  background-color:rgb(241, 214, 163);
+}
+#calendar .nulo {
+  background-color:rgb(223, 222, 222);
+}
+.btn-circle.btn-sm {
+  width: 30px;
+  height: 30px;
+  padding: 6px 0px;
+  border-radius: 15px;
+  font-size: 8px;
+  text-align: center;
+}
+.btn-circle.btn-md {
+  width: 50px;
+  height: 50px;
+  padding: 7px 10px;
+  border-radius: 25px;
+  font-size: 10px;
+  text-align: center;
+}
+.btn-circle.btn-xl {
+  width: 70px;
+  height: 70px;
+  padding: 10px 16px;
+  border-radius: 35px;
+  font-size: 12px;
+  text-align: center;
+}
+.btn-curve.btn-md {
+ 
+  padding: 7px 10px;
+  border-radius: 25px;
+  font-size: 15px;
+  text-align: center;
+}
+.alternar:hover{ background-color:#B9F8F8;}
