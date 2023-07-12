@@ -19,7 +19,7 @@ class ConfiguracionController extends Controller
         $importar_server2_a_server1_cxp = Parametro::buscarVariable('importar_server2_a_server1_cxp');
         $numero_registros_importar_cxp = Parametro::buscarVariable('numero_registros_importar_cxp');
         $numero_registros_importar_notacredito = Parametro::buscarVariable('numero_registros_importar_notacredito');
-        return view('configuraciones.confCuentasPorPagar',
+        return view('Admin.configuraciones.confCuentasPorPagar',
         [
             'pago_facturas_desde_facturas_por_pagar'=>$pago_facturas_desde_facturas_por_pagar,
             'verificar_facturas_en_siace'=>$verificar_facturas_en_siace,
@@ -80,7 +80,7 @@ class ConfiguracionController extends Controller
         $nombreEmpresa = Parametro::buscarVariable('nombre_general_empresa');
         $logoEmpresa = Parametro::buscarVariable('logo_empresa');
         
-        return view('configuraciones.confGeneral',['nombreEmpresa'=>$nombreEmpresa,'logoEmpresa'=>$logoEmpresa]);
+        return view('Admin.configuraciones.confGeneral',['nombreEmpresa'=>$nombreEmpresa,'logoEmpresa'=>$logoEmpresa]);
     }
 
     public function guardarConfiguracionGeneral(Request $request){

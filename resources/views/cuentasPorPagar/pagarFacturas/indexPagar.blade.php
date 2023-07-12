@@ -315,7 +315,7 @@
 							<div class="col">	
 								<div class="form-group">
 									<label>Fecha de Pago</label>
-									<input type="date" name="fecha_pago" class="form-control" >
+									<input type="date" name="fecha_pago" class="form-control" required>
 								</div>
 							</div>
 							<div class="col">						

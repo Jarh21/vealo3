@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 	<div class="container">
-		<h3>Listado de Empresas <a href="{{route('empresas.create')}}"><button class="btn btn-success float-right">Agregar</button></a></h3>
+		<h3>Listado de Empresas <a href="{{route('admin.empresas.create')}}"><button class="btn btn-success float-right">Agregar</button></a></h3>
 		<table class="table table-striped">
 		  <thead>
 		    <tr>
@@ -17,7 +17,7 @@
 		    	<td>{{$empresa->rif}}</td>
 		    	<td>{{$empresa->nombre}} @if($empresa->is_sincronizacion_remota ==1) <p class="text-success">Sincronizando con -> {{$empresa->servidor2 ?? 'no hay servidor'}}</p> @endif</td>
 		    	<td>
-		    		<a href="{{route('empresas.edit',$empresa->id)}}" class="btn btn-info">Modificar</a>
+		    		<a href="{{route('admin.empresas.edit',$empresa->id)}}" class="btn btn-info">Modificar</a>
 		    		<!-- Button trigger modal -->
 					<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal{{$empresa->id}}">
 					  Eliminar
@@ -40,7 +40,7 @@
 			      </div>
 			      <div class="modal-footer">
 			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-			        <a href="{{route('empresas.delete',$empresa->id)}}"><button class="btn btn-danger">Eliminar</button></a>			        
+			        <a href="{{route('admin.empresas.delete',$empresa->id)}}"><button class="btn btn-danger">Eliminar</button></a>			        
 			        
 			      </div>
 			    </div>

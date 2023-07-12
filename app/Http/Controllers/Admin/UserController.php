@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 //use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller

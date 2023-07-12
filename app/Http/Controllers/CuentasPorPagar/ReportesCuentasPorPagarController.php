@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 class ReportesCuentasPorPagarController extends Controller
 {
     public function reporteRelacionPagosPorEmpresa(){
-		if(empty(session('empresaRif'))){
+		if(empty(session('empresaRif')) or empty(session('modoPago'))){
     		
 			return redirect()->route('cuentasporpagar.inicio','reporteRelacionPagosPorEmpresa');
     	}
@@ -79,7 +79,7 @@ class ReportesCuentasPorPagarController extends Controller
     }
 
 	public function reportePagoPorProvedorTodasEmpresas(){
-		if(empty(session('empresaRif'))){
+		if(empty(session('empresaRif')) or empty(session('modoPago'))){
     		
 			return redirect()->route('cuentasporpagar.inicio','reportePagoPorProvedorTodasEmpresas');
     	}

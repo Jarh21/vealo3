@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-	<h3>Registrar De Empresas <a href="{{url('/empresas')}}" class="btn btn-success float-right">Regresar</a></h3><hr>
+	<h3>Registrar De Empresas <a href="{{url('/admin/empresas')}}" class="btn btn-success float-right">Regresar</a></h3><hr>
 	@if ($errors->any())
 		<div class="alert alert-danger">
 			<ul>
@@ -11,7 +11,7 @@
 			</ul>
 		</div>
 	@endif
-	<form action="{{route('empresas.save')}}" method="POST">
+	<form action="{{route('admin.empresas.save')}}" method="POST">
 		@csrf
 		<div class="row">
 			<div class="col-10">

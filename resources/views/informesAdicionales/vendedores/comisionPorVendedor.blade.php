@@ -1,7 +1,5 @@
-@extends('layouts.informes')
-@section('css')
-<link rel="stylesheet" type="text/css" href="{{asset('css/select2.min.css')}}">
-@endsection
+@extends('layouts.app')
+
 @section('content')
 <div class="content">
 <h3>Definicion de los porcentajes segun el grupo del vendedor</h3>
@@ -136,7 +134,6 @@
 </div>
 @endsection
 @section('js')
-<script src="{{asset('js/select2.min.js')}}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         // select 2

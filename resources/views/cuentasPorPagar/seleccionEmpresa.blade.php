@@ -15,7 +15,7 @@
 						<select name="empresa" class="form-control" required>
 							<option value="">-- Seleccionar --</option>
 							@foreach($empresas as $empresa)
-							<option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}">{{$empresa->rif}} {{$empresa->nombre}}</option>
+							<option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}" @if(session('empresaRif') == $empresa->rif) selected @endif>{{$empresa->rif}} {{$empresa->nombre}}</option>
 							@endforeach
 						</select>
 						
@@ -24,8 +24,8 @@
 						<label>Modo de Pago</label>
 						<select name="modo_pago" class="form-control" required>
 							<option value="">-- Seleccione --</option>
-							<option value="1|bolivares">Bolivares <b class="text-primary">Bs.</b></option>
-							<option value="2|dolares">Divisas <b class="text-success">$</b></option>
+							<option value="1|bolivares" @if(session('modoPago')=='bolivares') selected @endif>Bolivares <b class="text-primary">Bs.</b></option>
+							<option value="2|dolares" @if(session('modoPago')=='dolares') selected @endif>Divisas <b class="text-success">$</b></option>
 						</select>
 					</div>
 					<button type="submit" class="btn btn-primary">Seleccionar</button>

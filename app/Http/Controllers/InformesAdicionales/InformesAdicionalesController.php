@@ -45,21 +45,25 @@ class InformesAdicionalesController extends Controller
                 c.rif rif,
                 p.codtipopago tipoPago,
                 p.codtipomoneda tipoMoneda,
-                p.monto_moneda montoMoneda,
+                p.monto_moneda montoMoneda,                
                 p.monto_base montoBase,                
-                p.documento documento   
+                comprobantes.fiscalcomp comprobante,
+                comprobantes.npagos
+                
                 FROM
                 mov_pago_cxc AS p, 
-                clientes AS c
+                clientes AS c,
+                (SELECT facturas.`fiscalcomp`,cobro.`documento`,COUNT(cobro.documento)AS npagos,cxc.`creditos` FROM cxc,cobro_cxc,cobro,facturas WHERE cxc.documento = facturas.documento  AND cobro.keycodigo = cobro_cxc.codcobro AND cobro_cxc.codcxc = cxc.keycodigo AND (cobro.fecha BETWEEN :fechaini AND :fechafin)GROUP BY cobro.documento)AS comprobantes
                 WHERE
                 p.codclie = c.keycodigo
-                AND (p.fecha BETWEEN :fechaini AND :fechafin)
+                AND (p.fecha BETWEEN :fechaini2 AND :fechafin2)
                 AND p.codtipopago IN(1,2,3,4,10,11,14,15)
+                AND p.documento = comprobantes.documento
                 AND c.vendedor_codusua =:codVendedor
                 
             /* fin consulta por vendedor*/           
 
-                ",['fechaini'=>$fechaini,'fechafin'=>$fechafin,'codVendedor'=>$codVendedor]);
+                ",['fechaini'=>$fechaini,'fechafin'=>$fechafin,'fechaini2'=>$fechaini,'fechafin2'=>$fechafin,'codVendedor'=>$codVendedor]);
         
         return $resultado;
     }
@@ -82,7 +86,8 @@ class InformesAdicionalesController extends Controller
                 SUM(p.monto_moneda) montoMoneda,
                 SUM(p.monto_base) montoBase,
                 ROUND(SUM(p.monto_moneda)/SUM(p.monto_base),2) tasaConversion,
-                p.documento documento   
+                p.documento documento,
+                (SELECT facturas.`fiscalcomp` FROM cxc,cobro_cxc,cobro,facturas WHERE cxc.documento = facturas.documento  AND cobro.keycodigo = cobro_cxc.codcobro AND cobro_cxc.codcxc = cxc.keycodigo AND cobro.documento=p.documento ORDER BY cxc.keycodigo DESC LIMIT 1)AS comprobante   
                 FROM
                 mov_pago_cxc AS p, 
                 clientes AS c
@@ -111,8 +116,7 @@ class InformesAdicionalesController extends Controller
     }
 
     public function sqlInsertarVentasDelSiace($datos){
-        //dd($datos,'107 informe adicional controller');
-       
+        
         foreach($datos as $dato){
             DB::insert("insert into mov_pago_cxc_comision_ventas (empresa_rif,fecha,codigoVendedor,nombreVendedor,cCliente,cGrupo,cliente,rif,tipoPago,tipoMoneda,montoMoneda,montoBase,tasaConversion,documento) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[
                 session('empresaRif'),$dato->fecha,$dato->codigoVendedor,$dato->nombreVendedor,$dato->cCliente,$dato->cGrupo,$dato->cliente,$dato->rif,$dato->tipoPago,$dato->tipoMoneda,$dato->montoMoneda,$dato->montoBase,$dato->tasaConversion,$dato->documento
@@ -170,13 +174,13 @@ class InformesAdicionalesController extends Controller
             foreach($parametrosVendedors as $parametrosVendedor){
                     
                 //buscamos en numero de las facturas
-                 $documentoFactura =  $conexionSQL->select("SELECT cxc.documento,cxc.fecha,facturas.fiscalcomp FROM cxc,cobro_cxc,cobro,facturas WHERE cxc.documento = facturas.documento AND cobro.documento=:documento_mov_pago_cxc AND cobro.keycodigo = cobro_cxc.codcobro AND cobro_cxc.codcxc = cxc.keycodigo",['documento_mov_pago_cxc'=>$datos->documento]);
+                /*  $documentoFactura =  $conexionSQL->select("SELECT cxc.documento,cxc.fecha,facturas.fiscalcomp FROM cxc,cobro_cxc,cobro,facturas WHERE cxc.documento = facturas.documento AND cobro.documento=:documento_mov_pago_cxc AND cobro.keycodigo = cobro_cxc.codcobro AND cobro_cxc.codcxc = cxc.keycodigo",['documento_mov_pago_cxc'=>$datos->documento]);
                 foreach($documentoFactura as $factura){
                     //como el resultado mysql viene dentro de un array lo recorremos y lo asignamos a una variable para acceder a ellos de forma de objeto
                     //esto se hace porque el numero del documento cobro_cxc no es el numero de factura y por eso hay que buscarlos en cxc
                     $documento = $factura->documento;
                     $comprobante = $factura->fiscalcomp;
-                } 
+                } */ 
 
                 if(empty($parametrosVendedor->vendedores_especiales_id)){
                     //si no se especificaron vendedores se aplica a todos los usuarios de ese grupo
@@ -208,9 +212,9 @@ class InformesAdicionalesController extends Controller
                         'montoCobrado'=>$datos->montoBase,
                         'montoParaComision'=>$montoParaComision,
                         'fCobro'=>$datos->fecha,
-                        'documento'=>$documento,
-                        'comprobante'=>$comprobante,                       
-                        
+                        'documento'=>0,
+                        'comprobante'=>$datos->comprobante,                       
+                        'npagos'=>$datos->npagos,
                     );
                     
                 }else{
@@ -242,8 +246,9 @@ class InformesAdicionalesController extends Controller
                                 'montoCobrado'=>$datos->montoBase,
                                 'montoParaComision'=>$montoParaComision,
                                 'fCobro'=>$datos->fecha,
-                                'documento'=>$documento,
-                                'comprobante'=>$comprobante,
+                                'documento'=>0,
+                                'comprobante'=>$datos->comprobante,
+                                'npagos'=>$datos->npagos,
                             );    
                            
                         }

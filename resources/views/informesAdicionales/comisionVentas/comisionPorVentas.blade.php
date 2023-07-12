@@ -5,7 +5,7 @@
     .alternar:hover{ background-color:#C1BDBC;cursor: pointer}
 </style>
 <div class="container-fluid">
-<a href="#" data-toggle="modal" data-target="#modalCambioSucursal" class="btn btn-outline-primary my-2">Seleccione sucursal ->{{session('empresaRif')}} {{session('empresaNombre') ?? 'No hay sucursal seleccionada'}}</a>
+<a href="#" data-toggle="modal" data-target="#modalCambioSucursal" class="btn btn-outline-primary my-2 float-right float-end">Seleccione sucursal ->{{session('empresaRif')}} {{session('empresaNombre') ?? 'No hay sucursal seleccionada'}}</a>
 
 <h3>Comisión Por Ventas</h3>
 <div class="my-3">
@@ -56,28 +56,30 @@
         
         @if(isset($vendedores))
             @if($tipoResultado == 'lista')        
-            <div class="accordion" id="accordionExample">
+            
                 
                 @foreach($vendedores as $vendedor)
                 <?php $sumaComision=0; $sumaCobrado=0; ?>
-                    <div class="accordion-item">
-                        
-                        <div id="collapse{{$vendedor['codVendedor']}}" class="accordion-collapse collapse" aria-labelledby="heading{{$vendedor['codVendedor']}}" data-bs-parent="#accordionExample">
-                        
-                        <button class="btn btn-danger btn-sm float-right" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$vendedor['codVendedor']}}" aria-expanded="true" aria-controls="collapseOne">
-                        x
-                        </button>
-                            <div class="accordion-body">
+                    <!-- Modal -->
+                    <div class="modal fade" id="Modal{{$vendedor['codVendedor']}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                
+                    <div class="modal-dialog  modal-dialog-scrollable modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropLabel">{{$vendedor['nomVendedor']}}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
 
-                            <b class="text-primary">{{$vendedor['nomVendedor']}}</b>
                                 @if(!empty($vendedor['ventas']))
                                 <table class="table">
                                     <thead>
                                         <tr>
                                             
                                             <th>Cliente</th>
-                                            <th>Fecha Cobro</th>
-                                            <th>Factura</th>
+                                            <th>Fecha Cobro</th>                                            
                                             <th>Comprobante</th>
                                             <th>Monto Cobrado</th>
                                             <th title="Porcentaje de Descuento">%Des</th>
@@ -91,12 +93,11 @@
                                     <tbody>
                                         @foreach($vendedor['ventas'] as $resultado)
                                             @if(isset($resultado->cliente))
-                                            <tr style="background-color:#D6F3FF";>
+                                            <tr >
                                             
                                                 <td>{{$resultado->cliente}}</td>
-                                                <td>{{$resultado->fCobro}}</td>
-                                                <td>{{$resultado->documento}}</td>
-                                                <td>{{$resultado->comprobante}}</td>
+                                                <td>{{$resultado->fCobro}}</td>                                                
+                                                <td>{{$resultado->comprobante}}<span class="badge badge-primary">{{$resultado->npagos}} Registros de pago</span></td>
                                                 <td>{{$resultado->montoCobrado}}</td>
                                                 <td>
                                                     @if($resultado->porcentajeDescuento > 0)
@@ -121,24 +122,31 @@
                                 </table>
                                 @endif
                             </div>
+                            <div class="modal-footer">
+                            {{'Monto Cobrado '.number_format($sumaCobrado,2)}} {{'| Monto Comision '.number_format($sumaComision,2)}}<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>                               
+                            </div>
                         </div>
-                    <div class="row">
-                        <div class="col-6">
-                            <span class="accordion-header" id="heading{{$vendedor['codVendedor']}}">
-                            <a class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{$vendedor['codVendedor']}}" aria-expanded="true" aria-controls="collapseOne">
-                            {{$vendedor['codVendedor']}} - {{$vendedor['nomVendedor']}} 
-                            </a>
-                            </span>
-                        </div>
-                        <div class="col-3">
-                        {{'Monto Cobrado '.number_format($sumaCobrado,2)}}
-                        </div>
-                        <div col-3>
-                        {{'Monto Comision '.number_format($sumaComision,2)}}
-
-                        </div>
+                    </div>
+                </div><!--fin Modal-->
+                <div class="row">
+                    <div class="col-6">
+                    
+                        <a >
+                        {{$vendedor['codVendedor']}} - {{$vendedor['nomVendedor']}} 
+                        </a>
                         
                     </div>
+                    <div class="col-3">
+                        {{'Monto Cobrado '.number_format($sumaCobrado,2)}}
+                    </div>
+                    <div col-3>
+                        {{'Monto Comision '.number_format($sumaComision,2)}}
+                        <a href="#" class="h4"  data-toggle="modal" data-target="#Modal{{$vendedor['codVendedor']}}">
+                        <i class="fas fa-search-plus" title="Ver Detalles"></i>
+                        </a>
+                    </div>
+                        
+                    
                         
                         
                         
@@ -153,8 +161,7 @@
                         <tr>
                             <th>Vendedor</th>
                             <th>Cliente</th>
-                            <th>Fecha Cobro</th>
-                            <th>Factura</th>
+                            <th>Fecha Cobro</th>                            
                             <th>Comprobante</th>
                             <th>Monto Cobrado</th>
                             <th title="Porcentaje de Descuento">%Des</th>
@@ -170,8 +177,7 @@
                             <tr>
                                 <td>{{$vendedor['nomVendedor']}}</td>
                                 <td>{{$resultado->cliente}}</td>
-                                <td>{{$resultado->fCobro}}</td>
-                                <td>{{$resultado->documento}}</td>
+                                <td>{{$resultado->fCobro}}</td>                                
                                 <td>{{$resultado->comprobante}}</td>
                                 <td>{{$resultado->montoCobrado}}</td>
                                 <td>
@@ -194,7 +200,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                        <th colspan="10" style="text-align:right">Total </th>
+                        <th colspan="9" style="text-align:right">Total </th>
                         </tr>
                     </tfoot>
 
@@ -274,7 +280,7 @@ function mostrar() {
 	 	 
 	            // Total over this page
 	            pageTotal = api
-	                .column( 9, { page: 'current'} )
+	                .column( 8, { page: 'current'} )
 	                .data()
 	                .reduce( function (a, b) {
 	                    return intVal(a) + intVal(b);

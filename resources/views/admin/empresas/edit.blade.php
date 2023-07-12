@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-	<h3>Editar Empresa {{$empresa->nombre}} <a href="{{url('/empresas')}}" class="btn btn-success float-right">Regresar</a></h3><hr>
+	<h3>Editar Empresa {{$empresa->nombre}} <a href="{{url('/admin/empresas')}}" class="btn btn-success float-right">Regresar</a></h3><hr>
 	@if ($errors->any())
 			    <div class="alert alert-danger">
 			        <ul>
@@ -15,7 +15,7 @@
 
 			
 			
-			<form action="{{route('empresas.update',$empresa->id)}}" method="POST" accept-charset="UTF-8" enctype="multipart/form-data">
+			<form action="{{route('admin.empresas.update',$empresa->id)}}" method="POST" accept-charset="UTF-8" enctype="multipart/form-data">
 				@method('PUT')
 				@csrf
 				<div class="row">

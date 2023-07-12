@@ -1,4 +1,4 @@
-@extends('layouts.islr')
+@extends('layouts.app')
 @section('content')
 	<div class="container">
 		<h3>Registro de nuevos Empleados</h3><hr>

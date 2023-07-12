@@ -40,7 +40,8 @@ class CuentasPorPagarController extends Controller
     }
 
     public function facturasPorPagar($mensaje=''){
-    	if(empty(session('empresaRif'))){
+    	if(empty(session('empresaRif')) or empty(session('modoPago'))){
+
     		return self::seleccionarEmpresa('cuentasporpagar.facturasPorPagar');
     	}
     	//listamos todas las facturas por pagar o pagadas y las enviamos a la vista index
@@ -188,15 +189,45 @@ class CuentasPorPagarController extends Controller
     	}    	
     }
 
+	public function calcularRetencionISLR($proveedorRif,$montoExcento){
+		//realizamos el calculo de la retencion de impuestos localmente solo se requiere que
+		//el proveedor tenga registrado el ultimo porcentaje de retencion
+		if($montoExcento > 0){
+			$datos_proveedor = Proveedor::where('rif',$proveedorRif)->first();
+			$PorcRetencion = $datos_proveedor->ultimo_porcentaje_retener_islr;
+
+			//si el proveedor tiene porcentaje de retencion islr
+			if($PorcRetencion > 0){
+				if($datos_proveedor->tipo_contribuyente=="Juridico"){					
+					$sustraendo=0;
+				}else{
+					
+					$porcenReten = Retencion::where('procent_retencion',$PorcRetencion)->first();
+					$sustraendo=$porcenReten->sustraendo;
+				}					
+				
+				$retencionIslr = ((($montoExcento*$PorcRetencion)/100)-$sustraendo);
+				
+
+			}else{
+				$retencionIslr=0;
+				
+			}
+		}else{
+			$retencionIslr=0;
+		}
+		
+		return	$retencionIslr;	
+	}
+
     public function buscarRetencionIva($rifProveedor,$montoIva){
     	//metodo que calcula el valor a retener en el iva
-    	//buscamos datos del proveedor
-		
-    		$datos_proveedor = Proveedor::where('rif',$rifProveedor)->first(); 
+    	//buscamos datos del proveedor	
+    		 
 
     		//si la factura tiene monto en IVA se calcula la retencion del iva
     		if($montoIva > 0){
-
+				$datos_proveedor = Proveedor::where('rif',$rifProveedor)->first();
     			//verificamos el % de retencion de iva del proveedor si no lo tiene tomara el 100%
     			$banderaRetencionIva = 1;
     				 		
@@ -212,7 +243,7 @@ class CuentasPorPagarController extends Controller
     		}else{
     			$ivaRetener = 0;
     		}//fin retencion IVA
-			//dd($rifProveedor,'cuentasPorPagarController linea 184',$ivaRetener);
+			
     	return $ivaRetener;	
     }
 
@@ -404,7 +435,7 @@ class CuentasPorPagarController extends Controller
 	    			if($concepto =='FAC'){	    				
 	    				
     					////buscamos si la factura tiene retencion de ISLR
-		    			$retencionIslr = self::buscarRetencionISLR($proveedorRif,$documento,$fechaFactura); 
+		    			$retencionIslr = self::calcularRetencionISLR($proveedorRif,$registro->exento); 
 		    			//si retencion es mayor a 0.00 activamos bandera	    			
 		    			if($retencionIslr > 0.00){		    				
 		    				$arrayRegistro['debitos'] = 0;
@@ -1497,6 +1528,40 @@ class CuentasPorPagarController extends Controller
 		$factura->dias_credito = $request->dias_credito;
 		$factura->porcentaje_descuento = $request->porcentaje_descuento;
 		$factura->update();
+		//si tiene porcfentaje de descuento se agrega en cxp
+		if($request->porcentaje_descuento > 0){
+			$porcDescuento = $request->porcentaje_descuento;
+			$monto = $factura->debitos;
+
+			//verificamos que la factura tenca iva
+			$retencionIva= self::buscarRetencionIva($factura->proveedor_rif,$factura->montoiva);			
+			
+			//verificamos si el proveedor tiene retencion de islr
+			$retencionIslr = self:: calcularRetencionISLR($factura->proveedor_rif,$factura->excento);
+			
+			$descuento = (($monto - $retencionIva - $retencionIslr)*$porcDescuento)/100;            			
+			
+			$arrayRegistro['empresaRif'] = session('empresaRif');
+			$arrayRegistro['factura_id'] = $factura->id;
+			$arrayRegistro['ncontrol'] = $factura->n_control;
+			$arrayRegistro['cierre'] = $factura->cierre;
+			$arrayRegistro['proveedorRif'] = $factura->proveedor_rif;	
+			$arrayRegistro['proveedorNombre'] = $factura->proveedor_nombre;	
+			$arrayRegistro['documento'] = $factura->documento;	
+			$arrayRegistro['poriva'] = $factura->poriva;				
+			$arrayRegistro['gravado'] = $factura->gravado;
+			$arrayRegistro['exento'] = $factura->excento;
+			$arrayRegistro['debitos'] = 0;
+			$arrayRegistro['montoiva'] = 0;
+			$arrayRegistro['creditos'] = $descuento;
+			$arrayRegistro['concepto'] = 'DESC';
+			$arrayRegistro['cod_concepto']= 4;
+			$arrayRegistro['concepto_descripcion']='DESCUENTO DEL '.$porcDescuento.'%';
+			
+			
+			self::guardarEnCuentasPorPagar($arrayRegistro);
+			//fin guardar en cuentas por pagar
+		}
 		return redirect()->route($urlRetorno);
 	}
 
@@ -1544,7 +1609,7 @@ class CuentasPorPagarController extends Controller
  
     ///////////////RELACION PAGO FACTURAS EN DIVISAS //////////
     public function relacionPagoFacturasIndex(){
-    	if(empty(session('empresaRif'))){
+    	if(empty(session('empresaRif')) or empty(session('modoPago'))){
     		return self::seleccionarEmpresa('relacionPagoFacturasIndex');
     	}
     	$listadoFacturasPorPagar = self::prepararFacturasPorPagar('dolares');
@@ -1695,7 +1760,7 @@ class CuentasPorPagarController extends Controller
     }
 
     public function listadoFacturasCalculadas(){
-    	if(empty(session('empresaRif'))){
+    	if(empty(session('empresaRif')) or empty(session('modoPago'))){
     		return self::seleccionarEmpresa('listadoFacturasCalculadas');
     	}
     	$fechaini='';

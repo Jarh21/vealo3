@@ -1,16 +1,12 @@
-@extends('layouts.islr')
-@section('css')
+@extends('layouts.app')
 
-<!--<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />-->
-<link rel="stylesheet" type="text/css" href="{{asset('css/daterangepicker.css')}}">
-<link rel="stylesheet" type="text/css" href="{{asset('css/dataTables.bootstrap4.min.css')}}">
-@endsection
 <?php
 	if(!isset($empresa_seleccionada)){
 		$empresa_seleccionada='';
 	}  
 ?>
 @section('content')
+<div class="container-fluid">
 	<div class="row">
 		<div class="col">
 			<h3>Departamento de Talento Humano </h3><p>Registro de los empleados para la retención del impuesto sobre la renta.</p>
@@ -40,9 +36,9 @@
 	<button type="button" class="btn btn-info btn-sm d-inline mb-3 d-print-none" onclick="javascript:window.print()">
 			<i class="fa fa-print" aria-hidden="true"></i> Imprimir
 	</button>
-	<button type="button" class="btn btn-secondary btn-sm d-inline mb-3 d-print-none" data-toggle="modal" data-target="#exampleModalimportar"><i class="fas fa-arrow-down"></i> Importar Empleados</button>
+	<button type="button" class="btn btn-secondary btn-sm d-inline mb-3 d-print-none" data-toggle="modal" data-target="#exampleModalimportar" disabled><i class="fas fa-arrow-down"></i> Importar Empleados</button>
 	<a href="{{route('rrhh.create')}}" class="btn btn-primary btn-sm mb-3 d-print-none"><i class="fa fa-plus" aria-hidden="true"></i>Nuevo Empleado</a>
-	<a href="{{route('rrhh.export',$empresa_seleccionada)}}" class="btn btn-success btn-sm mb-3 d-print-none"><i class="far fa-file-excel"></i>Exportar Excel</a>
+	<!-- <a href="{{--route('rrhh.export',$empresa_seleccionada)--}}" class="btn btn-success btn-sm mb-3 d-print-none" disabled><i class="far fa-file-excel"></i>Exportar Excel</a> -->
 	</div>
 	@if(isset($messageBueno))
 		<div class="alert alert-success"><p>{{$messageBueno}}</p></div>
@@ -79,7 +75,7 @@
 					<td>{{$empleado->fecha_ingreso}}
 						
 					</td>
-					<td @if($nCadena==10) bgcolor="{{$empleado->color}}" @else bgcolor="red" @endif>{{$empleado->empresa_nombre}}@if($nCadena!=10)<b class="text-white bg-dark"> El rif esta malo</b>@endif</td>
+					<td @if($nCadena==10) bgcolor="{{--$empleado->color--}}" @else bgcolor="red" @endif>{{$empleado->empresa_nombre}}@if($nCadena!=10)<b class="text-white bg-dark"> El rif esta malo</b>@endif <span class="badge badge-light" style="background:{{$empleado->color}}">...</span></td>
 					<td width='120px'>
 						<input type="text" name="sueldo_nuevo[]" value="{{round($empleado->sueldo_base,2)}}" class="form-control ">						
 						<input type="hidden" name="id[]" value="{{$empleado->id}}">
@@ -124,9 +120,9 @@
 
 			@endforeach
 			
-				<div class="fixed-bottom d-flex justify-content-end bg-info">
+				<div class="fixed-bottom d-flex justify-content-end " style="background-color: rgb(233, 233, 229)">
 					Para aplicar todos los cambios haga click en el siguiente boton ----->
-					<button type="submit" class="btn btn-secondary my-2 mr-2 d-print-none"><i class="fas fa-save mx-2"></i>Aplicar Todos los cambios</button>
+					<button type="submit" class="btn btn-primary my-2 mr-2 d-print-none"><i class="fas fa-save mx-2"></i>Guardar Todos los cambios</button>
 				</div>
 				
 			
@@ -167,13 +163,13 @@
 		    </div>
 		  </div>
 		</div>	<!--fin modal-->
-
+</div>
 @endsection
 
 @section('js')
 <!--<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>-->
-<script src="{{asset('js/jquery.dataTables.min.js')}}"></script>
-<script src="{{asset('js/dataTable.bootstrap4.min.js')}}"></script>
+<!-- <script src="{{--asset('js/jquery.dataTables.min.js')--}}"></script>
+<script src="{{--asset('js/dataTable.bootstrap4.min.js')--}}"></script> -->
 
 <script type="text/javascript">
 

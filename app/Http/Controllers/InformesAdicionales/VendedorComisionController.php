@@ -5,6 +5,7 @@ namespace App\Http\Controllers\InformesAdicionales;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ParametroCalculoComision;
+use App\Http\Controllers\Herramientas\HerramientasController;
 class VendedorComisionController extends Controller
 {
     public function index(){

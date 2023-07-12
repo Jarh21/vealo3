@@ -139,7 +139,7 @@ class FacturasPorPagar extends Model
     }
 
     public function contarFacturasDelProveedorPorRangoDeFechaCalculada($fechaPago,$proveedorRif){
-      $resultado= DB::select("select count(*)as total from facturas_por_pagars where fecha_real_pago =:fechaPago and proveedor_rif=:proveedorRif and empresa_rif=:empresaRif and modo_pago=:modoPago",[$fechaPago,$proveedorRif,session('empresaRif'),session('modoPago')]);      
+      $resultado= DB::select("select count(*)as total from facturas_por_pagars where fecha_real_pago =:fechaPago and proveedor_rif=:proveedorRif and empresa_rif=:empresaRif and modo_pago=:modoPago and is_apartada_pago=1",[$fechaPago,$proveedorRif,session('empresaRif'),session('modoPago')]);      
       if(!empty($resultado)){
         return $resultado[0]->total;
       }else{

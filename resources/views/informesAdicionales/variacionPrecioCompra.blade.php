@@ -1,7 +1,4 @@
-@extends('layouts.informes')
-@section('css')
-<link rel="stylesheet" type="text/css" href="{{asset('css/select2.min.css')}}">
-@endsection
+@extends('layouts.app')
 
 @section('content')
     <div class='container'>
@@ -42,7 +39,7 @@
     </div>
 @endsection
 @section('js')
-<script src="{{asset('js/select2.min.js')}}"></script>
+
 <script type="text/javascript">
     $(document).ready(function() {
         // select 2
