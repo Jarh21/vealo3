@@ -170,14 +170,15 @@
                                     </div>
                                     <div class="col-md-3">
                                         <h5><strong class="sub-menu-heading">Herramientas</strong></h5><hr>
-                                        @can('habladores.index')<p><a href="{{route('habladores.index')}}" class=""><i class="fab fa-stack-exchange nav-icon mr-2"></i>Habladores</a></p>@endcan                                        
+                                        @can('habladores.index')<p><i class="fab fa-stack-exchange nav-icon mr-2"></i><a href="{{route('habladores.index')}}" class="">Habladores</a></p>@endcan                                        
                                                                                 
                                     </div>                                    
                                     <div class="col-md-3">
                                         <h5><strong class="sub-menu-heading">Reportes</strong></h5><hr>                                        
-                                        @can('comisionPorVentas')<p><a href="{{route('comisionPorVentas')}}" class=""><i class="fas fa-cash-register nav-icon mr-2"></i>Comisión por ventas</a></p>@endcan
-                                       
+                                        @can('comisionPorVentas')<p><i class="fas fa-cash-register nav-icon mr-2"></i><a href="{{route('comisionPorVentas')}}" class="">Comisión por ventas</a></p>@endcan
+                                        @can('comisionPorVentas')<p><i class="fas fa-percentage nav-icon mr-2"></i><a href="{{route('empleadosComisionEspecial')}}" class="">Definir Porcentajes para el calculo de comisión</a></p>@endcan
                                     </div>
+                                    
                                 </div>
 
                             </div>

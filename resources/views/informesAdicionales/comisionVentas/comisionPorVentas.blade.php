@@ -10,7 +10,7 @@
 <h3>Comisión Por Ventas</h3>
 <div class="my-3">
     
-    <a href="{{route('empleadosComisionEspecial')}}" class="btn btn-success">Definir Porcentajes % para el calculo de comisión</a>
+    <a href="{{route('empleadosComisionEspecial')}}" >Definir Porcentajes % para el calculo de comisión</a>
 </div>
 
 @if(empty(session('empresaRif')))
@@ -155,7 +155,7 @@
                 
             </div>        
             
-            @else
+            @else <!-- si selecciono tabla -->
                 <table class="table" id="ventas">
                     <thead>
                         <tr>
@@ -299,9 +299,9 @@ function mostrar() {
 </script>
 <script type="text/javascript">
     function eliminarTodaLaLista(fechaini,fechafin){
-        const eliminar = confirm("¿Confirma que desea eliminar el lisda del sistema vealo par apoder traer informacion actualizada del siace?");
+        const eliminar = confirm("¿Confirma que desea eliminar el listado del sistema vealo para traer informacion actualizada del siace?");
         if(eliminar){
-            window.location="/vealo/public/informes-eliminar-todas-las-comisiones/"+fechaini+"/"+fechafin; 
+            window.location="/vealo3/public/informes-eliminar-todas-las-comisiones/"+fechaini+"/"+fechafin; 
         }
     }
 </script>

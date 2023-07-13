@@ -54,13 +54,15 @@ class VendedorComisionController extends Controller
         $conexionSQL = $herramientas->conexionDinamicaBD(session('basedata'));
         $usuarios =  $conexionSQL->select("SELECT keycodigo,nombre from usuarios");
         $grupos = $conexionSQL->select("SELECT keycodigo,nombre from grupos");
+       
         return view('informesAdicionales.vendedores.comisionPorVendedor',['parametros'=>ParametroCalculoComision::all(),'parametroSeleccionado'=>$parametroSeleccionado,'empresas'=>$herramientas->listarEmpresas(),'usuarios'=>$usuarios,'grupos'=>$grupos]);
 
     }
 
     public function eliminar($id){
         $parametros = ParametroCalculoComision::find($id);
-        if($parametros->delete()){
+        
+         if($parametros->delete()){
             return self::index();
         }else{
             return self::index();

@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="content">
-<h3>Definicion de los porcentajes segun el grupo del vendedor</h3>
+<div class="container-fluid mb-3">
+<h3>Definicion de los porcentajes segun el grupo del vendedor. <a href="{{route('comisionPorVentas')}}" class="btn btn-warning float-right "><i class="fas fa-chevron-left"></i> Regresar</a></h3>
 </div>
-<div class="content">
+<div class="container-fluid">
     <form action="{{route('guardarEmpleadosComisionEspecial')}}" method="post">
         @csrf
         <input type="hidden" name="id_parametro_edit" value="{{$parametroSeleccionado->id ?? ''}}">
@@ -23,7 +23,7 @@
                                 @endif
                             @endif
                         >
-                        {{$grupo->nombre}}
+                       {{$grupo->keycodigo}} -{{$grupo->nombre}}
                         </option>
                         @endforeach
                     </select>
@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col">
                 <div class="input-group mb-3">
-                    <span class="mr-2" >Porcentaje Calculo Comision</span>
+                    <span class="mr-2" >Porcentaje % Calculo Comision</span>
                     <input type="number" class="form-control" name="porcentaje_calculo_comision" id="porcentaje_calculo_comision" value="{{$parametroSeleccionado->porcentaje_calculo_comision ?? ''}}">
                 </div>
             </div>
@@ -69,14 +69,14 @@
                     @endforeach
                 @endif
             </select>
+            <button type="submit" class="btn btn-primary float-right mx-2">Guardar</button>
         </div>
-        <div>
-            <button type="submit" class="btn btn-primary float-right">Guardar</button>
-        </div>
+        
     </form>
 </div>
-<div class="content">
+<div class="container-fluid">
     @if(isset($parametros))
+        <h3>Listado de porcentajes asignados.</h3>
         <table class="table">
             <thead>
                 <tr>
@@ -91,6 +91,7 @@
                 @foreach($parametros as $parametro)
                 <tr>
                     <td>
+                       
                         @foreach($grupos as $grupo)
                             @if($grupo->keycodigo == $parametro->codgrupo)
                             {{$grupo->nombre}}
@@ -122,7 +123,7 @@
                     </td>
                     
                     <td>
-                        <a href="{{route('eliminarEmpleadosComisionEspecial',$parametro->id)}}" class="text-danger"><i class="fa fa-trash mx-2"></i></a>
+                        <a href="#" class="text-danger" onclick="eliminar('{{$parametro->id}}')"><i class="fa fa-trash mx-2"></i></a>
                         <a href="{{route('editarEmpleadosComisionEspecial',$parametro->id)}}"><i class="fa fa-edit mx-2"></i></a>
                     </td>
                 </tr>
@@ -142,5 +143,12 @@
 	    	maximumSelectionLength:100,
 	    });
     });
+    
+    function eliminar(id){
+        let confirmar = confirm("Desea elimina el registro seleccionado");
+        if(confirmar){
+            window.location="/vealo3/public/vendedor-comision-eliminar/"+id;
+        }
+    }
 </script>
 @endsection
