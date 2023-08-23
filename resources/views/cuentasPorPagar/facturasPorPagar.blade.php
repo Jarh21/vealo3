@@ -202,7 +202,7 @@
 									<div class="row">
 										<div class="col"><a href="{{route('eliminarFacturaPorPagar',[$cuenta->id,'cuentasporpagar.facturasPorPagar'])}}" class="text-danger" title="Eliminar"><i class="fa fa-trash"></i></a></div>
 										
-										<div class="col">@can('acceso','editarFacturasPorPagar')<a href="{{route('editarFacturasPorPagar',[$cuenta->id,'cuentasporpagar.facturasPorPagar'])}}" title="Editar"><i class="fa fa-edit"></i></a>@endcan</div>
+										<div class="col">@can('editarFacturasPorPagar')<a href="{{route('editarFacturasPorPagar',[$cuenta->id,'cuentasporpagar.facturasPorPagar'])}}" title="Editar"><i class="fa fa-edit"></i></a>@endcan</div>
 									</div>
 									
 									
@@ -212,7 +212,7 @@
 								@else
 									@if($cuenta->pago_efectuado==0)
 									<!-- si tienes acceso a relacionar facturas puedes ver los modulos de edicion y desvincular las facturas -->
-										@can('acceso','relacionPagoFacturasIndex')
+										@can('relacionPagoFacturasIndex')
 											<a href="{{route('verVistaPagarFacturas',$cuenta->codigo_relacion_pago)}}" class="text-success" title="Pago en proceso haga click para terminar">Editar<i class="fa fa-edit"></i></a>
 											<a href="{{route('desvincularAsientoCuentasPorPagarBolivares',[$cuenta->id,$cuenta->codigo_relacion_pago]) }}" title="sacar de la relacion de pagos">Sacar<i class="fas fa-external-link-alt"></i></a>
 										@else

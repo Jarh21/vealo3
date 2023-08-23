@@ -24,7 +24,7 @@ class contribuyenteController extends Controller
     	$contribuyentes->codigo = $request->get('codigo');
     	$contribuyentes->porcentaje_retencion = $request->get('porcentaje_retencion');
     	$contribuyentes->save();
-    	return redirect('/contribuyentes');
+    	return redirect()->route('contribuyente.index');
     }
 
     public function edit($id){
@@ -35,7 +35,7 @@ class contribuyenteController extends Controller
     public function destroy($id){
     	$contribuyente = Contribuyente::findOrFail($id);
     	$contribuyente->delete();
-    	return redirect('/contribuyentes');
+    	return redirect()->route('contribuyente.index');
     }
 
     public function update(Request $request,$id){
@@ -44,6 +44,6 @@ class contribuyenteController extends Controller
         $contribuyente->codigo = $request->get('codigo');
         $contribuyente->porcentaje_retencion = $request->get('porcentaje_retencion');
         $contribuyente->update();
-        return redirect('/contribuyentes');
+        return redirect()->route('contribuyente.index');
     }
 }

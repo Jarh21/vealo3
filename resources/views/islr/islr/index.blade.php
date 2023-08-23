@@ -26,10 +26,10 @@
 			<button class="btn btn-success float-right"><i class="fa fa-plus mx-1" aria-hidden="true"></i>Agregar Documento</button></a>
 		</h3>
 		<!-- SEARCH FORM -->
-			
-			<form class="form-inline ml-5 my-2" action="{{route('islr.filtrar')}}" method="post">
+			<b>Buscar Retención</b><br>
+			<form class="form-inline  my-2" action="{{route('islr.filtrar')}}" method="post">
 				@csrf	
-				<b>Buscar Retención</b>			
+							
                 <div class="input-group input-group-sm">
 
                 	<span class="text-danger">*</span>
@@ -70,7 +70,7 @@
 		  	@foreach($islrs as $islr)
 		    <tr>
 		      <td scope="row">{{$islr['nControl']}}</td>
-		      <td>{{$islr['fecha']}}</td>
+		      <td width=10%>{{$islr['fecha']}}</td>
 		      <td>{{$islr['nom_corto']}}</td>
 		      <td width=50%>{{$islr['proveedor']}}
 		      	@if($islr['tipo_contribuyente'] == 'Natural') 
@@ -91,7 +91,7 @@
 		      	{{$islr['total_retener']}}
 		      	@endif
 		      </td>		      
-		      <td>
+		      <td width=10%>
 		      	<a href="{{route('islr.view',$islr['id'])}}" class="btn btn-secondary btn-sm"title="Ver"><i class="fa fa-search" aria-hidden="true"></i></a>
 		      	<a href="{{route('islr.edit',[$islr['id'],'edit'])}}" class="btn btn-primary btn-sm" title="Editar"><i class="fa fa-pencil-alt" aria-hidden="true"></i></a>
 		      	

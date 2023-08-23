@@ -18,7 +18,7 @@
                     <label for="">Fecha del cuadre</label>
                 </div>
                 <div class="p-2 bd-highlight">
-                    <input name="fecha" type="date" class="form-control">
+                    <input name="fecha" type="date" @if(isset($fechaCuadre)) value="{{$fechaCuadre}}" @endif class="form-control">
                     
                 </div>
                 <div class="p-2 bd-highlight">
@@ -143,6 +143,10 @@
             </div>
             <div class="my-2"><observacion-cuadre-general/></div>
     </div>
+    @else
+        @if(isset($fechaCuadre))
+            <div class="alert alert-warning">¡ No se encontraron registros para la fecha !</div>
+        @endif
     @endif
 </div>
 

@@ -16,10 +16,14 @@ class BancoController extends Controller
     }
 
     public function create(Request $request){
-    	$banco = new Banco();
+    	
+        $banco = new Banco();
     	$banco->nombre = $request->get('nombre');
-    	$banco->nombre_corto = $request->get('nombreCorto');        
+    	$banco->nombre_corto = $request->get('nombreCorto');
         $banco->primeros_cuatro_digitos = $request->get('primeros_cuatro_digitos');
+        if($request->is_bank_list=="on"){
+            $banco->is_bank_list = 1;
+        }
     	$banco->save();
 
     	return view('admin.banco.index',['bancos'=>Banco::all()]);
@@ -32,10 +36,14 @@ class BancoController extends Controller
     }
 
     public function update(Request $request,$id){
+                
         $banco = Banco::findOrFail($id);
         $banco->nombre = $request->get('nombre');
         $banco->nombre_corto = $request->get('nombre_corto');
         $banco->primeros_cuatro_digitos = $request->get('primeros_cuatro_digitos');
+        if($request->is_bank_list=="on"){
+            $banco->is_bank_list = 1;
+        }
         $banco->update();
 
         return redirect('/bancos');

@@ -1,4 +1,4 @@
-@extends('layouts.islr')
+@extends('layouts.app')
 @section('content')
 	<div class="container">
 		<h3>Valor de unidad Tributaria Anual <a href="{{route('ut.create')}}" class="btn btn-success float-right">Crear</a></h3>

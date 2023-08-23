@@ -19,7 +19,7 @@
 		</p>
 	<form action="{{route('calculoDeDeudasPorFacturas')}}" method="post">
 			@csrf
-		<div class="alert alert-info">	
+		<div class="pb-5">	
 		<table id="articulos" class="table table-bordered " data-page-length='25'>
     		<thead>
     			<tr>    				
@@ -134,16 +134,27 @@
     		@endif
     	</table>
     	</div>
-    	<label for="fecha_real_pago">Dia a Cancelar</label>
-    	<div class="row">
-    		<div class="col">
-    			<input type="date" class="form-control" name="fecha_real_pago" required>
-    		</div>
-    		<div class="col">
-    			<button type="submit" id="enviarFacturas" class="btn btn-primary" disabled>Enviar</button>
-    		</div>
-    	</div>
-    	
+		
+		<div class="footer fixed-bottom float-right pt-4">
+			
+				
+				<div class="row bg-gradient-light py-2 border-top">
+					<div class="col text-right">
+						<label for="fecha_real_pago">Dia a Cancelar</label>
+					</div>
+					<div class="col">
+						<input type="date" class="form-control" name="fecha_real_pago" required>
+					</div>
+					<div class="col">
+						<button type="submit" id="enviarFacturas" class="btn btn-primary" disabled>Enviar</button>
+					</div>
+				</div>
+			
+			
+		</div>
+
+			
+		
     	
     </form>
     

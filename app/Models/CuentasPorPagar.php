@@ -150,30 +150,35 @@ class CuentasPorPagar extends Model
     }
 
     
-    public function buscarCuentasPagadasPorBanco($empresa,$banco,$fechaini,$fechafin){
+    public function buscarCuentasPagadasPorBanco($empresa,$bancos,$fechaini,$fechafin){
+        $bancoTodosRegistrosCxp=array();
+        foreach($bancos as $banco){
+            $registrosCxp =array();
+            $todosRegistrosCxp=array();
+            //
+            $resultados=DB::select("SELECT cuentas_por_pagars.id,tipo_moneda,empresa_rif,bancos.nombre as banco_nombre,fecha_pago,proveedor_rif,proveedor_nombre,referencia_pago,concepto_descripcion,codigo_relacion_pago,creditos,factura_id FROM cuentas_por_pagars, bancos WHERE concepto='CAN' AND bancos.id =:bancoId1 AND banco_id=:bancoId2 AND empresa_rif=:empresaRif AND fecha_pago >=:fechaIni AND fecha_pago <=:fechaFin",[$banco,$banco,$empresa,$fechaini,$fechafin]);
+            /* $resultados=DB::select("SELECT cuentas_por_pagars.id,tipo_moneda,empresa_rif,bancos.nombre as banco_nombre,fecha_pago,proveedor_rif,proveedor_nombre,referencia_pago,concepto_descripcion,codigo_relacion_pago,creditos FROM cuentas_por_pagars, bancos WHERE cod_tipo_moneda=1 AND concepto='CAN' AND bancos.id =:bancoId1 AND banco_id=:bancoId2 AND empresa_rif=:empresaRif AND fecha_pago >=:fechaIni AND fecha_pago <=:fechaFin",[$banco,$banco,$empresa,$fechaini,$fechafin]); */
+            if(empty($resultados)){ continue; }
+            foreach ($resultados as $resultado) {
+                //buscamos las facturqas relacionadas al pago con el codiogo de relacion
+                $facturas = DB::select("select documento from facturas_por_pagars where id=:facturaId",[$resultado->factura_id]);
+                $registrosCxp['empresa_rif']=$resultado->empresa_rif;
+                $registrosCxp['banco_nombre']=$resultado->banco_nombre;
+                $registrosCxp['fecha_pago']=$resultado->fecha_pago;
+                $registrosCxp['proveedor_rif']=$resultado->proveedor_rif;
+                $registrosCxp['proveedor_nombre']=$resultado->proveedor_nombre;
+                $registrosCxp['referencia_pago']=$resultado->referencia_pago;
+                $registrosCxp['pago']=$resultado->creditos;
+                $registrosCxp['facturas']=$facturas;
+                $registrosCxp['concepto_descripcion']=$resultado->concepto_descripcion;
+                $registrosCxp['id']=$resultado->id;
+                $todosRegistrosCxp[]=$registrosCxp;
+            }
+            $bancoTodosRegistrosCxp[] = $todosRegistrosCxp;
+        }
        
-       $registrosCxp =array();
-       $todosRegistrosCxp=array();
-       $resultados=DB::select("SELECT cuentas_por_pagars.id,tipo_moneda,empresa_rif,bancos.nombre as banco_nombre,fecha_pago,proveedor_rif,proveedor_nombre,referencia_pago,concepto_descripcion,codigo_relacion_pago,creditos FROM cuentas_por_pagars, bancos WHERE concepto='CAN' AND bancos.id =:bancoId1 AND banco_id=:bancoId2 AND empresa_rif=:empresaRif AND fecha_pago >=:fechaIni AND fecha_pago <=:fechaFin",[$banco,$banco,$empresa,$fechaini,$fechafin]);
-       /* $resultados=DB::select("SELECT cuentas_por_pagars.id,tipo_moneda,empresa_rif,bancos.nombre as banco_nombre,fecha_pago,proveedor_rif,proveedor_nombre,referencia_pago,concepto_descripcion,codigo_relacion_pago,creditos FROM cuentas_por_pagars, bancos WHERE cod_tipo_moneda=1 AND concepto='CAN' AND bancos.id =:bancoId1 AND banco_id=:bancoId2 AND empresa_rif=:empresaRif AND fecha_pago >=:fechaIni AND fecha_pago <=:fechaFin",[$banco,$banco,$empresa,$fechaini,$fechafin]); */
-      
-       foreach ($resultados as $resultado) {
-        //buscamos las facturqas relacionadas al pago con el codiogo de relacion
-        $facturas = DB::select("select documento from facturas_por_pagars where codigo_relacion_pago=:codigoRelacionPago",[$resultado->codigo_relacion_pago]);
-        $registrosCxp['empresa_rif']=$resultado->empresa_rif;
-        $registrosCxp['banco_nombre']=$resultado->banco_nombre;
-        $registrosCxp['fecha_pago']=$resultado->fecha_pago;
-        $registrosCxp['proveedor_rif']=$resultado->proveedor_rif;
-        $registrosCxp['proveedor_nombre']=$resultado->proveedor_nombre;
-        $registrosCxp['referencia_pago']=$resultado->referencia_pago;
-        $registrosCxp['pago']=$resultado->creditos;
-        $registrosCxp['facturas']=$facturas;
-        $registrosCxp['concepto_descripcion']=$resultado->concepto_descripcion;
-        $registrosCxp['id']=$resultado->id;
-        $todosRegistrosCxp[]=$registrosCxp;
-       }
               
-        return $todosRegistrosCxp;
+        return $bancoTodosRegistrosCxp;
     }
 
     public function listarAsientosDeFacturas($codRelacion){

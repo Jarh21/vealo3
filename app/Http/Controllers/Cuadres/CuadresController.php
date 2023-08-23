@@ -38,7 +38,8 @@ class CuadresController extends Controller
         $conexionSQL = $this->herramientas->conexionDinamicaBD(session('basedata'));
         $reporteZetas = $conexionSQL->select("select * from reporte_zeta where fecha=:fecha",[$request->fecha]);
         $reportesCxc = $conexionSQL->select("SELECT equipo,fecha,codorigen,fiscalserial,fiscalz,SUM(debitos)debitos,SUM(creditos)creditos,SUM(exento)exento,SUM(gravado)gravado,SUM(montoiva)iva FROM cxc  WHERE fecha='2023-03-20' AND codorigen IN(1000,1001) GROUP BY fiscalz,fiscalserial,codorigen");
-        session(['fechaCuadre'=>$request->fecha]); 
-        return view('cuadres.registrarCuadre',compact('reporteZetas','reportesCxc'));
+        session(['fechaCuadre'=>$request->fecha]);
+        $fechaCuadre =  $request->fecha;
+        return view('cuadres.registrarCuadre',compact('reporteZetas','reportesCxc','fechaCuadre'));
     }
 }

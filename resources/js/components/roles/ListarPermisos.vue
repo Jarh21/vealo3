@@ -68,6 +68,9 @@
                 await axios.post('permisos/guardar-permisos',this.formPermiso);
                 this.cerrarModal();
                 this.allPermisos();
+                this.formPermiso={
+                    nuevoPermiso:'',
+                };
                 
             },
             async eliminarPermiso(id){

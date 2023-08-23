@@ -122,7 +122,7 @@ class HerramientasController extends Controller
 
 		//llenamos el arreglo con los datos de conexion	
 		if(empty($conexion)){
-			dd('Verifique en la tabla empresa si esta lleno el campo que pertenece al nombre d ela base de datos');
+			dd('Verifique en la tabla empresa si esta lleno el campo que pertenece al nombre d ela base de datos porque no hay conexion con la base de datos');
 		}
 		$configDb = [
 			'driver' => 'mysql',

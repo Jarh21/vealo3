@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <div class="container">
-        <h3>Editar Usuarios</h3>
+        <h3>Editar Usuarios <a href="{{route('admin.user.index')}}" class="btn btn-warning float-right"><i class="fas fa-chevron-left"></i>Regresar</a></h3>
             @if(session('info'))
             <div class="alert alert-info">
                 <strong>{{session('info')}}</strong>

@@ -2,7 +2,7 @@
 @section('content')
 <div class="container">
 	<h3>Retgistros para el XML 
-		<a href="{{route('islr.xml.listar')}}" class="btn btn-warning float-right">Regresar</a>
+		<a href="{{route('islr.xml.listar')}}" class="btn btn-warning float-right"><i class="fas fa-chevron-left"></i>Regresar</a>
 		
 	</h3>
 	<hr>

@@ -37,12 +37,27 @@ class ReportesCuentasPorPagarController extends Controller
     public function buscarReporteCuentasPagadas(Request $request){
 		//por banco
     	//este metodo filtra los pagos realizados segun empresa o banco o ambos y retorna a la vista reportecuentaspagadas.blade.php
-    	$empresa = explode('|',$request->get('empresa_rif'));
-    	$banco = $request->get('banco_id');    	
+    	$bancos = Banco::all();
+		$empresa = explode('|',$request->get('empresa_rif'));
+    	$banco = $request->get('banco_id'); 
+		//si se selecciona todos los bancos recorremos el arreglo de los bancos y comparamos aquellos que tienen tildado lista de bancos
+		//luego llenamos un nuevo arreglo donde se asignan los bancos que si estan en la lista.
+		foreach($banco as $valoBanco){
+			if($valoBanco =='0'){
+				$todosBanco=array();
+					foreach($bancos as $banco){
+						if($banco->is_bank_list==1){
+							$todosBanco[]=$banco->id;
+						}
+					}
+					
+				$banco = $todosBanco;	   
+			}	
+		}
+			
     	$fechaini = $request->fechaini;
     	$fechafin = $request->fechafin;
-    	$herramientas  = new HerramientasController();
-    	$bancos = Banco::all();    	
+    	$herramientas  = new HerramientasController();    	    	
     	$buscarPagos = new CuentasPorPagar();
     	$resultadoBusqueda =$buscarPagos->buscarCuentasPagadasPorBanco($empresa[0],$banco,$fechaini,$fechafin);
 		

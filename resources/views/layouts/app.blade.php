@@ -1,295 +1,514 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<?php 
+    
+    //use App\User;
+    use App\Http\Controllers\HerramientasController;
+?>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
+    <title>{{session('nombre_general_empresa')}}</title>    <!-- Scripts -->
 
 
+
+   
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <!-- <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet"> -->
-    <!-- <script src="{{ mix('/js/app.js') }}"></script> -->
-    <!-- Styles -->
+   <!--  <link rel="dns-prefetch" href="//fonts.gstatic.com"> -->
+
+
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('fontawesome-free-5.15.3/css/all.min.css')}}">
     <script defer src="{{ asset('fontawesome-free-5.15.3/js/all.min.js')}}"></script>
+    <!-- <link href="{{ asset('css/adminlte.min.css') }}" rel="stylesheet"> -->
+
+   
 </head>
-<body>
-    <div id="app" >
-        
-        <nav class="navbar navbar-expand-md fixed-top navbar-light shadow-sm bg-navbar d-print-none" >
-        <!-- <nav class="navbar navbar-expand-md navbar-light shadow-sm bg-navbar" > -->
-            <div class="container-fluid">
-                <a class="navbar-brand h5" href="{{ url('/home') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
+<body class="hold-transition sidebar-mini layout-fixed">
+
+    <div id="app">
+        <div class="wrapper">
+
+            <!-- Navbar -->
+            <nav class="main-header navbar fixed-top navbar-light">
+                <!-- Left navbar links -->
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars ml-2" aria-hidden="true"></i>Minimizar Menú</i></a>
+                    </li>
+                </ul>
+
+                
+
+                <!-- Right navbar links -->
+                <ul class="navbar-nav ml-auto">
+                                       
+                    <!-- Notifications Dropdown Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" data-toggle="dropdown" href="#">
+                            <i class="far fa-bell"></i>
+                            <span class="badge badge-warning navbar-badge">                               
+                                <?php //$cotizacion = HerramientasController::ultimoValorDolar(); ?>
+                                Cotizacion:{{--$cotizacion->fecha ?? ''--}} {{--$cotizacion->tasa_segunda_actualizacion ?? 0--}}
+                            </span>
+                        </a>
                         
-                        <li class="nav-item  ">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-chart-line text-danger mr-1"></i>ISLR
-                            </a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <img src="{{asset('imagen/bg-card1.png')}}" alt="" class="img-fluid">
-                                        <hr>
-                                        <h4 class="text-danger">Impuesto Sobre la Renta</h4>
-                                        <p>Gestion de calculo de impuesto sobre la renta, GRUPO FARMA DESCUENTO</p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Registro Retención</strong></h5><hr>
-                                        <p><i class="fa fa-file"></i><a href="{{ url('regisretenciones')}}" class="ml-2">Agregar Documento</a></p>
-                                        <p><i class="fas fa-file-excel text-success"></i><a href="{{route('islr.xml.listar')}}" class="ml-2">Generar XML</a></p>
-                                        <hr>
-                                        <p><i class="fas fa-user-tie"></i><a href="{{ url('proveedor')}}" class="ml-2">Proveedores</a></p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Recursos Humanos</strong></h5><hr>
-                                        <p><i class="fas fa-restroom"></i><a href="{{ url('rrhh')}}" class="ml-2">Empleados</a></p>
-                                        <p><i class="fas fa-user-shield"></i><a href="{{url('/declarantes')}}" class="ml-2">Directivos</a></p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Configuración</strong></h5><hr>
-                                        <p><i class="fas fa-chart-line"></i><a href="{{route('ut.index')}}" class="ml-2">Valor de Unidad Tributaria</a></p>
-                                        <p><i class="fas fa-percentage"></i><a href="{{url('/retencion')}}" class="ml-2"> Determinacion de la Retención</a></p>
-                                        <p><i class="fas fa-donate"></i><a href="{{url('/contribuyentes')}}" class="ml-2">Contribuyentes</a></p>
-                                    </div>
-                                </div>
+                    </li> 
+                </ul>
+            </nav>
+            <!-- /.navbar -->
 
-                            </div>
-                        </li>
-                        @can('cuentasporpagar.inicio')
-                        <li class="nav-item ">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-handshake text-primary mr-1"></i>Ceuntas por Pagar
-                            </a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <img src="{{asset('imagen/bg-card2.png')}}" alt="" class="img-fluid" style="width: 92px; height: 92px;">
-                                        <hr>
-                                        <h4 class="text-primary">Cuentas Por Pagar</h4>
-                                        <p>Registro y control de cuentas por pagar, GRUPO FARMA DESCUENTO</p>
-                                    </div>
-                                    @can('cuentasporpagar.inicio')
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Inicio</strong></h5><hr>
-                                        <p><i class="nav-icon fas fa-hand-holding-usd"></i><a href="{{ route('cuentasporpagar.inicio')}}" class="ml-2">Modo de Pago</a></p>
-                                        <p><i class="fa fa-address-book nav-icon"></i><a href="{{ url('proveedor')}}" class="ml-2">Proveedores</a></p>
-                                        <p><i class="fa fa-university nav-icon" ></i><a href="{{ url('bancos')}}" class="ml-2">Banco</a></p>
-                                                                                
-                                    </div>
-                                    @endcan
-                                    @can('cuentasporpagar.facturasPorPagar')
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Relación Facturas</strong></h5><hr>
-                                        @can('cuentasporpagar.facturasPorPagar')<p><i class="fas fa-file-download nav-icon text-primary"></i><a href="{{ route('cuentasporpagar.facturasPorPagar')}}" class="ml-2">Ingreso Facrturas</a></p>@endcan
-                                        @can('relacionPagoFacturasIndex')<p><i class="fab fa-buffer nav-icon text-darck"></i><a href="{{ route('relacionPagoFacturasIndex')}}" class="ml-2">Facturas a relacionar</a></p>@endcan
-                                        @can('listadoFacturasCalculadas')<p><i class="fa fa-calculator nav-icon text-warning"></i><a href="{{route('listadoFacturasCalculadas')}}" class="ml-2">Facturas Calculadas</a></p>@endcan
-                                    </div>
-                                    @endcan
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Reportes</strong></h5><hr>
-                                        @can('reportecuntaspagas')<p><i class="fas fa-handshake text-primary "></i><a href="{{route('reportecuntaspagas')}}" class="ml-2">Facturas Pagadas</a></p>@endcan
-                                        @can('reportePagoBolivares')<p><i class="fas fa-percentage"></i><a href="{{route('reportePagoBolivares')}}" class="ml-2"> Pagos Bs. de las Divisas</a></p>@endcan
-                                        @can('reporteRelacionPagosPorEmpresa')<p><i class="fas fa-store"></i><a href="{{route('reporteRelacionPagosPorEmpresa')}}" class="ml-2">Relacion Pagos Empresa</a></p>@endcan
-                                        @can('reportePagoPorProvedorTodasEmpresas')<p><i class="fas fa-user-tie"></i><a href="{{route('reportePagoPorProvedorTodasEmpresas')}}" class="ml-2">Relacion Pago Proveedores</a></p>@endcan
-                                    </div>
-                                </div>
+            <!-- Main Sidebar Container -->
+            <aside class="main-sidebar sidebar-dark-primary elevation-4">
+                <!-- Brand Logo -->
+                <a href="{{ url('/') }}" class="brand-link">
+                    <img src="imagen/1686243552-1665415989-AdminLTELogo.png" alt="" class="brand-image rounded-circle elevation-3"
+                        style="opacity: .8">
+                    <span class="brand-text font-weight-light h4">{{ config('app.name', 'Laravel') }}</span>
+                </a>
 
-                            </div>
-                        </li>
-                        @endcan
-                        @can('listar.operaciones.divisas')
-                        <li class="nav-item  ">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-money-bill-alt text-success mr-1"></i>Recepción de Divisas
-                            </a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <img src="{{asset('imagen/bg-card4.png')}}" alt="" class="img-fluid" style="width: 92px; height: 92px;">
-                                        <hr>
-                                        <h4 class="text-success">Recepción de Divisas</h4>
-                                        <p>Registro y control de divisas y pago movil, GRUPO FARMA DESCUENTO</p>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="row">
-                                            <div class="col">
-                                                <h5><strong class="sub-menu-heading">Inicio</strong></h5><hr>
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        
-                                                        <p><i class="fa fa-calculator nav-icon "></i><a href="{{route('listar.operaciones.divisas')}}" class="ml-2">Operacion en Divisas</a></p>
-                                                        <p><i class="fa fa-phone nav-icon "></i><a href="{{route('listar.pago.movil')}}"class="ml-2">Procesar PagoMovil</a></p>
-                                                        <p><i class="fa fa-chart-line nav-icon "></i><a href="{{url('/divisas/reporte')}}"class="ml-2">Reporte Administración</a></p>
-                                                                
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <p><i class="fa fa-chart-bar nav-icon "></i><a href="{{route('divisa.reporte.recaudo')}}"class="ml-2">Reporte Recaudo</a></p>
-                                                        <p><i class="fas fa-calculator nav-icon"></i><a href="{{route('porcentaje.puntosventas')}}" class="ml-2"><span class="Left badge badge-warning">Relación Puntos de Venta </span></a></p>                             
-                                                    </div>
-                                                    <div class="col-md-4">
-
-                                                    </div>
-                                                </div>                                                
-                                            </div>    
-                                        </div>    
-                                    </div>
-                                                                        
-                                </div>
-
-                            </div>
-                        </li>
-                        @endcan
-                        @can('informesAdicionales.index')
-                        <li class="nav-item ">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-print text-info"></i>Informes Adicionales
-                            </a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <img src="{{asset('imagen/bg-card5.jpg')}}" alt="" class="rounded-circle" style="width: 92px; height: 92px;">
-                                        <hr>
-                                        <h4 class="text-primary">Informes Adicionales</h4>
-                                        <p>Multiples Reportes de, GRUPO FARMA DESCUENTO</p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Herramientas</strong></h5><hr>
-                                        @can('habladores.index')<p><i class="fab fa-stack-exchange nav-icon mr-2"></i><a href="{{route('habladores.index')}}" class="">Habladores</a></p>@endcan                                        
-                                                                                
-                                    </div>                                    
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Reportes</strong></h5><hr>                                        
-                                        @can('comisionPorVentas')<p><i class="fas fa-cash-register nav-icon mr-2"></i><a href="{{route('comisionPorVentas')}}" class="">Comisión por ventas</a></p>@endcan
-                                        @can('comisionPorVentas')<p><i class="fas fa-percentage nav-icon mr-2"></i><a href="{{route('empleadosComisionEspecial')}}" class="">Definir Porcentajes para el calculo de comisión</a></p>@endcan
-                                    </div>
-                                    
-                                </div>
-
-                            </div>
-                        </li>
-                        @endcan
-                        @can('cuadres.index')
-                        <li class="nav-item ">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-cash-register text-warning mr-1"></i>Cuadres
-                            </a>
-                            <div class="dropdown-menu mega-menu">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                    <img src="{{asset('imagen/bg-card6.jpeg')}}" class="rounded-circle" style="width: 92px; height: 92px;">
-
-                                        <hr>
-                                        <h4 class="text-primary">Cuadres</h4>
-                                        <p>Multiples Reportes de, GRUPO FARMA DESCUENTO</p>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <h5><strong class="sub-menu-heading">Principal</strong></h5><hr>
-                                        @can('cuadres.index')<p><a class="dropdown-item" href="{{route('cuadres.index')}}">Inicio</a></p>@endcan
-
-                                        @can('cuadres.vistaRegistrarCuadre')<p><a class="dropdown-item" href="{{route('cuadres.vistaRegistrarCuadre')}}">Registro Cuadres</a></p>@endcan
-                                                                               
-                                                                               
-                                    </div>                                    
-                                    
-                                </div>
-
-                            </div>
-                        </li>
-                        @endcan                        
-                        @can('admin.general.datosEmpresa')
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-tools mr-1"></i>Administrador
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="{{route('admin.general.datosEmpresa')}}">General</a></li>
-                                @can('admin.user.index')<li><a class="dropdown-item" href="{{route('admin.user.index')}}">Usuarios</a></li>@endcan
-                                @can('admin.role.index')
-                                <li><a class="dropdown-item" href="#">Roles y Permisos &raquo;</a>
-                                    <ul class="dropdown-menu submenu">
-                                        <li><a href="{{route('admin.role.index')}}" class="dropdown-item">Roles</a></li>
-                                        <li><a href="{{route('admin.permiso.index')}}" class="dropdown-item">Permisos</a></li>
-                                    </ul>
-                                </li>
-                                @endcan
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{route('admin.empresas.index')}}">Empresas</a></li>
-                                <li><a class="dropdown-item" href="{{route('banco.index')}}">Entidades Bancarias</a></li>
-                                <li><a class="dropdown-item" href="{{ url('proveedor')}}">Proveedores</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{route('configuracionGeneral')}}">Configuración General</a></li>
-                                <li><a class="dropdown-item" href="{{route('indexConfiguracionCuentasPorPagar')}}">Configuracion Cuentas por pagar</a></li>
-                            </ul>
-                        </li>
-                        @endcan
-                    </ul>
-                    </div>   
-                    
-                    
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto left-right">
-                        <!-- Authentication Links -->
-                        @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Sidebar user panel (optional) -->
+                    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                        <div class="image">
+                            <img src="" class="img-circle elevation-2" alt="">
+                        </div>
+                        <div class="info">
+                            <a href="#" class="d-block">
+                                @guest
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Iniciar Sesión') }}</a>
+                                @else
+                                {{ Auth::user()->name }}
+                                <a class="" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                           document.getElementById('logout-form').submit();">
+                                    Cerrar Sesión
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    style="display: none;">
+                                    @csrf
+                                </form>
 
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
-                    
-                <!-- </div> -->
-            </div>
+                                @endguest
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Menu -->
+                    <nav class="mt-2">
+                        <div class="accordion" id="accordionExample">
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="{{ asset('/')}}" class="{{ Request::path() === '/' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}">
+                                        <i class="nav-icon fas fa-home"></i>
+                                        <p>Inicio</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'cuentasporpagar' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#cuentasporpagar">
+                                        <i class="fas fa-handshake {{ Request::segment(1) === 'cuentasporpagar' ? 'text-light' : 'text-primary' }} "></i>
+                                        Cuentas Por Pagar
+                                    </a>
+                                </li>
+                            </ul>
+                            
+                            <div id="cuentasporpagar" class=" {{ Request::segment(1) === 'cuentasporpagar' ? 'collapse show ' : 'collapse' }} ml-2" data-parent="#accordionExample">
+
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                                    
+                                    <li class="nav-item">
+                                        <a href="{{ route('cuentasporpagar.inicio')}}" class="{{ Request::path() === 'cuentasporpagar/inicio' ? 'nav-link active' : 'nav-link' }}">
+                                            <!-- <i class="nav-icon fas fa-home"></i> -->
+                                            <i class="nav-icon fas fa-hand-holding-usd"></i>
+                                            Modos de Pago
+                                        </a>
+                                    </li>
+                                    @can('cuentasporpagar.facturasPorPagar')
+                                    <li class="nav-item">
+                                        <a href="{{ route('cuentasporpagar.facturasPorPagar')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/facturasPorPagar' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fas fa-file-download nav-icon text-white "></i>
+                                            Ingreso Facrturas
+                                        </a>
+                                    </li>                 
+                                    
+                                    @endcan
+                                    
+                                    @can('relacionPagoFacturasIndex')
+                                    <li class="nav-item">
+                                        <a href="{{ route('relacionPagoFacturasIndex')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/relacion-pago-facturas' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fab fa-buffer nav-icon text-white"></i>
+                                            Facturas a relacionar
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('listadoFacturasCalculadas')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/facturas-calculadas' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fa fa-calculator nav-icon text-warning"></i>
+                                            Facturas Calculadas
+                                        </a>
+                                    </li>
+                                                                
+                                    @endcan
+                                    @can('reportecuntaspagas')                                 
+                                    
+                                    <li class="nav-item">
+                                        <a href="{{route('cuentasporpagar.facturasPagadas')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/facturasPagadas' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fa fa-print nav-icon"></i>
+                                            Facturas Pagadas
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('reportecuntaspagas')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/cuentaspagadas-reportepagos' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fa fa-print nav-icon"></i>
+                                            Reporte Pagos Bancos
+                                        </a>
+                                    </li> 
+                                    <li class="nav-item">
+                                        <a href="{{ route('reportePagoBolivares')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/ReporteBolivares' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fa fa-print nav-icon"></i>
+                                            Pagos Bs. de las Divisas
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('reporteRelacionPagosPorEmpresa')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/reporte-cuentasporpagar-reportePagosEmpresa' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fa fa-print nav-icon"></i>
+                                            Relacion Pagos Empresa
+                                        </a>
+                                    </li>                                   
+                                    <li class="nav-item">
+                                        <a href="{{ route('reportePagoPorProvedorTodasEmpresas')}}"
+                                            class="{{ Request::path() === 'cuentasporpagar/reporte-cuentasporpagar-proveedorTodasEmpresa' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fa fa-print nav-icon"></i>
+                                            Relacion Pago Proveedor
+                                        </a>
+                                    </li>
+                                </ul> <!-- ul del menu cuentas por pagar -->    
+                            </div>
+                            @endcan 
+                            </div><!-- fin div capa cuentas por pagar -->
+
+                            <!-- div capa cuadres -->
+                            @can('cuadres.index')
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'recaudo' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#cuadres">
+                                    <i class="fas fa-cash-register text-warning"></i>
+                                        <p>Cuadres</p>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div id="cuadres" class=" {{ Request::segment(1) === 'recaudo' ? 'collapse show' : 'collapse' }} ml-2" data-parent="#accordionExample">
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                                    
+                                    <li class="nav-item">
+                                        <a href="{{route('cuadres.index')}}" 
+                                        class="{{ Request::path() === 'recaudo/cuadres' ? 'nav-link active' : 'nav-link' }}"><i class="fab fa-stack-exchange nav-icon mr-2"></i>Inicio</a>
+                                    </li>
+                                    
+                                    @can('cuadres.vistaRegistrarCuadre')
+                                    <li class="nav-item">
+                                        <a href="{{route('cuadres.vistaRegistrarCuadre')}}" 
+                                        class="{{ Request::path() === 'recaudo/cuadres-nuevo-registro' ? 'nav-link active' : 'nav-link' }}"><i class="fab fa-stack-exchange nav-icon mr-2"></i>Registro Cuadres</a>
+                                    </li>
+                                    @endcan
+                                                                            
+                                </ul>
+                            </div>
+                            @endcan
+                            <!-- fin div capa cuadres -->
+
+                            <!--  capa islr -->
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'regisretenciones' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#islr">
+                                        <i class="fas fa-chart-line text-danger"></i>
+                                        <p>ISLR</p>
+                                    </a>
+                                </li>
+                            </ul>    
+                            <div id="islr" class=" {{ Request::segment(1) === 'regisretenciones' ? 'collapse show ' : 'collapse' }} ml-2" data-parent="#accordionExample">
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" >
+                                
+                                    @can('islr.index')
+                                    
+                                    <li class="nav-item">
+                                        <a href="{{ route('islr.index')}}"
+                                            class="{{ Request::path() === 'regisretenciones' ? 'nav-link active' : 'nav-link' }}">
+                                            
+                                            <i class="fa fa-file"></i>Agregar Documento
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('islr.xml.listar')}}"
+                                            class="{{ Request::path() === 'regisretenciones/xml-listar' ? 'nav-link active collapse show' : 'nav-link' }}">
+                                            <i class="fas fa-file-excel "></i>
+                                            Generar XML
+                                        </a>
+                                    </li>
+                                        
+                                    @endcan
+                                    
+                                    
+                                                                
+                                    @can('rrhh.index')
+                                    
+                                    <li class="nav-item">
+                                        <a href="{{ route('rrhh.index')}}"
+                                            class="{{ Request::path() === 'regisretenciones/rrhh' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fas fa-restroom"></i>
+                                            RRHH Empleados
+                                        </a>
+                                    </li>
+                                    @can('declarantes.index')
+                                    <li class="nav-item">
+                                        <a href="{{route('declarantes.index')}}"
+                                            class="{{ Request::path() === 'regisretenciones/declarantes' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fas fa-user-shield"></i>
+                                            RRHH Directivos
+                                        </a>
+                                    </li>
+                                    @endcan
+                                        
+                                    @endcan
+                                    
+                                    
+                                    @can('ut.index')
+                                    
+                                            
+                                    <li class="nav-item">
+                                        <a href="{{route('ut.index')}}"
+                                            class="{{ Request::path() === 'regisretenciones/ut' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fas fa-chart-line"></i>
+                                            Valor UT
+                                        </a>
+                                    </li>
+                                    
+                                    <li class="nav-item">
+                                        <a href="{{route('retencion.index')}}"
+                                            class="{{ Request::path() === 'regisretenciones/retencion' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fas fa-percentage"></i>
+                                            % Retencion
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('contribuyente.index')}}"
+                                            class="{{ Request::path() === 'regisretenciones/contribuyentes' ? 'nav-link active' : 'nav-link' }}">
+                                            <i class="fas fa-donate"></i>
+                                            Contribuyentes
+                                        </a>
+                                    </li>
+                                            
+                                        
+                                    @endcan
+                                </ul>
+                            </div> <!-- fin capa islr -->
+                            <!-- capa recepcion de divisas -->
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'divisas' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#recepcion_divisas">
+                                    <i class="fas fa-money-bill text-success"></i>
+                                        <p>Recepción de Divisas</p>
+                                    </a>
+                                </li>
+                            </ul>    
+                            <div id="recepcion_divisas" class=" {{ Request::segment(1) === 'divisas' ? 'collapse show ' : 'collapse' }} ml-2" data-parent="#accordionExample">
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                                    <li class="nav-item">
+                                        <a href="{{route('listar.operaciones.divisas')}}" 
+                                        class="{{ Request::path() === 'divisas' ? 'nav-link active' : 'nav-link' }}"><i class="fa fa-calculator nav-icon "></i>Operacion en Divisas</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('listar.pago.movil')}}"
+                                        class="{{ Request::path() === 'divisas/listar-pagos' ? 'nav-link active' : 'nav-link' }}"><i class="fa fa-phone nav-icon "></i>Procesar PagoMovil</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('divisas.reporte.general')}}"
+                                        class="{{ Request::path() === 'divisas/reporte' ? 'nav-link active' : 'nav-link' }}"><i class="fa fa-chart-line nav-icon "></i>Reporte Administración</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('divisa.reporte.recaudo')}}"
+                                        class="{{ Request::path() === 'divisas/reporte-recaudo' ? 'nav-link active' : 'nav-link' }}"><i class="fa fa-chart-bar nav-icon "></i>Reporte Recaudo</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('porcentaje.puntosventas')}}" 
+                                        class="{{ Request::path() === 'divisas/relacion-puntosdeventa' ? 'nav-link active' : 'nav-link' }}"><span class="Left badge badge-warning"><i class="fas fa-calculator nav-icon"></i>Relación Puntos de Venta </span></a>
+                                    </li>    
+                                </ul>
+                            </div> <!-- fin de capa recepcion de divisas  -->
+                            <!-- capa Asistente de compra  -->
+                            @can('asistentecompra.visualizadorPrecios')
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'asistentecompra' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#asistente_compra">
+                                    <i class="fas fa-cart-plus"></i>
+                                        <p>Asistente de Compra</p>
+                                    </a>
+                                </li>
+                            </ul>    
+                            <div id="asistente_compra" class=" {{ Request::segment(1) === 'asistentecompra' ? 'collapse show' : 'collapse' }} ml-2" data-parent="#accordionExample">
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                                    
+                                    <li class="nav-item">
+                                        <a href="{{route('asistentecompra.visualizadorPrecios')}}"
+                                        class="{{ Request::path() === 'asistentecompra/inicio' ? 'nav-link active' : 'nav-link' }}"><i class="fab fa-shopify nav-icon mr-2"></i>Productos a Comprar</a>
+                                    </li>
+                                    
+                                                                            
+                                </ul>
+                            </div> 
+                            @endcan
+                            <!-- fin de capa Asistente de compras  -->
+                            <!-- capa Informes adicionales -->
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'informes' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#informes_adicionales">
+                                    <i class="fas fa-print text-info"></i>
+                                        <p>Informes Adicionales</p>
+                                    </a>
+                                </li>
+                            </ul>    
+                            <div id="informes_adicionales" class=" {{ Request::segment(1) === 'informes' ? 'collapse show ' : 'collapse' }} ml-2" data-parent="#accordionExample">
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                                    @can('habladores.index')
+                                    <li class="nav-item">
+                                        <a href="{{route('habladores.index')}}" 
+                                        class="{{ Request::path() === 'informes/habladores' ? 'nav-link active' : 'nav-link' }}"><i class="fab fa-stack-exchange nav-icon mr-2"></i>Habladores</a>
+                                    </li>
+                                    @endcan
+                                    @can('comisionPorVentas')
+                                    <li class="nav-item">
+                                        <a href="{{route('comisionPorVentas')}}"
+                                        class="{{ Request::path() === 'informes/comision-ventas' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-cash-register nav-icon mr-2"></i>Comisión por ventas</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('empleadosComisionEspecial')}}"
+                                        class="{{ Request::path() === 'informes/vendedores-comision' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-percentage nav-icon mr-2"></i>Definir Porcentajes para el calculo de comisión</a>
+                                    </li>
+                                    @endcan                                        
+                                </ul>
+                            </div> <!-- fin de capa Informes Adicionales  -->
+
+                            <ul class="nav  nav-sidebar flex-column">
+                                @can('proveedor.index')
+                                <li class="nav-item">
+                                    <a href="{{ url('proveedor')}}" class="{{ Request::path() === 'proveedor' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}">
+                                        <i class="fa fa-address-book "></i>
+                                        <p>Proveedores </p> 
+                                    </a>
+                                </li>
+                                @endcan
+                            </ul>
+                            <ul class="nav  nav-sidebar flex-column">
+                                @can('bancos.index')
+                                    <li class="nav-item">
+                                        <a href="{{ url('bancos')}}" class="{{ Request::path() === 'bancos' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}">
+                                            <i class="fa fa-university " ></i>
+
+                                            <p>Bancos </p> 
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>    
+                            <!-- capa configuracion -->
+                            @can('admin.general.datosEmpresa')
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'admin' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#configuracion">
+                                    <i class="fas fa-tools mr-1"></i>
+                                        <p>Configuracion</p>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div id="configuracion" class=" {{ Request::segment(1) === 'admin' ? 'collapse show' : 'collapse' }} ml-2" data-parent="#accordionExample">
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                                    
+                                    <li class="nav-item"><a class="{{ Request::path() === 'admin' ? 'nav-link active' : 'nav-link' }}" href="{{route('configuracionGeneral')}}">Configuración General</a></li>
+                                    
+                                    @can('admin.user.index')
+                                    <li class="nav-item">
+                                        <a class="{{ Request::path() === 'admin/user' ? 'nav-link active' : 'nav-link' }}" href="{{route('admin.user.index')}}">Usuarios</a>
+                                    </li>
+                                    @endcan
+                                    @can('admin.role.index')                                
+                                    <li class="nav-item"><a href="{{route('admin.role.index')}}" class="{{ Request::path() === 'admin/roles' ? 'nav-link active' : 'nav-link' }}">Roles</a></li>
+                                    <li class="nav-item"><a href="{{route('admin.permiso.index')}}" class="{{ Request::path() === 'admin/permisos' ? 'nav-link active' : 'nav-link' }}">Permisos</a></li>                                
+                                    @endcan
+                                    <li ><hr class="dropdown-divider"></li>
+                                    <li class="nav-item"><a class="{{ Request::path() === 'admin/empresas' ? 'nav-link active' : 'nav-link' }}" href="{{route('admin.empresas.index')}}">Empresas</a></li>
+                                    <li class="nav-item"><a class="{{ Request::path() === 'bancos' ? 'nav-link active' : 'nav-link' }}" href="{{route('banco.index')}}">Entidades Bancarias</a></li>
+                                    <li class="nav-item"><a class="{{ Request::path() === 'proveedor' ? 'nav-link active' : 'nav-link' }}" href="{{ url('proveedor')}}">Proveedores</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    
+                                    <li  class="nav-item"><a class="{{ Request::path() === 'admin/configuracion/cuentasPorPagar' ? 'nav-link active' : 'nav-link' }}" href="{{route('indexConfiguracionCuentasPorPagar')}}">Configuracion Cuentas <br> por pagar</a></li>
+                                </ul>
+                            </div> <!-- fin capa configuracion  -->
+                            @endcan 
+                        </div> <!-- el acordion general -->
+
+                    </nav>
+                    <!-- /.sidebar-menu -->
+                </div><!-- /.sidebar -->
+                
+            </aside>
+
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper bg-white">
+                <!-- Content Header (Page header) -->
+                <div class="content-header">
+                    <p>Cabecera que no se donde esta</p>
+                </div>
+                <!-- /.content-header -->
+
+                <!-- Main content -->
+                <section class="content bg-white">
+                    @yield('content')
+                   
+                </section>
+                <!-- /.content -->
+                
+            </div>           
+
+            <!-- Control Sidebar -->
+            <aside class="control-sidebar control-sidebar-dark">
+                <!-- Control sidebar content goes here -->
+                <p>Esta seccion donde se encuentra</p>
+                <!-- /.content-wrapper -->
             
-        </nav>
-        <div class="py-5"></div>
-        <main >
-            @yield('content')
-        </main>
+            </aside>
+            <!-- /.control-sidebar -->
+            
+            
+
+            <!-- Control Sidebar -->
+            <aside class="control-sidebar control-sidebar-dark">
+                <!-- Control sidebar content goes here -->
+
+            </aside>
+            <!-- /.control-sidebar -->
+        </div>
     </div>
-        <!-- Scripts -->
+
+    <!-- <div class=" text-center border-top">
+        <footer class="d-print-none" style="position: absolute;"> -->
+                <!-- NO QUITAR -->
+                <!-- <strong>Elaborado por: Jose Rivero & Eric Leon | jarh18@gmail.com</strong>
+        </footer>
+    </div -->>
+
         
-        <script src="{{ asset('js/app.js')}}"></script>
-        @yield('js')
+    <script src="{{ asset('js/app.js')}}"></script>
+<!--     <script src="{{ asset('js/adminlte.js')}}"></script> -->
+    @yield('js')
 </body>
 </html>

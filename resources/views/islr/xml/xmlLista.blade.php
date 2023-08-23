@@ -27,14 +27,14 @@
 							@if($valorxml->activo==1)
 								<a href="{{route('islr.xml.ver',[$valorxml->periodo_fiscal,$valorxml->rif_empresa,$valorxml->id,$valorxml->fechas_periodo_fiscal])}}" class="btn btn-primary btn-sm">Ver
 								</a>
-								@can('acceso','xml.delete')
+								@can('xml.delete')
 								<!-- Button trigger modal -->
 								<button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#exampleModal{{$valorxml->id}}">
 						  		Eliminar
 								</button>
 								@endcan
 							@else
-								@can('acceso','xml.update')
+								@can('xml.update')
 								<a href="{{route('islr.xml.ver',[$valorxml->periodo_fiscal,$valorxml->rif_empresa,$valorxml->id,$valorxml->fechas_periodo_fiscal])}}" class="btn btn-primary btn-sm">Ver
 								</a>
 								@endcan
@@ -88,7 +88,7 @@
 		    select: true,
 		    paging: true,
 		    searching: true,
-    		ordering:  true
+    		ordering:  false
 			});			
     	
 

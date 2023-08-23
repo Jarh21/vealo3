@@ -135,7 +135,7 @@ import axios from 'axios';
                 
             }, 
             async listadeBnacos(){
-                const res = await axios.get("banco-lista-bancos");
+                const res = await axios.get("http://localhost/vealo3/public/banco-lista-bancos");
                 this.listaBancos = res.data;
                 
             },

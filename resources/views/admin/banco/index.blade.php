@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 	
-	<div class="container">
+<div class="container">
 		<h3>Bancos<a href=""></a></h3>
 		<hr>
 		<h5>Registro de Nuevo Banco</h5>
@@ -11,15 +11,16 @@
 				<div class="col">
 				<input type="text" class="form-control" name="nombre" placeholder="Nombre del Banco" required></div>
 				
-				<div class="col">
+				<div class="col-2">
 					<input type="text" class="form-control" name="nombreCorto" placeholder="Abreviaturas Ej. BNC" required>
 				</div>
 				<div class="col">
-					<input type="text" class="form-control" name="primeros_cuatro_digitos" placeholder="Los primero numero de la cuenta Ej. 0102">
-				</div>
-				<div class="col">
+					<label for="lista_bancos">Agregar a la lista de todos los bancos</label><input type="checkbox" id="lista_bancos" class="mx-2" name="is_bank_list">
 					<button class="btn btn-success " type="submit">Guardar</button>
 				</div>
+				
+					
+				
 				
 			</div>
 		</form><hr>
@@ -30,7 +31,7 @@
 					<th>Id</th>
 					<th>NOMBRE BANCO</th>
 					<th>ABREVIATURA</th>
-					<th>CUATRO PRIMERO NUMEROS</th>
+					<th>LISTADO DE BANCOS</th>
 					<th>Acción</th>
 				</tr>
 			</thead>
@@ -40,16 +41,16 @@
 						<tr>
 							<td>{{$banco->id}}</td>
 							<td>{{$banco->nombre}}</td>
-							<td>{{$banco->nombre_corto}}</td>							
-							<td>{{$banco->primeros_cuatro_digitos}}</td>
+							<td>{{$banco->nombre_corto}}</td>
+							<td>{{$banco->is_bank_list===1 ? 'Todos los Bancos':''}}</td>
 							<td>
 								<a href="{{route('banco.edit',$banco->id)}}" class="btn btn-secondary">Editar</a>
-								<button type="button" class="btn btn-danger " data-bs-toggle="modal" data-bs-target="#exampleModal{{$banco->id}}">
-						 		Eliminar
+								<button type="button" class="btn btn-danger " data-toggle="modal" data-target="#exampleModal{{$banco->id}}">
+						 		<i class="fa fa-trash" aria-hidden="true"></i>
 								</button>
 
 								<!-- Modal -->
-								<div class="modal fade" id="exampleModal{{$banco->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+								<div class="modal fade" id="exampleModal{{$banco->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 								  <div class="modal-dialog">
 								    <div class="modal-content">
 								      <div class="modal-header">

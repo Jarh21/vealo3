@@ -1,4 +1,4 @@
-@extends('layouts.islr')
+@extends('layouts.app')
 @section('content')
 	<div class="container">
 		<h3>Registrar de unidad Tributaria Anual</h3>
@@ -15,11 +15,11 @@
 						
 					  <div class="form-group">
 					    <label for="anio">Año</label>
-					    <input type="date" class="form-control" name="anio"  value="">				    
+					    <input type="date" class="form-control" name="anio" required value="">				    
 					  </div>
 					  <div class="form-group">
 					    <label for="monto">Monto</label>
-					    <input type="text" class="form-control" name="monto"  value="">
+					    <input type="text" class="form-control" name="monto" required value="">
 					  </div>  
 					  <div class="form-group">
 					    <label for="observacion">Observación</label>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-	<h3>Editar Proveedores {{$proveedor->nombre}} <a href="{{url('/proveedor')}}"><button type="button" class="btn btn-success float-right">Regresar</button></a></h3><hr>
+	<h3>Editar Proveedores {{$proveedor->nombre}} <a href="{{url('/proveedor')}}"><button type="button" class="btn btn-warning float-right"><i class="fas fa-chevron-left"></i>Regresar</button></a></h3><hr>
 	@if ($errors->any())
     <div class="alert alert-danger">
         <ul>

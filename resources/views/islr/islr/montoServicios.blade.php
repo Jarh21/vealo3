@@ -3,7 +3,7 @@
 <head>
 	<title></title>
 	<!-- Styles -->
-    <link href="{{ asset('css/bootstrap4.5.2.css') }}" rel="stylesheet">    
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">   
     <link rel="stylesheet" href="{{ asset('fontawesome-free-5.15.3/css/all.min.css')}}">
     <script defer src="{{ asset('fontawesome-free-5.15.3/js/all.min.js')}}"></script>
     <!--<script src="{{asset('js/jquery-3.5.1.min.js')}}"></script>-->

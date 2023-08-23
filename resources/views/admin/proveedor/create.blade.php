@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="container">
-	<h3>Registro de Proveedores</h3>
+	<h3>Registro de Proveedores <a href="{{route('proveedor.index')}}" class="btn btn-warning float-right"><i class="fas fa-chevron-left"></i>Regresar</a></h3>
 	@if ($errors->any())
     <div class="alert alert-danger">
         <ul>

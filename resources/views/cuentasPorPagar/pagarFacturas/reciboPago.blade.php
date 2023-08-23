@@ -46,13 +46,13 @@
 								if($cxp->monto_bolivares > 0.00){
 									
 								
-									$monto = number_format($cxp->monto_bolivares/$cxp->tasa,2);
+									$monto = $cxp->monto_bolivares/$cxp->tasa;
 								}else{
-									$monto = number_format($cxp->creditos,2);
+									$monto = $cxp->creditos;
 								}							
 							?>
 							<?php //$divisaCambio = $cxp->monto_bolivares/$cxp->tasa; ?>
-							{{$cxp->monto_bolivares}} Bs. tasa({{$cxp->tasa }}) = {{$monto.'$'}}
+							{{number_format($cxp->monto_bolivares,2)}} Bs. tasa({{$cxp->tasa }}) = {{number_format($monto,2).'$'}}
 							
 						@endif
 					</td> 
@@ -68,8 +68,8 @@
 
 			@endforeach
 			<tr>
-				<td colspan="1"><b>Totla $</b></td>
-				<td><b>{{$suma.'$'}}</b></td>
+				<td colspan="1"><b>Totla </b></td>
+				<td><b>{{number_format($suma,2)}}</b></td>
 			</tr>
 		</table>
 		<br><br>

@@ -31,8 +31,8 @@
             <label for="fechafin">Hasta</label> 
             <input type="date" class="form-control " name="fechafin" id="fechafin" value="{{$fechafin ?? ''}}" required>
             <label for="">Mostar Los Datos</label>
-            <input type="radio" name="tipo_resultado" id="" checked value="lista" @if(isset($tipoResultado)) @if($tipoResultado=='lista') checked @endif @endif>Lista
-            <input type="radio" name="tipo_resultado" value="tabla" @if(isset($tipoResultado)) @if($tipoResultado=='tabla') checked @endif @endif>Tabla      
+            <input type="radio" name="tipo_resultado" id=""  value="lista" @if(isset($tipoResultado)) @if($tipoResultado=='lista') checked @endif @endif>Lista
+            <input type="radio" name="tipo_resultado" checked value="tabla" @if(isset($tipoResultado)) @if($tipoResultado=='tabla') checked @endif @endif>Tabla      
         </div>
             
         <div class="col">

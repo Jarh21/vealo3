@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <div>
-           <h3>Editar el Rol {{$datosRole['role']->name}} <a href="{{route('admin.role.index')}}" class="btn btn-close btn-sm float-end"></a></h3> 
+           <h3>Editar el Rol {{$datosRole['role']->name}} <a href="{{route('admin.role.index')}}" class="btn btn-warning float-right"><i class="fas fa-chevron-left"></i>Regresar</a></h3> 
         </div>
         @if(session('infoRol'))
             <div class="alert alert-success">

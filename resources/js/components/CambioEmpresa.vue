@@ -51,17 +51,17 @@
         methods:{
 
           async obtenerEmpresaSeleccionada(){
-            const respuesta = await axios.get('http://localhost/my-app/public/obtener-empresa-seleccionada');
+            const respuesta = await axios.get('http://localhost/vealo3/public/recaudo/obtener-empresa-seleccionada');
             this.empresaSeleccionada = respuesta.data;
           },
           
           async listarEmpresas(){
-            const respuesta = await axios.get('admin/empresa/listar/api');
+            const respuesta = await axios.get('http://localhost/vealo3/public/admin/empresa/listar/api');
             this.listaEmpresas = respuesta.data;
           },
 
           async cambioDeEmpresa(rif){
-            await axios.get('admin/empresa/cambair-empresa/'+rif);
+            await axios.get('http://localhost/vealo3/public/admin/empresa/cambair-empresa/'+rif);
             
              this.obtenerEmpresaSeleccionada(); 
              this.cerrarModal();

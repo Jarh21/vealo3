@@ -1,4 +1,4 @@
-@extends('layouts.islr')
+@extends('layouts.app')
 @section('content')
 	<div class="container">
 		<h3>Determinacion de la Retención<a href="{{route('retencion.create')}}"><button class="btn btn-success float-right">Agregar Determinacion de Retenciones</button></a></h3>

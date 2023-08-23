@@ -1,32 +1,31 @@
 <template>
     <div>
-        <div class="container">
+        
             
             <!-- The Modal -->
-            <div class="modal" :class="{mostrar:modal}">
-                <div class="modal-dialog">
+            <div class="modal " tabindex="-1" :class="{mostrar:modal}">
+                <div class="modal-dialog modal-lg ">
                     <div class="modal-content">
 
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                        <h4 class="modal-title">{{tituloModal}}</h4>
-                        <button type="button" class="btn-close" @click="cerrarModal()"></button>
-                    </div>
-                    <form >
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">{{tituloModal}}</h4>
+                            <button type="button" @click="cerrarModal()"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                        <form >
                         <!-- Modal body -->
-                        <div class="modal-body">
+                        <div class="modal-body ">
                         
-                                <input v-model="formularioRolesPermisos.rol" type="text" class="form-control" placeholder="Nombre del Rol2" >
-                                
-                                <div v-for="(permiso, index) in permisos" :key="index">
-                                    
-                                        <input type="checkbox"  v-model="formularioRolesPermisos.selectPermisos" v-bind:value="permiso.name">                         
-                                    
-                                    <label for="">{{ permiso.name }}</label>
-                                </div>                                     
-                                
-                                
-                            
+                                <input v-model="formularioRolesPermisos.rol" type="text" class="form-control" placeholder="Escriba el nombre del Rol" >
+                                <div class="d-flex flex-wrap">
+                                    <div class="p-2 bd-highlight" v-for="(permiso, index) in permisos" :key="index">
+                                        
+                                            <input type="checkbox"  v-model="formularioRolesPermisos.selectPermisos" v-bind:value="permiso.name">                         
+                                        
+                                        <label for="">{{ permiso.name }}</label>
+                                    </div>                                     
+                                </div>
+                                                           
                         </div>
 
                         <!-- Modal footer -->
@@ -34,14 +33,14 @@
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="cerrarModal">Close</button>
                             <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" @click="crear">Guardar</button>
                         </div>
-                    </form>
+                        </form>
                     </div>
                 </div>
             </div> <!-- fin modal -->
-        </div>
         
-        <div class="container">
-            <h3>Roles de Usuarios </h3><a href="#" class="mx-3" @click="modificar=false; abrirModal();"> + Nuevo</a>
+        
+        <div class="container-fluid">
+            <h3>Roles de Usuarios </h3><a href="#" class="mx-3" @click="modificar=false; abrirModal();"> + Agregar Nuevo Rol</a>
             <div class="card">
                 <div class="card-body">
                     <table class="table table-striped">

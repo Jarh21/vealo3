@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <h3>Listado de usuarios</h3>
-        <div> <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a></div>
+        <div> <a href="{{ route('admin.user.register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">+ Registrar Nuevo Usuario</a></div>
         <div class="card">
             <div class="card-body">
                 <table class="table">

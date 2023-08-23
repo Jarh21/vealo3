@@ -568,8 +568,10 @@ class islrController extends Controller
 		$empresas = Empresa::all();
 		$ultimoPorcentajeProveedor=0;
 		//buscamos los datos de retencion
-		$datosRetencion = self::buscar($id);
+		$datosRetencion = self::buscar($id); 
+		
 		$ultimoPorcentajeProveedor = Islr::ultimoPorcentajeDelProveedor($datosRetencion[0]->proveedor_rif,$datosRetencion[0]->empresa_rif);
+		
 		//Buscar si el proveedor es Natural o Juridico ya que
 		// el natural se le aplica el sustrendo
 		$obj_proveedor = new ProveedorController();
