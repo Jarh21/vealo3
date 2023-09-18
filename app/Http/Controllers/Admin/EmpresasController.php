@@ -9,6 +9,9 @@ use App\Models\Empresa;
 
 class EmpresasController extends Controller
 {
+	public function __construct(){
+		$this->middleware('auth');
+	}
     public function index(){
 		
 
@@ -21,6 +24,14 @@ class EmpresasController extends Controller
         $herramientas  = new HerramientasController();
         $empresa = $herramientas->listarEmpresas();
 		return view('admin.empresas.seleccion',['empresas'=>$empresa]);
+	}
+
+	public function listarEmpresasApi(){
+			
+		$herramientas  = new HerramientasController();
+		/* $valor = json_decode($herramientas->listarEmpresas(session('usuarioId')),true);
+		dd($valor[2]['rif']); */
+        return $herramientas->listarEmpresas(session('usuarioId'));
 	}
 
 

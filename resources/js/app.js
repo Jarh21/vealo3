@@ -31,7 +31,7 @@ Vue.component('cuadre-cierre-de-lotes',require('./components/cuadres/CuadresRegi
 Vue.component('cuadre-registrar-transferencias',require('./components/cuadres/CuadresTransferencia.vue').default);
 Vue.component('cuadre-prestamos-efectivo',require('./components/cuadres/CuadresPrestamosEfectivo.vue').default);
 Vue.component('visualizador-precios',require('./components/asistenteCompras/AsistenteVisualizadorPrecios.vue').default);
-Vue.component('asistentecomprasRegistroPorFarmamacia',require('./components/asistenteCompras/RegistroPorFarmacia.vue').defaul);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

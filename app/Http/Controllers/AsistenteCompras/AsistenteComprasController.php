@@ -5,6 +5,9 @@ namespace App\Http\Controllers\AsistenteCompras;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Herramientas\HerramientasController;
+use App\Models\AsistenteCompraDetalle;
+use App\Http\Controllers\Admin\EmpresasController;
+use Illuminate\Support\Facades\DB;
 class AsistenteComprasController extends Controller
 {
     private $empresas = '';
@@ -14,8 +17,10 @@ class AsistenteComprasController extends Controller
         /*
         buscamos las empresas registradas y sus datos para la vista
         */
+        $this->middleware('auth');
         $this->herramientas = new HerramientasController();
-        $this->empresas= $this->herramientas->listarEmpresas();
+        
+       
     }
 
     public function index(){
@@ -34,10 +39,35 @@ class AsistenteComprasController extends Controller
         return $preciosDroguerias;
     }
 
+    public function apiListarRegistrosAsistenteCompra($visualizadorId){
+        $datos = DB::select("SELECT a.cantidad, e.nom_corto FROM asistente_compras_detalles a,empresas e WHERE a.empresa_rif COLLATE utf8mb4_unicode_ci = e.rif AND a.visualiador_precio_drogueria_id=:keycodigo",["keycodigo"=>$visualizadorId]);
+       // $datos = DB::select("SELECT a.cantidad FROM asistente_compras_detalles a WHERE a.visualiador_precio_drogueria_id=:keycodigo",["keycodigo"=>$visualizadorId]);
+        return $datos;
+    }
 
     public function guardarPedidoDetallado(Request $request){
-        $empresas = $request->empresaRif;
+        $objEmpresas = new EmpresasController();
+        $empresas = $objEmpresas->listarEmpresasApi();
+        $empresas = json_decode($empresas,true);
+        $contador = 0;
+
+        foreach($request->cantidad as $valor ){
+            if(empty($valor)){
+                $contador ++;
+            }else{
+                $compras = new AsistenteCompraDetalle();
+                $compras->producto = $request->producto;
+                $compras->empresa_rif =$empresas[$contador]['rif'];
+                $compras->cantidad = $valor;
+                $compras->drogueria = $request->drogueria;
+                $compras->costo = $request->costo;
+                $compras->visualiador_precio_drogueria_id = $request->visualizadorPrecioId;
+                $compras->save();
+                $contador ++;
+            }
+            
+        }
         
-        return $request;
+        
     }
 }

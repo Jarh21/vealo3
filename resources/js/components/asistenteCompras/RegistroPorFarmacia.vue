@@ -1,18 +1,18 @@
 <template>
     <div>
         <!-- Modal -->
-        <div class="modal fade" :id="datosProducto.keycodigo" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade" id="agregarPedido" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="staticBackdropLabel">{{ datosProducto.descripcion }}</h5>
+                        <h5 class="modal-title" id="staticBackdropLabel">{{ datosPedidos.producto }}</h5>
                         <button type="button" class="close" @click="cerrarModal()">
                         <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
                         <form >
-                            <input type="text" :value="datosProducto.descripcion">
+                         
                             <span v-for="(empresa,index) in listaEmpresas" :key="index">
                                 {{ empresa.nom_corto }}<input type="text" v-model="datosPedidos.empresasRif[index]" style="width: 40px;">
                             </span>
@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div><!--  fin del modal -->
-        <a  class="btn btn-primary btn-sm" @click="abrirModal()">Pedir {{ datosProducto.descripcion }}</a>
+        <a  class="btn btn-primary btn-sm" @click="abrirModal()">Pedir </a>
     </div>
 </template>
 <script>
@@ -37,7 +37,7 @@ import { ref } from 'vue';
     export default{
         mounted(){
 
-            this.listarEmpresas();
+            
             
         },
         props:{
@@ -73,17 +73,19 @@ import { ref } from 'vue';
                 
                 this.datosPedidos.empresasRif=[];
                 this.datosPedidos.producto='';
-               /*  this.listarEmpresas(); */
-                this.datosPedidos.producto = this.datosProducto.descripcion
+                /* this.listarEmpresas(); */
+                this.datosPedidos.producto = 'valor'/* this.datosProducto.descripcion */
                 console.log(this.datosPedidos.producto);
                 /* this.datosPedidos = {producto:datos.descripcion} */
-                /* $('#agregarPedido').modal('show') */
-                $('#'+this.datosProducto.keycodigo).modal('show')
+                $('#agregarPedido').modal('show')
+                /* $('#'+this.datosProducto.keycodigo).modal('show') */
                 //datosProducto.keycodigo.modal()
             },
             cerrarModal(){
                 this.datosPedidos.empresasRif=[];
-                $('#'+this.datosProducto.keycodigo).modal('hide')
+                this.listaEmpresas=[];
+                /* $('#'+this.datosProducto.keycodigo).modal('hide') */
+                $('#agregarPedido').modal('hide')
             }
         }
     }

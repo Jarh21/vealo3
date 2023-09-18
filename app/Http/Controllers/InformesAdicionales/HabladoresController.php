@@ -11,6 +11,7 @@ class HabladoresController extends Controller
 {
     private $herramientas='';
     function __construct(){
+        
         $this->herramientas = new HerramientasController();
     }
         /* $herramientas = new HerramientasController();

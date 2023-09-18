@@ -5,11 +5,21 @@ namespace App\Http\Controllers\Herramientas;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Parametro;
+use App\Models\User;
+use App\Models\Empresa;
 
 class HerramientasController extends Controller
 {
+	public function __construct(){
+        /*
+        buscamos las empresas registradas y sus datos para la vista
+        */
+        
+	}	
+	
     public static function convertirMonto($valor){
     	//este metodo cambia los montos 1.000.000,00 en validos para mysql 1000000.00
     	$decimal = str_replace(',', '.', str_replace('.', '', $valor));
@@ -24,8 +34,23 @@ class HerramientasController extends Controller
 		return	$nControl=str_pad(($valor), 8, "0", STR_PAD_LEFT);
 	}
 
-	public function listarEmpresas(){
-		$empresas = DB::connection('mysql')->select('select * from empresas');
+	public function listarEmpresas($usuarioId=0){
+		///si se pasa como parametro el id del uisuario, se busca cuales son las empresas  a las cuales tiene acceso y esas son las que le va a mostrar
+		////si no se pasa el usuario id se pasan todas las empresas
+ 		$rifs=array();
+		if($usuarioId > 0 ){
+			$permisoEmpresas = DB::connection('mysql')->select('select * from usuarios_acceso_empresas where user_id =:userId',['userId'=>session('usuarioId')]);
+			if(empty($permisoEmpresas)){
+				dd("Revise las empresas asignadas en los datos del usuario porque al parecer no tiene ninguna empresa asignada");
+			}
+			foreach($permisoEmpresas as $permisoEmpresa){
+			$rifs[]=$permisoEmpresa->empresa_rif;
+			}
+			$empresas = Empresa::whereIn('rif',$rifs)->get();
+		}else{
+			$empresas = Empresa::all();
+		}
+		
 		
 		return $empresas;
 	}

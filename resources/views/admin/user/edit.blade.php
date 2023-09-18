@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         <h3>Editar Usuarios <a href="{{route('admin.user.index')}}" class="btn btn-warning float-right"><i class="fas fa-chevron-left"></i>Regresar</a></h3>
             @if(session('info'))
             <div class="alert alert-info">
@@ -18,6 +18,21 @@
                     <input type="text" value="{{$user->email}}" class="form-control" name="email">
                     <label for="">Password</label>
                     <input type="text" class="form-control" name="password">
+                    <hr>
+                    <label for="">Empresas a las que tiene acceso</label>
+                    <br>
+                   
+                        @foreach($empresas as $empresa)
+                        <input type="checkbox" name="empresas[]" id="{{$empresa->id}}" value="{{ $empresa->rif }}"
+                            @if(isset($accesoEmpresas))
+                                @foreach($accesoEmpresas as $acceso)
+                                   @if($acceso->empresa_rif == $empresa->rif)
+                                    checked
+                                   @endif
+                                @endforeach
+                            @endif
+                        ><label for="{{$empresa->id}}">{{$empresa->nombre}}</label>  <br>
+                        @endforeach
                     <button type="submit" class="btn btn-primary float-end my-3">Actualizar</button>
                 </div>
                 <div class="col">

@@ -66,8 +66,8 @@
             <aside class="main-sidebar sidebar-dark-primary elevation-4">
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
-                    <img src="imagen/1686243552-1665415989-AdminLTELogo.png" alt="" class="brand-image rounded-circle elevation-3"
-                        style="opacity: .8">
+                    <!-- <img src="imagen/1686243552-1665415989-AdminLTELogo.png" alt="" class="brand-image rounded-circle elevation-3"
+                        style="opacity: .8"> -->
                     <span class="brand-text font-weight-light h4">{{ config('app.name', 'Laravel') }}</span>
                 </a>
 
@@ -466,7 +466,7 @@
             <div class="content-wrapper bg-white">
                 <!-- Content Header (Page header) -->
                 <div class="content-header">
-                    <p>Cabecera que no se donde esta</p>
+                    <p>Cabecera </p>
                 </div>
                 <!-- /.content-header -->
 
