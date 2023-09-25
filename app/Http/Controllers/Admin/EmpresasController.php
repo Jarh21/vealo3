@@ -34,6 +34,14 @@ class EmpresasController extends Controller
         return $herramientas->listarEmpresas(session('usuarioId'));
 	}
 
+	public function cambiarEmpresa($rif){
+		$empresa = Empresa::where('rif',$rif)->first();
+		session(['empresaNombre'=>$empresa->nombre,'empresaRif'=>$empresa->rif,'basedata'=>$empresa->basedata]);
+	}
+
+	public function obtenerEmpresaSeleccionada(){
+		return json_encode(array('empresaNombre'=>session('empresaNombre'),'empresaRif'=>session('empresaRif'),'basedata'=>session('basedata')));
+	}
 
 	public function create(){
 		

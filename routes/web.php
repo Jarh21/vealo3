@@ -56,7 +56,8 @@ Route::middleware(['auth'])->group(function(){
     Route::post('recaudo/cuadres-guardar-observacion',[CuadresObservacionController::class,'guardarObservacion']);
     Route::get('recaudo/cuadres-lista-empleados-arqueo',[CuadresObservacionController::class,'listaEmpleadosCuadre']);
     Route::get('recaudo/cuadres-eliminar-observacion/{id}',[CuadresObservacionController::class,'eliminarObservacionCuadre']);
-
+    Route::get('recaudo/banco-lista-bancos',[BancoController::class,'listaBancos']);
+    
     /*************CUADRES TRANSFERENCIAS */
     Route::get('recaudo/cuadres-listar-transferencias',[CuadresTransferenciaController::class,'index']);
     Route::post('recaudo/cuadres-registro-transferencias',[CuadresTransferenciaController::class,'guardarTransferenciaCuadre']);

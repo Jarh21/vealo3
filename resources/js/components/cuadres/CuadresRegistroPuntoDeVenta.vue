@@ -94,7 +94,7 @@
         },
         created(){
             this.listadeBancos();
-            this.listarPuntos();
+            /*this.listarPuntos();*/
         }
         
     }
