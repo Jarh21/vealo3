@@ -8,6 +8,10 @@ use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Models\AsistenteCompraDetalle;
 use App\Http\Controllers\Admin\EmpresasController;
 use Illuminate\Support\Facades\DB;
+/* use Maatwebsite\Excel\Facades\Excel; */
+# Indicar que usaremos el IOFactory
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 class AsistenteComprasController extends Controller
 {
     private $empresas = '';
@@ -26,6 +30,35 @@ class AsistenteComprasController extends Controller
     public function index(){
         
         return view('asistenteCompras.visualizadorPrecios');
+    }
+
+    public function descargarExcel(){
+        $rutaArchivoDestino = public_path()."\PLUS_MEDICAL_cargado.xlsx";
+        if(file_exists($rutaArchivoDestino)){
+            
+            unlink($rutaArchivoDestino);
+        }
+
+        $rutaArchivo = public_path()."/PLUS_MEDICAL.xlsx";
+        $documento = IOFactory::load($rutaArchivo);
+        $hojaActual = $documento->getSheet(0);
+        $hojaActual->setCellValue('L32','10');
+        $hojaActual->setCellValue('L33','11');
+        $hojaActual->setCellValue('L34','1');
+        $hojaActual->setCellValue('L35','13');
+        $hojaActual->setCellValue('L36','14');
+        $hojaActual->setCellValue('L37','20');
+        $guardar = IOFactory::createWriter($documento,"Xlsx");
+        $guardar->save($rutaArchivoDestino);
+        
+        //$coordenadas = "A1";
+        # Lo que hay en A1
+        //$celda = $hojaActual->getCell($coordenadas);
+        //$celda = $hojaActual->getCellByColumnAndRow(1,1);
+        # El valor, así como está en el documento
+        //$valorRaw = $celda->getValue();
+        
+        
     }
 
     public function apiListadoPrecioDrogueria(){

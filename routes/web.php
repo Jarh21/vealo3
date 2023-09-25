@@ -326,6 +326,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/asistentecompra/guardar-pedido-detallado',[AsistenteComprasController::class,'guardarPedidoDetallado'])->name('guardar-pedido-detallado');
     Route::get('/asistentecompra/pedir/{id?}',[AsistenteComprasController::class,'seleccionarPedido'])->name('asistentecompra.pedir');
     Route::get('/asistentecompra/ApiListarEditarPedidos/{id}',[AsistenteComprasController::class,'apiListarRegistrosAsistenteCompra'])->name('apiListarRegistrosAsistenteCompra');
+    Route::get('/asistentecompra/descargarExcel',[AsistenteComprasController::class,'descargarExcel'])->name('asistentecompra.descargarExcel');
     /**FIN DEL ASISTENTE DE COMPRAS */
 
     //puntos de ventas
