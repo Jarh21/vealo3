@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Parametro;
 use App\Models\User;
 use App\Models\Empresa;
-
+use DateTime;
 class HerramientasController extends Controller
 {
 	public function __construct(){
@@ -190,16 +190,21 @@ class HerramientasController extends Controller
 	}
 
 	public function diferenciaEntreFechas($fechaInicio,$fechaFin){
+
+		$fechaPago = new DateTime($fechaInicio);
+		$fechaActual = new DateTime($fechaFin);
+		$diferencia = $fechaPago->diff($fechaActual);
+		$dias = $diferencia->days;
 		
-		$diferencia = abs(strtotime($fechaFin)-strtotime($fechaInicio));
+		/* $diferencia = abs(strtotime($fechaFin)-strtotime($fechaInicio));
 
 		 $years = floor($diferencia / (365*60*60*24));
 		
 		 $months = floor(($diferencia - $years * 365*60*60*24) / (30*60*60*24));
 		
-		 $days = floor(($diferencia - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+		 $days = floor(($diferencia - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)); */
 
-		 return $days;
+		 return $dias;
 	}
 
 	

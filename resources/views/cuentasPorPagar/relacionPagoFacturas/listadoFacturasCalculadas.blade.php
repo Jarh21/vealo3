@@ -77,7 +77,8 @@
 					<th class="d-print-none">Monto</th>							
 					<th class="d-print-none">RetIva</th>
 					<th class="d-print-none">RetISLR</th>					
-					<th class="d-print-none">Pago Bs.</th>				
+					<th class="d-print-none">Monto Fac.</th>				
+					<th class="d-print-none">Monto pagar.</th>				
 					<th>Tasa</th>
 					<th>IGTF</th>							
 					<th>Divisas</th>
@@ -98,6 +99,7 @@
 			 $sumaNotasDebitos=0;
 			 $banderaProveedor=0; 
 			 $sumaPorProveedor=0;
+			 $sumaPagoMonedaNacional = 0;
 			 $proveedor='';
 			 $contadorFila=0;
 			@endphp		
@@ -158,17 +160,21 @@
 									//si de ser asi se suman para obtener el total por proveedor
 									if($banderaProveedor==0){//si la bandera es 0 estamos iniciado la primera factura
 										$proveedor = $cuenta->proveedor_rif;//asignamos el rif del proveedor al comparador
+										$sumaPagoMonedaNacional = $sumaPagoMonedaNacional + $pagoBolivaresMenosDescuento;
 										$sumaPorProveedor = $sumaPorProveedor +	$pagoTotal;//sumamos el total porque estamos iniciado
 										$banderaProveedor=1;//cambiamos la bandera del proveddor porque ya no es el primer registro
 										$contadorFila = $contadorFila +1;
 									}else{//cuando ya no es el primer registro
 										if($proveedor == $cuenta->proveedor_rif){//verificamos si el proximo es del mismo proveedor
+											$sumaPagoMonedaNacional = $sumaPagoMonedaNacional + $pagoBolivaresMenosDescuento;
 											$sumaPorProveedor = $sumaPorProveedor +	$pagoTotal; //de ser asi sumamos
 											$contadorFila = $contadorFila +1;
 										}else{  //de lo contrario reniciamos el contador y asignamos el nuevo proveedor para reiniciar la suma
 											$sumaPorProveedor=0;
+											$sumaPagoMonedaNacional=0;
 											$contadorFila=1;
 											$proveedor = $cuenta->proveedor_rif;
+											$sumaPagoMonedaNacional = $sumaPagoMonedaNacional + $pagoBolivaresMenosDescuento;
 											$sumaPorProveedor = $sumaPorProveedor +	$pagoTotal;
 										}
 									}
@@ -182,13 +188,14 @@
 								<span>{{number_format($pagoBolivares,2,'.',',').'Bs.'}}</span>
 								@endif
 								
-							</td>						
+							</td>
+							<td class="d-print-none">{{number_format($cuenta->resto,2)}}</td>						
 							<td>{{$cuenta->moneda_secundaria}}</td><!-- TASA -->
 							<td>{{number_format($cuenta->igtf,2,'.',',')}}</td><!-- IGTF -->
 							<td>{{number_format($pagoTotal,2)}}</td> <!-- pago en Divisas -->
 
 							@if($cuenta->totalFactutrasPorProveedor == $contadorFila)
-							<td style="border-top: none; ">{{number_format($sumaPorProveedor,2)}}</td><!--total por proveedor-->
+							<td style="border-top: none; ">{{number_format($sumaPorProveedor,2)}}$<br>{{number_format($sumaPagoMonedaNacional,2).'Bs'}}</td><!--total por proveedor-->
 							@else
 							<td style="border-top:none;  border-bottom:none"></td>
 							@endif
@@ -246,12 +253,13 @@
 						    $sumaTotalDivisas = $sumaTotalDivisas + $sumaPagoTotalFecha;
 						?>
 						
-						<td colspan="12">
+						<td colspan="13">
 							<b class="float-right">{{$dia}} {{date('d-m-Y',strtotime($fechaFactura->fechaPagoAcordado))}} Pago Total {{number_format($sumaPagoTotalFecha,2)}}</b>
 							@if($sumaNotasDebitos > 0.00)
 								<p class="float-right text-danger d-print-none">Excedente en Bs por Aumento Tasa {{number_format($sumaNotasDebitos,2).'Bs. '}}</p>
 							@endif
 						</td>
+						<td  style="display: none;"></td>
 						<td  style="display: none;"></td>
 						<td  style="display: none;"></td>
 						<td  style="display: none;"></td>
@@ -276,7 +284,7 @@
 			</tbody>
 			<tfoot>
 	            <tr>
-	                <th colspan="12" style="text-align:right">Total </th>
+	                <th colspan="13" style="text-align:right">Total </th>
 	               
 	            </tr>
     		</tfoot>
@@ -328,7 +336,7 @@
 	 
 	            // Total over this page
 	            pageTotal = api
-	                .column( 10, { page: 'current'} )
+	                .column( 11, { page: 'current'} )
 	                .data()
 	                .reduce( function (a, b) {
 	                    return intVal(a) + intVal(b);

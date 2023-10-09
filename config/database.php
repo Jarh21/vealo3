@@ -90,6 +90,25 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
+        'slave' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '10.0.2.2',
+            'port' =>'3306',
+            'database' => 'asistente_de_compras',
+            'username' => 'jonas.salas',
+            'password' => 'camaleon',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
 
     ],
 
