@@ -48,6 +48,7 @@ class EmpresasController extends Controller
 
 		return view('admin.empresas.create');
 	}
+
 	public function save(Request $request){
 		$agenteRetencion=0;
 		$sincronizacion =0;
@@ -82,6 +83,24 @@ class EmpresasController extends Controller
 		$empresa->basedata2 = $request->get('basedata2');
 		$empresa->is_agente_retencion = $agenteRetencion;
 		$empresa->is_sincronizacion_remota = $sincronizacion;
+		if($request->hasfile('firma')){
+
+			$file = $request->file('firma');
+			$destinatinoPath ='imagen/';
+			$filename = time().'-'.$file->getClientOriginalName();
+			$uploadsuccess = $request->file('firma')->move($destinatinoPath,$filename);    
+			$empresa->firma= $destinatinoPath.$filename;
+
+		}
+		if($request->hasfile('logo')){
+
+			$file = $request->file('logo');
+			$destinatinoPath ='imagen/';
+			$filename = 'logo'.time().'-'.$file->getClientOriginalName();
+			$uploadsuccess = $request->file('logo')->move($destinatinoPath,$filename);    
+			$empresa->logo= $destinatinoPath.$filename;
+
+		}
 		if($empresa->save()){
 			return redirect()->route('admin.empresas.index');
 		}else{
@@ -143,7 +162,15 @@ class EmpresasController extends Controller
 			$empresa->firma= $destinatinoPath.$filename;
 
 		}
+		if($request->hasfile('logo')){
 
+			$file = $request->file('logo');
+			$destinatinoPath ='imagen/';
+			$filename = 'logo'.time().'-'.$file->getClientOriginalName();
+			$uploadsuccess = $request->file('logo')->move($destinatinoPath,$filename);    
+			$empresa->logo= $destinatinoPath.$filename;
+
+		}
 		$empresa->update();
 		return redirect()->route('admin.empresas.index'); 
 	}

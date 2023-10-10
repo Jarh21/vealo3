@@ -15,7 +15,7 @@
 						<select name="empresa" class="form-control" required>
 							<option value="">-- Seleccionar --</option>
 							@foreach($empresas as $empresa)
-							<option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}" @if(session('empresaRif') == $empresa->rif) selected @endif>{{$empresa->rif}} {{$empresa->nombre}}</option>
+							<option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}|{{$empresa->logo}}" @if(session('empresaRif') == $empresa->rif) selected @endif>{{$empresa->rif}} {{$empresa->nombre}}</option>
 							@endforeach
 						</select>
 						

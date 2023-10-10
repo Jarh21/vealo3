@@ -29,7 +29,7 @@ class CuentasPorPagarController extends Controller
 		if(empty($empresa[2])){
 			dd('En la tabla empresa debe agregar el nombre de la base de datos de la empresa seleccionada en el campo basedata');
 		}
-        session(['empresaNombre'=>$empresa[1],'empresaRif'=>$empresa[0],'codTipoMoneda'=>$modoPago[0],'modoPago'=>$modoPago[1],'basedata'=>$empresa[2]]);
+        session(['empresaNombre'=>$empresa[1],'empresaRif'=>$empresa[0],'codTipoMoneda'=>$modoPago[0],'modoPago'=>$modoPago[1],'basedata'=>$empresa[2],'logo_empresa'=>$empresa[3]]);
        
 		if(empty($rutaSolicitante)){
 			return self::facturasPorPagar();
@@ -842,8 +842,10 @@ class CuentasPorPagarController extends Controller
     	$bancos = Banco::all();
     	$facturas = $request->facturasPorPagar;    	
     	$codigoUnico = uniqid();//genera un codigo unico en php
-    	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);    	
-    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico]);
+    	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
+		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
+		$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');     	
+    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
 
     }
 
@@ -851,8 +853,10 @@ class CuentasPorPagarController extends Controller
     	$modoPago = session('modoPago');
     	$bancos = Banco::all();    	
     	//$codigoUnico = uniqid();//genera un codigo unico en php
-    	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);    	
-    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico]);
+    	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas); 
+		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
+		$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');     	
+    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
 
     }
 
@@ -868,7 +872,9 @@ class CuentasPorPagarController extends Controller
     	foreach($todosRegistros as $registro){
     		$facturas[]=$registro['factura_id'];
     	}    	
-    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico]);
+		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
+		$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');  
+    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
     }
 
     public function prepararPagarFacturas($codigoUnico,$facturasId){

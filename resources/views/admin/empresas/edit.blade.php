@@ -63,12 +63,23 @@
 									</div>
 									
 								</div>								
-								
-								<div class="form-group">
-									<label>Firma Digital</label>
-									<input type="file" class="form-control" name="firma">
-									<img src="{{asset($empresa->firma)}}">					
+								<div class="row">
+									<div class="col">
+										<div class="form-group">
+											<label>Firma Digital</label>
+											<input type="file" class="form-control" name="firma">
+											<img src="{{asset($empresa->firma)}}">					
+										</div>
+									</div>
+									<div class="col">
+										<div class="form-group">
+											<label>Logo de la Empresa</label>
+											<input type="file" class="form-control" name="logo">
+											<img src="{{asset($empresa->logo)}}">					
+										</div>
+									</div>
 								</div>
+								
 							</div>
 						</div>
 						

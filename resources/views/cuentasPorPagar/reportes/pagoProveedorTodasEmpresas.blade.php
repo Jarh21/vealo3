@@ -115,6 +115,13 @@
             </table>
         @endif
     </div>
+    <div class="d-print-none">
+        <div class="alert alert-info">
+            <p>
+                <b>Nota:</b>Este reporte solo muestra las facturas relacionadas para pagar en una fecha especificada, esto se realiza en el siguiente enlace <a href="{{route('relacionPagoFacturasIndex')}}">Facturas a Relacionar</a> y dicha relacion se visualiza en: <a href="{{route('listadoFacturasCalculadas')}}">Facturas Calculadas</a>, este reporte no incluye los pagos registrados directamente del modulo <a href="{{route('cuentasporpagar.facturasPorPagar')}}">Ingreso Factura</a>
+            </p>
+        </div>
+    </div>
 </div>
 @endsection
 @section('js')

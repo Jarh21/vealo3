@@ -475,7 +475,7 @@
                     @yield('content')
                    
                 </section>
-                <!-- /.content -->
+                
                 
             </div>           
 
@@ -504,11 +504,11 @@
                 <!-- NO QUITAR -->
                 <!-- <strong>Elaborado por: Jose Rivero & Eric Leon | jarh18@gmail.com</strong>
         </footer>
-    </div -->>
+    </div -->
 
         
     <script src="{{ asset('js/app.js')}}"></script>
-<!--     <script src="{{ asset('js/adminlte.js')}}"></script> -->
+
     @yield('js')
 </body>
 </html>

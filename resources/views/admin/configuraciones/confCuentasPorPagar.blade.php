@@ -21,6 +21,23 @@
 
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                <label for="select_banco_desde_modo_pago_divisa"> * Permitir seleccionar tipo de banco desde el modo de pago Divisas</label>
+
+                </div>
+                <div class="col">
+                <input 
+                    type="checkbox" 
+                    name="select_banco_desde_modo_pago_divisa" 
+                    id="select_banco_desde_modo_pago_divisa"
+                    @if($select_banco_desde_modo_pago_divisa==1)
+                        checked
+                    @endif    
+                >
+
+                </div>
+            </div>
             <hr>
             <div class="row">
                 <div class="col">

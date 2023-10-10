@@ -393,7 +393,7 @@
 		    $("#referencia_pago").prop('disabled', true);
 		  var modopago =  $("#modo_pago").val();
 		  var selector = $("#Select_id  option:selected").val();		  
-		  
+		  var isActivarBanco = <?php echo $isActivarBanco; ?>;
 		  
 		  switch(selector){
 		    case "NDEB":		      
@@ -419,6 +419,10 @@
 				$("#nfactura_nota").prop('required',false);
 		      	document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
 		      }else{
+				if(isActivarBanco == '1'){
+					$("#banco_id").prop('disabled', false);
+		        	$("#banco_id").prop('required', true);
+			  	}
 		      	 document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3)?>;
 		      }
 		      break;
@@ -429,6 +433,7 @@
 			var modopago = $("#modo_pago  option:selected").val();
 			var tipoTasa = $("#tipo_tasa option:selected").val();
 			var seleccion = tipoTasa.split('|');
+			var isActivarBanco = <?php echo $isActivarBanco; ?>;
 			switch(modopago){
 		    
 		    case "bolivares":
@@ -448,9 +453,16 @@
 		     
 		      break;		    
 		    case "dolares":		      	
-		      $("#banco_id").prop('disabled', true);
+		      
 		      $("#referencia_pago").prop('disabled', true);
-		      $("#banco_id").prop('required', false);
+			  
+			    $("#banco_id").prop('disabled', true);
+		        $("#banco_id").prop('required', false);
+				if(isActivarBanco == '1'){
+				$("#banco_id").prop('disabled', false);
+		        $("#banco_id").prop('required', true);
+			  }
+			  
 		      $("#referencia_pago").prop('required', false);
 		      $("#tipo_tasa").prop('disabled',false);
 		      $("#tipo_tasa").prop('required',false)		      

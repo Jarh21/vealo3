@@ -19,6 +19,7 @@ class ConfiguracionController extends Controller
         $importar_server2_a_server1_cxp = Parametro::buscarVariable('importar_server2_a_server1_cxp');
         $numero_registros_importar_cxp = Parametro::buscarVariable('numero_registros_importar_cxp');
         $numero_registros_importar_notacredito = Parametro::buscarVariable('numero_registros_importar_notacredito');
+        $select_banco_desde_modo_pago_divisa = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');
         return view('admin.configuraciones.confCuentasPorPagar',
         [
             'pago_facturas_desde_facturas_por_pagar'=>$pago_facturas_desde_facturas_por_pagar,
@@ -28,6 +29,7 @@ class ConfiguracionController extends Controller
             'importar_server2_a_server1_cxp'=>$importar_server2_a_server1_cxp,
             'numero_registros_importar_cxp'=>$numero_registros_importar_cxp,
             'numero_registros_importar_notacredito'=>$numero_registros_importar_notacredito,
+            'select_banco_desde_modo_pago_divisa'=>$select_banco_desde_modo_pago_divisa,
         ]);
     }
 
@@ -40,39 +42,58 @@ class ConfiguracionController extends Controller
         $base_datos_tipo_moneda                            = $request->base_datos_tipo_moneda;
         $importar_server2_a_server1_cxp                    = $request->importar_server2_a_server1_cxp;
         $numero_registros_importar_cxp                     = $request->numero_registros_importar_cxp;
-        $numero_registros_importar_notacredito             = $request->numero_registros_importar_notacredito; 
+        $numero_registros_importar_notacredito             = $request->numero_registros_importar_notacredito;
+        $select_banco_desde_modo_pago_divisa               = $request->select_banco_desde_modo_pago_divisa;   
+
         Parametro::actualizarVariable('base_datos_tipo_moneda',$base_datos_tipo_moneda);  
-
-
+        /***************** */
         if($pago_facturas_desde_facturas_por_pagar=='on'){
             $bandera=1;
         }else{
             $bandera=0;
-        }
-        
+        }        
         Parametro::actualizarVariable('pago_facturas_desde_facturas_por_pagar',$bandera);
         $bandera=0;
+        /***************** */
 
         if($verificar_facturas_en_siace=='on'){
             $bandera=1;
         }else{
             $bandera=0;
         }
-        Parametro::actualizarVariable('verificar_facturas_en_siace',$bandera);
+        Parametro::actualizarVariable('verificar_facturas_en_siace',$bandera);        
         $bandera=0;
+        /***************** */
        
         Parametro::actualizarVariable('verificar_tasa_dolar_tipo_moneda_o_historial_dolar',$verificar_tasa_dolar_tipo_moneda_o_historial_dolar);
+        /***************** */
 
         Parametro::actualizarvariable('conversion_moneda_nacional_a_extranjera',$conversion_moneda_nacional_a_extranjera);
+        /***************** */
 
         if($importar_server2_a_server1_cxp=='on'){
             $bandera=1;
         }else{
             $bandera=0;
         }
-        Parametro::actualizarVariable('importar_server2_a_server1_cxp',$bandera);  
+        Parametro::actualizarVariable('importar_server2_a_server1_cxp',$bandera);
+        $bandera=0;
+        /***************** */
+
         Parametro::actualizarVariable('numero_registros_importar_cxp',$numero_registros_importar_cxp);
+        /***************** */
+
         Parametro::actualizarVariable('numero_registros_importar_notacredito',$numero_registros_importar_notacredito);
+        /***************** */
+      
+        if($select_banco_desde_modo_pago_divisa=='on'){
+            $bandera=1;
+        }else{
+            $bandera=0;
+        }
+        Parametro::actualizarVariable('select_banco_desde_modo_pago_divisa',$bandera);
+        $bandera=0;
+
         return self::indexConfiguracionCuentasPorPagar();
     }
 

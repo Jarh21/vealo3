@@ -75,6 +75,7 @@ class ReportesCuentasPorPagarController extends Controller
     	$fechafin = $request->fechaFin;
     	$arrayFechas=[];
     	$arrayFacturas=[];
+		$logo='';
 		//buscamos en cuentas por pagars el total a cancelar
     				
 		$facturasCalculadas = new FacturasPorPagar();
@@ -88,8 +89,10 @@ class ReportesCuentasPorPagarController extends Controller
 			$arrayFechas[]=(object)$arrayFacturas;
 			
 		}
-	       
-        return view('cuentasPorPagar.reportes.reporteRelacionPagoPorEmpresa',['pagos'=>$arrayFechas]);
+	    if(!empty(session('logo'))){
+			$logo = session('logo');
+		}
+        return view('cuentasPorPagar.reportes.reporteRelacionPagoPorEmpresa',['pagos'=>$arrayFechas,'logo'=>$logo]);
 
     }
 

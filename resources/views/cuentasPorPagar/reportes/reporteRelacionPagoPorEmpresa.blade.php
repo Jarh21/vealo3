@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="row">
 		<div class="col-3">			
-            <img src="{{ asset(session('logo_empresa'))}}" alt="AdminLTE Logo" class="" style="opacity: .8" width="100px">
+            <img src="{{ asset(session('logo_empresa'))}}" alt="Logo" class="" style="opacity: .8" width="100px">
             <p>{{session('nombre_general_empresa')}}</p>
 		</div>
 		<div class="col">

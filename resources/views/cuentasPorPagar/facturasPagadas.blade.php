@@ -18,7 +18,7 @@
 		
 		<form action="{{route('cuentaspagadas.buscar')}}" method="POST">
 			@csrf
-			<div class="alert alert-success">
+			<div class="">
 				  		   	
 			<div class="form-group ">
 				<div>
@@ -73,7 +73,7 @@
     				<th>Nº Factura</th>
     				<th>Pagos</th>	
     				<th>Fecha Pago</th>
-    				<th>Acción</th>
+    				<th class="d-print-none">Acción</th>
     			</tr>
     		</thead>
     		@if(isset($cuentas))
@@ -102,17 +102,23 @@
 							@endif
 						</td>
 	    				<td>{{$cuenta->documento ?? $cuenta->concepto_descripcion}}</td>	    				   				
-	    				<td>{{number_format($cuenta->creditos,2,',','.')}}</td>
+	    				<td>{{number_format($cuenta->creditos,2)}}</td>
 	    				<td>{{$cuenta->fecha_real_pago}}</td>
-	    				<td>
-						@can('acceso','relacionPagoFacturasIndex')
+	    				<td class="d-print-none">
+						@can('relacionPagoFacturasIndex')
 	    					<a href="{{route('verVistaPagarFacturas',$cuenta->codigo_relacion_pago)}}" class="btn-success btn-sm" title="Pago en proceso haga click para terminar">Ver</a>
 						@endcan	
 	    				</td>
 	    			</tr>
 	    			
 	    			@endforeach
-	    			</tbody>    		
+	    			</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="6" style="text-align:right">Total </th>
+							<th colspan="2"></th>
+						</tr>
+					</tfoot>    		
     		@endif	
     	</table><hr>    		
     	    		
@@ -135,11 +141,43 @@
 	$(document).ready(function() {	
 		
 		$('#articulos').DataTable({
-		
-	    scrollY: 400,
+			fixedColumns:   {
+            	heightMatch: 'none'
+        	},
+			"columnDefs": [
+            { "orderable": false, "targets": 0 }
+        ],
+		"order": [
+            [ 6, "desc" ]
+        ],
 	    select: true,
 	    searching: true,
-	    paging: false
+	    paging: false,
+		"footerCallback": function ( row, data, start, end, display ) {
+	            var api = this.api(), data;
+	 
+	            // Remove the formatting to get integer data for summation
+	            var intVal = function ( i ) {
+	                return typeof i === 'string' ?
+	                    i.replace(/[\$,]/g, '')*1 :
+	                    typeof i === 'number' ?
+	                        i : 0;
+	            };	 
+	        
+	            // Total over this page
+	            pageTotal = api
+	                .column( 5, { page: 'current'} )
+	                .data()
+	                .reduce( function (a, b) {
+	                    return intVal(a) + intVal(b);
+	                }, 0 );
+	 
+	            // Update footer
+	            $( api.column( 2 ).footer() ).html(
+	                'Suma total en divisa: '+new Intl.NumberFormat("de-DE").format(pageTotal)
+	            );
+	            
+	        },
 		});	
     } );
 </script>

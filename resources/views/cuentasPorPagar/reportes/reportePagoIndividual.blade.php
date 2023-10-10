@@ -9,7 +9,7 @@
 		<tr>
 			<td>
 				
-				<img src="{{ asset(session('logo_empresa'))}}" alt="AdminLTE Logo" class="" style="opacity: .8" width="100px">
+				<img src="{{ asset(session('logo_empresa'))}}" alt="Logo" class="" style="opacity: .8" width="100px">
             
 			</td>
 			<td>

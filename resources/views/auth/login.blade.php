@@ -4,10 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+        <!-- <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"> -->
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <!-- Styles -->
         <style>
@@ -19,18 +19,24 @@
         
     </head>
 <body class="antialiased">
+<div class="container-fluid"> 
+    <div class="alert alert-warning">
+        <h4> <span>{{ config('app.name', ' ') }}</span> <span class="font-weight-light">Sistema de Gestion Administrativo.</span></h4>
+    </div>
+</div>
 <div class="container mt-5">
+   
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+                <div class="card-header">Inicio de Sessión</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 
                         <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+                            <label for="email" class="col-md-4 col-form-label text-md-end">Correo Electronico</label>
 
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
@@ -44,7 +50,7 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+                            <label for="password" class="col-md-4 col-form-label text-md-end">Contraseña</label>
 
                             <div class="col-md-6">
                                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
@@ -56,25 +62,27 @@
                                 @enderror
                             </div>
                         </div>
+                        @if(isset($empresas))
                         <div class="row mb-3">
                             <label for="empresas" class="col-md-4 col-form-label text-md-end">Empresas</label>
 
                             <div class="col-md-6">
-                                <select name="empresas" id="empresas" class="form-control" >
+                                <select name="empresas" required  id="empresas" class="form-control" >
                                     <option value="">-- Seleccione la Empresa --</option> 
                                     @foreach($empresas as $empresa)
-                                        <option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}">{{$empresa->nombre}}</option>
+                                        <option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}|{{$empresa->logo ?? 0}}">{{$empresa->nombre}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        @endif
                         <div class="row mb-3">
                             <div class="col-md-6 offset-md-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
 
                                     <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }} <a href="{{ route('registroAlternoUsuarios')}}" class="text-decoration-none" style="cursor: default">.</a>
+                                        Recordarme <a href="{{ route('registroAlternoUsuarios')}}" class="text-decoration-none" style="cursor: default">.</a>
                                     </label>
                                 </div>
                             </div>
@@ -83,12 +91,12 @@
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
+                                    Ingresar
                                 </button>
 
                                 @if (Route::has('password.request'))
                                     <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
+                                        Olvido su contraseña
                                     </a>
                                 @endif
                             </div>
