@@ -109,12 +109,14 @@
                                         <p>Inicio</p>
                                     </a>
                                 </li>
+                                @can('cuentasporpagar.inicio')
                                 <li class="nav-item">
                                     <a href="#" class="{{ Request::segment(1) === 'cuentasporpagar' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#cuentasporpagar">
                                         <i class="fas fa-handshake {{ Request::segment(1) === 'cuentasporpagar' ? 'text-light' : 'text-primary' }} "></i>
                                         Cuentas Por Pagar
                                     </a>
                                 </li>
+                                @endcan
                             </ul>
                             
                             <div id="cuentasporpagar" class=" {{ Request::segment(1) === 'cuentasporpagar' ? 'collapse show ' : 'collapse' }} ml-2" data-parent="#accordionExample">
@@ -229,6 +231,7 @@
                             <!-- fin div capa cuadres -->
 
                             <!--  capa islr -->
+                            @can('islr.index')
                             <ul class="nav  nav-sidebar flex-column">
                                 <li class="nav-item">
                                     <a href="#" class="{{ Request::segment(1) === 'regisretenciones' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#islr">
@@ -249,6 +252,8 @@
                                             <i class="fa fa-file"></i>Agregar Documento
                                         </a>
                                     </li>
+                                    @endcan
+                                    @can('islr.xml.listar')
                                     <li class="nav-item">
                                         <a href="{{route('islr.xml.listar')}}"
                                             class="{{ Request::path() === 'regisretenciones/xml-listar' ? 'nav-link active collapse show' : 'nav-link' }}">
@@ -312,8 +317,9 @@
                                         
                                     @endcan
                                 </ul>
-                            </div> <!-- fin capa islr -->
+                            </div> @endcan <!-- fin capa islr -->
                             <!-- capa recepcion de divisas -->
+                            @can('listar.operaciones.divisas')
                             <ul class="nav  nav-sidebar flex-column">
                                 <li class="nav-item">
                                     <a href="#" class="{{ Request::segment(1) === 'divisas' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#recepcion_divisas">
@@ -346,6 +352,7 @@
                                     </li>    
                                 </ul>
                             </div> <!-- fin de capa recepcion de divisas  -->
+                            @endcan
                             <!-- capa Asistente de compra  -->
                             @can('asistentecompra.visualizadorPrecios')
                             <ul class="nav  nav-sidebar flex-column">
@@ -370,6 +377,7 @@
                             @endcan
                             <!-- fin de capa Asistente de compras  -->
                             <!-- capa Informes adicionales -->
+                            @can('habladores.index')
                             <ul class="nav  nav-sidebar flex-column">
                                 <li class="nav-item">
                                     <a href="#" class="{{ Request::segment(1) === 'informes' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#informes_adicionales">
@@ -398,28 +406,30 @@
                                     @endcan                                        
                                 </ul>
                             </div> <!-- fin de capa Informes Adicionales  -->
-
+                            @endcan
+                            @can('proveedor.index')
                             <ul class="nav  nav-sidebar flex-column">
-                                @can('proveedor.index')
+                                
                                 <li class="nav-item">
                                     <a href="{{ url('proveedor')}}" class="{{ Request::path() === 'proveedor' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}">
                                         <i class="fa fa-address-book "></i>
                                         <p>Proveedores </p> 
                                     </a>
                                 </li>
-                                @endcan
+                                
                             </ul>
-                            <ul class="nav  nav-sidebar flex-column">
-                                @can('bancos.index')
+                            @endcan
+                            @can('bancos.index')
+                            <ul class="nav  nav-sidebar flex-column">                                
                                     <li class="nav-item">
-                                        <a href="{{ url('bancos')}}" class="{{ Request::path() === 'bancos' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}">
+                                        <a href="{{ route('banco.index')}}" class="{{ Request::path() === 'bancos' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}">
                                             <i class="fa fa-university " ></i>
 
                                             <p>Bancos </p> 
                                         </a>
-                                    </li>
-                                @endcan
-                            </ul>    
+                                    </li>                               
+                            </ul>  
+                            @endcan  
                             <!-- capa configuracion -->
                             @can('admin.general.datosEmpresa')
                             <ul class="nav  nav-sidebar flex-column">
