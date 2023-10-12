@@ -72,6 +72,9 @@
 			
 			
 	</div>
+        
+@endsection	
+@section('js')
 <script type="text/javascript">
 		/*funcion que formatea el valor numerico al de moneda*/
 	$(document).ready(function() {
@@ -88,5 +91,5 @@
             }
         });
     } );    
-</script>        
-@endsection	
+</script>
+@endsection

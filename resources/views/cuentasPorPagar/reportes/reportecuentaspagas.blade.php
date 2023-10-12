@@ -99,9 +99,9 @@
 					</tr>
 					@endforeach
 					<tr>
-						<td></td><td></td><td></td><td></td>
-						<td><b>Total {{$banco}} </b></td><td></td>
-						<td><b>{{number_format($suma,2,'.',',')}}</b></td>
+						<td></td><td></td><td></td>
+						<td><b>Sub Total </b></td>
+						<td><b>{{number_format($suma,2,'.',',')}}</b></td><td></td><td></td>
 						
 					</tr>
 					@php $suma=0; $banco='';@endphp
