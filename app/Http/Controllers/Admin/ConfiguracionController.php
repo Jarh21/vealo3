@@ -101,7 +101,7 @@ class ConfiguracionController extends Controller
         $nombreEmpresa = Parametro::buscarVariable('nombre_general_empresa');
         $logoEmpresa = Parametro::buscarVariable('logo_empresa');
         
-        return view('Admin.configuraciones.confGeneral',['nombreEmpresa'=>$nombreEmpresa,'logoEmpresa'=>$logoEmpresa]);
+        return view('admin.configuraciones.confGeneral',['nombreEmpresa'=>$nombreEmpresa,'logoEmpresa'=>$logoEmpresa]);
     }
 
     public function guardarConfiguracionGeneral(Request $request){
