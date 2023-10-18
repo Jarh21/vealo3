@@ -25,63 +25,50 @@
 		<table border="1" class="ml-5" style="width: 800px; height: 50px;">
 			
 			<tr>
-				<th>Factura</th>
-				<th>Debitos</th>
-				<th>Creditos</th>			
-				<th>Divisas</th>				
-				<th>Bolivares</th>
-				<th>Tasa</th>
+				<th>Factura</th>			
+				<th>Dinero Entregadas</th>
 				<th>Concepto</th>				
 				
 			</tr>
 			<?php $monto=0;$suma=0; ?>
 			@foreach($datosDelPago as $datos)
-				<tr>
-					<td></td>
-				</tr>
 				@foreach($datos['cxp'] as $cxp)
-				
+				@if($cxp->concepto=='CAN')
 				<tr>
-					<td  class="mx-3">{{$cxp->documento}}</td><!--Factura-->
-					<td>{{$cxp->debitos ?? 0}}</td>
-					<td>{{$cxp->creditos ?? 0}}</td>				
+					<td  class="mx-3">{{$cxp->documento}}</td><!--Factura-->				
 					<td><!--Divisa Entregadas-->
 						@if($cxp->monto_divisa > 0.00)
+						<?php $monto = $cxp->monto_divisa; ?>
+						{{$cxp->monto_divisa}}
+						@else
 							
-							{{$cxp->monto_divisa.'Monto Divisa'}}
-													
+							<?php 
+								if($cxp->monto_bolivares > 0.00){
+									
+								
+									$monto = $cxp->monto_bolivares/$cxp->tasa;
+								}else{
+									$monto = $cxp->creditos;
+								}							
+							?>
+							<?php //$divisaCambio = $cxp->monto_bolivares/$cxp->tasa; ?>
+							{{number_format($cxp->monto_bolivares,2)}} Bs. tasa({{$cxp->tasa }}) = {{number_format($monto,2).'$'}}
+							
 						@endif
-					</td>
-					
-					<td>
-						@if($cxp->monto_bolivares > 0.00)
-							{{$cxp->monto_bolivares}}		
-						@endif
-					</td>
-					<td>
-					{{$cxp->tasa}}
 					</td> 
 					<td>
-						@if($cxp->concepto=='FAC')
-						{{"MONTO FACTURA"}}		
-						@else
 						{{$cxp->concepto_descripcion}}
-						@endif
 					</td>					
 					
-					<?php
-						if($cxp->concepto=='CAN') 
-						$suma += $cxp->creditos; 
-						
-					?>
+					<?php $suma += $monto; ?>
 					
 				</tr>
-				
+				@endif
 				@endforeach
 
 			@endforeach
 			<tr>
-				<td colspan="1"><b>Total </b></td>
+				<td colspan="1"><b>Totla </b></td>
 				<td><b>{{number_format($suma,2)}}</b></td>
 			</tr>
 		</table>

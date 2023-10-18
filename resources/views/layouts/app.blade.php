@@ -135,7 +135,7 @@
                                         <a href="{{ route('cuentasporpagar.facturasPorPagar')}}"
                                             class="{{ Request::path() === 'cuentasporpagar/facturasPorPagar' ? 'nav-link active' : 'nav-link' }}">
                                             <i class="fas fa-file-download nav-icon text-white "></i>
-                                            Ingreso Facrturas
+                                            Ingreso Facturas
                                         </a>
                                     </li>                 
                                     
@@ -163,7 +163,7 @@
                                     <li class="nav-item">
                                         <a href="{{route('cuentasporpagar.facturasPagadas')}}"
                                             class="{{ Request::path() === 'cuentasporpagar/facturasPagadas' ? 'nav-link active' : 'nav-link' }}">
-                                            <i class="fa fa-print nav-icon"></i>
+                                            <i class="fas fa-handshake text-success"></i>
                                             Facturas Pagadas
                                         </a>
                                     </li>

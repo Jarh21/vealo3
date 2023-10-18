@@ -899,6 +899,7 @@ class CuentasPorPagarController extends Controller
     	$color2='#D4EFDF';
     	$cambioColor=0;
 		$montoPagado=0;
+		$todosRegistros=array();
     	foreach($facturasId as $facturaId){
     		////cambiamos los colores 
     		if($cambioColor==0){
@@ -912,7 +913,7 @@ class CuentasPorPagarController extends Controller
     		$sumaCredito=0;
     		$restaTotal=0;
     		$datosFactura = FacturasPorPagar::find($facturaId); 
-			$registrosCxp = CuentasPorPagar::where('factura_id',$datosFactura->id)->get();
+			$registrosCxp = CuentasPorPagar::leftJoin('bancos','cuentas_por_pagars.banco_id','=','bancos.id')->where('cuentas_por_pagars.factura_id',$datosFactura->id)->select('cuentas_por_pagars.*','bancos.nombre')->get();
 			//verificamos si es en divisas monto pagado es divisas si es bolivares tomamos los bolivares
 			//si el monto en diviasas es 0 tomamos el monto en bolivares
 			if($datosFactura->monto_divisa > 0.00){
@@ -987,7 +988,7 @@ class CuentasPorPagarController extends Controller
     	$codigoRelacionPago = $request->codigo_relacion_pago;
     	$datosPagoFacturas = $request->datosPagoFactura;
 		$cantidadFacturas=count($datosPagoFacturas);
-    	$tipoTasa = $request->tipo_tasa;
+    	//$tipoTasa = $request->tipo_tasa;
 		$sumaMontosFacturas =0;
 		$cuentasPorPagarNCP['fecha_pago'] = $fechaPago;		    	
 		$cuentasPorPagarNCP['codigo_relacion_pago'] = $codigoRelacionPago;		    			    	
@@ -1017,6 +1018,20 @@ class CuentasPorPagarController extends Controller
 				}
 		    				
     			break;
+			case 'DESC':
+				// Nota de credito...
+				$conceptoDescripcion='DESCUENTO';    			
+				$debeOhaver='creditos';
+				$codConcepto=4;				
+				if($idFacturaNotaCreditoDebito<>0){
+					$cuentasPorPagarNCP['cod_concepto'] =$codConcepto;
+					$cuentasPorPagarNCP['concepto_descripcion'] = $conceptoDescripcion;
+					$cuentasPorPagarNCP[$debeOhaver] = round($montoPagoIngresado,2);
+					$cuentasPorPagarNCP['monto_bolivares'] =0;						
+					self::guardarEnCuentasPorPagar($cuentasPorPagarNCP);
+				}
+							
+				break;
 			case 'RISLR':
 					// Nota de credito...
 					$conceptoDescripcion='RETENCION DE ISLR';    			
@@ -1150,6 +1165,8 @@ class CuentasPorPagarController extends Controller
 					    	//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
 							$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoBs,$tasa);
 					    	$montoPagoIngresado=0;
+							$cuentasPorPagar['tasa'] = $tipoTasa;
+							
 					    	self::guardarEnCuentasPorPagar($cuentasPorPagar);
 					    	//comparamos si la duda se cancelo en la factura y actualizamos la bandera
 	    					//facturas_pagada

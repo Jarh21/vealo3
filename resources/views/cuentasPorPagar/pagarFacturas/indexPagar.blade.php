@@ -64,6 +64,9 @@
 								</td>
 								<td><!--Concepto -->
 									{{$registro->concepto}}
+									{{$registro->fecha_pago ?? ''}}
+									{{$registro->nombre ?? ''}}
+									{{'#'.$registro->referencia_pago ?? ''}}
 								</td>							
 								<td><!--Debitos -->
 									@if($registro->debitos > 0.00)
@@ -144,16 +147,7 @@
 									      				{{$registro->debitos}}
 									      			@endif	
 									      		</h4>
-											<!--	<input type="text" name="id_cuentas_por_pagar" value="{{$registro->id}}">
-												@if($registro->debitos > 0.00)
-												<input type="number" name="monto_registro" value="{{$registro->debitos}}">
-												<input type="text" name="tipo_registro" value="dibitos">
-												@endif
-												@if($registro->creditos > 0.00)
-												<input type="number" name="monto_registro" value="{{$registro->creditos}}">
-												<input type="text" name="tipo_registro" value="creditos">
-												@endif
-												<input type="text" name="codigo_relacion_pago" value="{{$registro->codigo_relacion_pago}}">		-->										
+																				
 									      	</div>
 									      	<div class="modal-footer">
 									        	<!--<button type="button" class="btn btn-primary" data-dismiss="modal">Actualizar</button>-->
@@ -277,6 +271,7 @@
 										<option value="NCP">Nota de Credito</option>
 										<option value="RISLR">Retencion de ISLR</option>
 										<option value="RIVA">Retencion de IVA</option>								
+										<option value="DESC">Descuento</option>								
 										<option value="CAN">Pago Deuda</option>
 									</select>
 								</div>
@@ -287,9 +282,7 @@
 									<select class="form-control" name="modo_pago" id="modo_pago" disabled="true">
 										<option value=""> -- -- </option>
 										<option value="bolivares"@if($modoPagoSelect == 'bolivares')selected @endif >Bolivares</option>
-				      					<option value="dolares" @if($modoPagoSelect == 'dolares')selected @endif >Dolares</option>
-				      					<option value="zelle"  @if($modoPagoSelect == 'zelle')selected @endif >Zelle</option>
-				      					<option value="otros">Otros</option>
+				      					<option value="dolares" @if($modoPagoSelect == 'dolares')selected @endif >Divisas</option>	
 									</select>								
 								</div>						
 							</div>	
@@ -322,7 +315,7 @@
 								<div class="form-group">
 									
 									<label>Valor Tasa</label>
-									<select class="form-control" name="tipo_tasa" id="tipo_tasa" disabled>
+									<select class="form-control" name="tipo_tasa" id="tipo_tasa" >
 																	
 										<option value="{{$cuenta['tasa']}}|tasaFactura" @if(session('modoPago')=='bolivares')selected @endif>Tasa de la Factura {{$cuenta['tasa']}}</option>								
 										<option value="{{$cuenta['tasaDelDia']}}|tasaActual" @if(session('modoPago')<>'bolivares')selected @endif>Tasa Actual {{$cuenta['tasaDelDia']}}</option>								
@@ -364,7 +357,7 @@
 								
 					</div>
 				@else
-					<a href="{{route('reciboPagoFacturas',$codigo_relacion_pago)}}"><i class="fa fa-print"></i>Reporte de las facturas canceladas {{$codigo_relacion_pago}}</a>	
+					<a href="{{route('reciboPagoFacturas',$codigo_relacion_pago)}}"><i class="fa fa-print"></i>Reporte de las facturas canceladas {{$codigo_relacion_pago}} Monto {{number_format($totalDivisa,3) ?? 0}}</a>	
 				@endif <!-- fin if($totalFacturas > 0.00)-->
 			@endif	<!-- fin totalFacturas -->
 		</form>
@@ -372,18 +365,17 @@
 	@endsection
 	@section('js')
 	<script type="text/javascript">
+		/*****dejar selected la tasa del dolar de la factura o el actual con dependiendo si el modo de pago es dolares o bolivares */
+
+
+
+
 		/*funcion que formatea el valor numerico al de moneda*/
         $("#moneda1").on({
             "focus": function (event) {
                 $(event.target).select();
             },
-        /*    "keyup": function (event) {
-                $(event.target).val(function (index, value ) {
-                    return value.replace(/\D/g, "")
-                                .replace(/([0-9])([0-9]{2})$/, '$1,$2')
-                                .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ".");
-                });
-            }*/
+        
         });
 
 
@@ -394,7 +386,8 @@
 		  var modopago =  $("#modo_pago").val();
 		  var selector = $("#Select_id  option:selected").val();		  
 		  var isActivarBanco = <?php echo $isActivarBanco; ?>;
-		  
+		  var tipoTasaSelect = document.getElementById('tipo_tasa');
+
 		  switch(selector){
 		    case "NDEB":		      
 		      $("#banco_id").prop('disabled', true);
@@ -410,6 +403,13 @@
 			  $("#nfactura_nota").prop('required',true);
 		      break;	
 
+			case "DESC":
+		      $("#banco_id").prop('disabled', true);
+		      $("#referencia_pago").prop('disabled', true);
+			  $("#nfactura_nota").prop('disabled',false);
+			  $("#nfactura_nota").prop('required',true);
+		      break;	
+
 		    case "CAN":
 		      $("#modo_pago").prop('disabled',false)	
 		      if(modopago=='bolivares'){
@@ -417,8 +417,12 @@
 		      	$("#referencia_pago").prop('disabled', false);
 				$("#nfactura_nota").prop('disabled',true);
 				$("#nfactura_nota").prop('required',false);
+				tipoTasaSelect.selectedIndex = 1;
 		      	document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
 		      }else{
+				/** cual tasa queda por defecto */
+				tipoTasaSelect.selectedIndex = 0;
+						
 				if(isActivarBanco == '1'){
 					$("#banco_id").prop('disabled', false);
 		        	$("#banco_id").prop('required', true);
@@ -430,6 +434,7 @@
 		});
 
 		$("#modo_pago").change(function(){
+			var tipoTasaSelect = document.getElementById('tipo_tasa');
 			var modopago = $("#modo_pago  option:selected").val();
 			var tipoTasa = $("#tipo_tasa option:selected").val();
 			var seleccion = tipoTasa.split('|');
@@ -441,6 +446,11 @@
 		      $("#referencia_pago").prop('disabled', false);
 		      $("#tipo_tasa").prop('disabled',false);
 		      $("#tipo_tasa").prop('required', true);
+			  ///despues de cambiar la seleccion optenemos el nuevo valor y seteamos
+			  tipoTasaSelect.selectedIndex = 1;
+			  tipoTasa = $("#tipo_tasa option:selected").val();
+			  seleccion = tipoTasa.split('|');
+
 		      if(seleccion[1] == 'tasaActual'){
 		      	 document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa*$tasaDelDia,3) ?>;
 		      }
@@ -453,7 +463,7 @@
 		     
 		      break;		    
 		    case "dolares":		      	
-		      
+				tipoTasaSelect.selectedIndex = 0;
 		      $("#referencia_pago").prop('disabled', true);
 			  
 			    $("#banco_id").prop('disabled', true);
@@ -473,17 +483,21 @@
 
 		$("#tipo_tasa").change(function(){
 			var tipoTasa = $("#tipo_tasa option:selected").val();
+			var modopago = $("#modo_pago  option:selected").val();
 			var seleccion = tipoTasa.split('|');
 
-			switch(seleccion[1]){
-				case "tasaFactura":
-					document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
-				break;
+			if(modopago == 'bolivares'){
+				switch(seleccion[1]){
+					case "tasaFactura":
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					break;
 
-				case "tasaActual":
-					document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa*$tasaDelDia,3) ?>;
-				break;
+					case "tasaActual":
+						document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa*$tasaDelDia,3) ?>;
+					break;
+				}
 			}
+			
 		});
     </script>
 
