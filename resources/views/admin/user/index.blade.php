@@ -3,10 +3,10 @@
 @section('content')
     <div class="container">
         <h3>Listado de usuarios</h3>
-        <div> <a href="{{ route('admin.user.register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">+ Registrar Nuevo Usuario</a></div>
+        <div> <a href="{{ route('admin.user.register') }}" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline btn btn-primary btn-sm my-2">+ Registrar Nuevo Usuario</a></div>
         <div class="card">
             <div class="card-body">
-                <table class="table">
+                <table class="table" id="usuarios">
                     <thead>
                         <tr>
                             <th>Id</th>
@@ -34,13 +34,29 @@
 
         </div>
     </div>
-    <script type="text/javascript">
+    
+  
+@endsection
+@section('js')
+<script type="text/javascript">
         function eliminar(id){
             let conf = confirm("¿Desea Eliminar el usuario seleccionado?");
             if(conf){
                 location.href="user/delete/"+id;
             }
         }
+
+        $(document).ready(function() {	
+		
+                $('#usuarios').DataTable({                
+                    select: true,
+                    paging: true,
+                    searching: true,
+                    ordering:  true
+                });
+                
+            
+
+        } );
     </script>
-  
 @endsection
