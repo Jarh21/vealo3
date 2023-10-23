@@ -39,14 +39,17 @@
 					<div class="row">
 						<div class="col">
 							<label  class="text-secondary">Fechas desde</label>
-							<input type="date" name="fechaini" class="form-control" value={{$fechaini ?? ''}} />
+							<input type="date" name="fechaini" class="form-control" required value={{$fechaini ?? ''}} />
 						</div>
 						<div class="col">
 							<label  class="text-secondary">Fechas hasta</label>
-							<input type="date" name="fechafin" class="form-control" value={{$fechafin ?? ''}} />
+							<input type="date" name="fechafin" class="form-control" required value={{$fechafin ?? ''}} />
 						</div>
 						<div class="col mt-4">
 							<button type="submit" class="btn btn-primary btn-sm" title="Buscar"><i class="fa fa-search"></i></button>
+						</div>
+						<div class="col">
+						<input type="checkbox" id="checkbox" onchange="toggleEtiquetas()"><label for="checkbox">Mostrar Bolivares en pago total del proveedor</label>
 						</div>
 					</div>
 					
@@ -60,7 +63,11 @@
 	<div class="text-center">
 		<?php $desde = date('d-m-Y',strtotime($fechaini)); ?>
 		<?php $hasta = date('d-m-Y',strtotime($fechafin)); ?>
+		@if($desde == '01-01-1970')
+		<div class="alert alert-warning my-3"><i class="fas fa-exclamation-circle"></i> Debe seleccionar el rango de fechas en el cual desea trabajar</div>
+		@else
 		<h4>Relación de Facturas desde {{$desde ?? 'no definida'}} hasta {{$hasta ?? 'no definida'}}</h4>
+		@endif
 	</div>
 	<form action="{{route('vistaPagarFacturas')}}" method="post" name="formCuentaPorPagar">
 		@csrf
@@ -195,7 +202,7 @@
 							<td>{{number_format($pagoTotal,2)}}</td> <!-- pago en Divisas -->
 
 							@if($cuenta->totalFactutrasPorProveedor == $contadorFila)
-							<td style="border-top: none; ">{{number_format($sumaPorProveedor,2)}}$<br>{{number_format($sumaPagoMonedaNacional,2).'Bs'}}</td><!--total por proveedor-->
+							<td style="border-top: none; ">{{number_format($sumaPorProveedor,2)}}$<br><span class="etiqueta" hidden> {{number_format($sumaPagoMonedaNacional,2).'Bs'}}</span></td><!--total por proveedor-->
 							@else
 							<td style="border-top:none;  border-bottom:none"></td>
 							@endif
@@ -301,7 +308,20 @@
 </div>
 @endsection
 @section('js')
+	<script type="text/javascript">
+		function toggleEtiquetas() {
+			var checkbox = document.getElementById("checkbox");
+			var etiquetas = document.getElementsByClassName("etiqueta");
 
+			for (var i = 0; i < etiquetas.length; i++) {
+				if (checkbox.checked) {
+				etiquetas[i].removeAttribute("hidden"); // Mostrar la etiqueta si el checkbox está seleccionado
+				} else {
+				etiquetas[i].setAttribute("hidden", true); // Ocultar la etiqueta si el checkbox no está seleccionado
+				}
+			}
+		}
+	</script>
 
 	<script type="text/javascript">
 		$(document).ready(function() {	

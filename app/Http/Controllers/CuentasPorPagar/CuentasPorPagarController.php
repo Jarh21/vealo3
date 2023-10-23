@@ -253,7 +253,7 @@ class CuentasPorPagarController extends Controller
     	*/
     	$herramientas  = new HerramientasController();
     	
-		$facturas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion, cuentas_por_pagars.id as idcxp, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, facturas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE cuentas_por_pagars.concepto = 'CAN' AND cuentas_por_pagars.empresa_rif =:empresa AND facturas_por_pagars.id = cuentas_por_pagars.factura_id order by id desc limit 100",['empresa'=>session('empresaRif')]);
+		$facturas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion, cuentas_por_pagars.id as idcxp, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, facturas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE cuentas_por_pagars.concepto = 'CAN' AND cuentas_por_pagars.empresa_rif =:empresa AND facturas_por_pagars.id = cuentas_por_pagars.factura_id order by id desc limit 1000",['empresa'=>session('empresaRif')]);
 		
     	return view('cuentasPorPagar.facturasPagadas',[
     		'empresas'=>$herramientas->listarEmpresas(),
@@ -1613,9 +1613,11 @@ class CuentasPorPagarController extends Controller
     	$eliminarAsiento->delete();
 		//comparamos si la duda se cancelo en la factura y actualizamos la bandera
 		//facturas_pagada
-		$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($eliminarAsiento->factura_id);										
-		if($verificarSiSeCanceloFactura->resto > 0.00){								
+		$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($eliminarAsiento->factura_id);
+											
+		if(floatval($verificarSiSeCanceloFactura->resto) > 0.00){								
 			FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>0]);
+			
 			// aqui se registrara las deducciones de la sra helen 
 		}     	
     	return self::verVistaPagarFacturas($codigoRelacion);

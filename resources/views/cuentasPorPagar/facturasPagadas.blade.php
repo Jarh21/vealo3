@@ -152,7 +152,7 @@
         ],
 	    select: true,
 	    searching: true,
-	    paging: false,
+	    paging: true,
 		"footerCallback": function ( row, data, start, end, display ) {
 	            var api = this.api(), data;
 	 
