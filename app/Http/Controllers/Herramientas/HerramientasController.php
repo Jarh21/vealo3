@@ -98,6 +98,35 @@ class HerramientasController extends Controller
 		}
 		
 	}
+
+	public static function listarTodasLasTasa(){
+		$dolar='';
+		$conexionSQL = self::conexionDinamicaBD(session('basedata'));
+		//buscamos en la configuracin de cuentas por pagar si la tasa de la moneda secundaria es en historial_dolar o en tipo moneda del siace
+		$cualTasa = Parametro::buscarVariable('verificar_tasa_dolar_tipo_moneda_o_historial_dolar');
+		if($cualTasa == 'historial_dolar_vealo'){
+			$dolar = DB::select('SELECT tasa_segunda_actualizacion,fecha from historial_dolar order by fecha desc');
+		}
+		if($cualTasa=='historial_dolar_siace'){
+			$dolar = $conexionSQL->select('SELECT tasa_segunda_actualizacion,fecha from historial_dolar  order by fecha desc');
+		}
+		
+		if($cualTasa=='tipo_moneda_historial_tasa_vealo'){
+			$dolar = DB::select('SELECT nueva_tasa_de_cambio_en_moneda_nacional as tasa_segunda_actualizacion,fecha  FROM tipo_moneda_historial_tasa  order by fecha desc');
+		}
+		if($cualTasa=='tipo_moneda_historial_tasa_siace'){
+			$dolar = $conexionSQL->select('SELECT nueva_tasa_de_cambio_en_moneda_nacional as tasa_segunda_actualizacion, fecha  FROM tipo_moneda_historial_tasa  order by fecha desc');
+		}
+		//dd($dolar,$fecha,'herramientas controller 42');
+		if(empty($dolar) or $dolar==0.000){
+			
+			\Session::flash('message', 'No se pudo optener el valor de la Tasa del Dolar a la fecha ');
+			return 1;
+		}else{
+			return $dolar;
+		}
+		
+	}
 	
 	public static function ultimoValorDolar(){
 		$dolar='';
@@ -134,9 +163,60 @@ class HerramientasController extends Controller
 			}
 		}else{
 			return 0;
+		}		
+	}
+
+	public function guardarTasa(Request $request){
+		//este metodo se encarga de guardar el valor de la tasa de la divisa, el verifica con cual base de datos se esta trabajando, esto se defina en configuracion->cuentas por pagar
+		//si la tabla base es del vealo se registran en ella y si es en siace lo hace en el siace pero solo uno de ambas, esto busca si se registro una fecha anteriormente lo edita si no exste 
+		//crea un nuevo registro y si es viernes inserta viernes,sabado y domingo.
+		$fecha = $request->fecha;
+		$tasa = $request->tasa;
+		$dia_semana = date('l', strtotime($fecha));
+		$ndias = 0;
+		if($dia_semana == 'Friday'){
+			$ndias=2;
 		}
-		
-		
+		$conexionSQL = self::conexionDinamicaBD(session('basedata'));
+		//buscamos en la configuracin de cuentas por pagar si la tasa de la moneda secundaria es en historial_dolar o en tipo moneda del siace
+		$cualTasa = Parametro::buscarVariable('verificar_tasa_dolar_tipo_moneda_o_historial_dolar');
+			//si es con la base de datos del VEALO	
+		if($cualTasa=='tipo_moneda_historial_tasa_vealo'){
+			//buscamos si el registro existe, de lo contrario se insertan
+			$dolar = DB::select('SELECT nueva_tasa_de_cambio_en_moneda_nacional as tasa_segunda_actualizacion,fecha  FROM tipo_moneda_historial_tasa  where fecha=:fecha ',['fecha'=>$fecha]);
+			if(isset($dolar[0]->tasa_segunda_actualizacion)){
+				DB::update("update tipo_moneda_historial_tasa set nueva_tasa_de_cambio_en_moneda_nacional=? where fecha=?",[$tasa,$fecha]);
+			}else{
+				for($i=0;$i<=$ndias;){
+					$fecha_actual = date('Y-m-d', strtotime($fecha . ' +'.$i.' day'));
+					DB::insert("INSERT INTO tipo_moneda_historial_tasa (codtipomoneda,nueva_tasa_de_cambio_en_moneda_nacional,fecha) VALUES	(?,?,?)",[3,$tasa,$fecha_actual]);
+					$i++;
+				}
+				
+			}
+		}
+			//si es con la base de datos del SIACE
+		if($cualTasa=='tipo_moneda_historial_tasa_siace'){
+			$codTipoMoneda = 0;
+			$dolar = $conexionSQL->select('SELECT nueva_tasa_de_cambio_en_moneda_nacional as tasa_segunda_actualizacion, fecha  FROM tipo_moneda_historial_tasa  where fecha=:fecha ',['fecha'=>$fecha]);
+			//buscamos el codigo del tipo moneda divisas en el siace
+			$tipoMoneda = $conexionSQL->select('SELECT keycodigo FROM tipo_moneda WHERE is_moneda_secundaria=1 AND is_activo=1');
+			//verificamos que existe el registro para evitar error al momento de ejecuatar
+			if(isset($tipoMoneda[0]->keycodigo)){
+				$codTipoMoneda = $tipoMoneda[0]->keycodigo;
+			}
+			if(isset($dolar[0]->tasa_segunda_actualizacion)){
+				$conexionSQL->update("update tipo_moneda_historial_tasa set nueva_tasa_de_cambio_en_moneda_nacional=? where fecha=?",[$tasa,$fecha]);
+			}else{
+				
+				for($i=0;$i<=$ndias;){
+					$fecha_actual = date('Y-m-d', strtotime($fecha . ' +'.$i.' day'));
+					$conexionSQL->insert("INSERT INTO tipo_moneda_historial_tasa (codtipomoneda,nueva_tasa_de_cambio_en_moneda_nacional,fecha) VALUES	(?,?,?)",[$codTipoMoneda,$tasa,$fecha_actual]);
+					$i++;
+				}
+			}
+		}
+
 	}
 
 	public function conexionDinamicaBD($conexion) {
@@ -244,6 +324,6 @@ class HerramientasController extends Controller
 			
 			return $conversion;
 		}
-		dd("Error no se pudo conectar con el siace para determinar la moneda base de dicho sistema, herraminetasController linea 200");
+		dd("Error no se pudo conectar con el siace para determinar la moneda base de dicho sistema, herraminetasController linea 319");
 	}
 }

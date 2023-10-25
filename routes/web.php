@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\GeneralController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\RolesPermisosController;
 use App\Http\Controllers\Admin\EmpresasController;
+use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Http\Controllers\Cuadres\CuadresObservacionController;
 use App\Http\Controllers\Cuadres\CuadresTransferenciaController;
 use App\Http\Controllers\Cuadres\CuadresPrestamoEfectivoController;
@@ -332,6 +333,13 @@ Route::middleware(['auth'])->group(function(){
 
     //puntos de ventas
     /* Route::get('/listar-puntos-de-ventas-registrados',[]) */
+
+
+    /***********************HERRAMINETAS CONTROLLER******* */
+    Route::get('/herraminetas/valorTasaActual',[HerramientasController::class,'ultimoValorDolar']);
+    Route::get('/herraminetas/listarTodasLasTasas',[HerramientasController::class,'listarTodasLasTasa']);
+    Route::post('/herraminetas/guardarTasa',[HerramientasController::class,'guardarTasa'])->name('guardarValorTasa');
+
 
 });
 

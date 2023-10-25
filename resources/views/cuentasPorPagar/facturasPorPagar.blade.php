@@ -38,7 +38,7 @@
 					<div class="col-5">
 						<div class="form-group">
 						
-						<select name="proveedorRif" class="js-example-basic-single " style="width: 100%;"; title="Seleccionar el proveedor de la facturas del siace" >
+						<select name="proveedorRif" class="js-example-basic-single " style="width: 100%;" title="Seleccionar el proveedor de la facturas del siace" >
 							<option value=""></option>
 							@if(isset($proveedores))
 							@foreach($proveedores as $proveedor)
@@ -141,10 +141,10 @@
 										<b class="text-danger">{{$cuenta->estatus}}</b>
 									@else	
 										@if(session('modoPago')=='bolivares')
-										<input type="checkbox" id="check{{$cuenta->id}}" name="facturasPorPagar[]" onchange="isCheckBoxSeleccionado({{$cuenta->id}});" class="CheckedAK" value="{{$cuenta->id}}">
+										<input type="checkbox" id="check{{$cuenta->id}}" name="facturasPorPagar[]" onchange="isCheckBoxSeleccionado({{$cuenta->id}})" class="CheckedAK" value="{{$cuenta->id}}">
 										@else
 											@if($pago_facturas_desde_facturas_por_pagar==1)
-											<input type="checkbox" id="check{{$cuenta->id}}" name="facturasPorPagar[]" onchange="isCheckBoxSeleccionado({{$cuenta->id}});" class="CheckedAK" value="{{$cuenta->id}}">
+											<input type="checkbox" id="check{{$cuenta->id}}" name="facturasPorPagar[]" onchange="isCheckBoxSeleccionado({{$cuenta->id}})" class="CheckedAK" value="{{$cuenta->id}}">
 											@endif
 										@endif
 									@endif
@@ -196,7 +196,7 @@
 								@if(empty($cuenta->codigo_relacion_pago))	    					
 								<!--<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ModalEliminar" title="Eliminar"><i class="fa fa-trash" aria-hidden="true"></i></button>--><!--Eliminar-->
 									@if($cuenta->is_apartada_pago==0)
-									<div class="row" @if($cuenta->is_factura_revisada==true) style="background-color:#CFF5E2"; @endif title="Factura Revisada">
+									<div class="row" @if($cuenta->is_factura_revisada==true) style="background-color:#CFF5E2" @endif title="Factura Revisada">
 									<div class="col">Cre({{$cuenta->dias_credito}})Dias<br>Des({{$cuenta->porcentaje_descuento}})% </div>
 									</div>
 									<div class="row">
@@ -207,7 +207,7 @@
 									
 									
 									@else
-									<span style="font-size:11px;">Apartada para pago {{$cuenta->fecha_real_pago}}</span>
+									<span style="font-size:11px">Apartada para pago {{$cuenta->fecha_real_pago}}</span>
 									@endif
 								@else
 									@if($cuenta->pago_efectuado==0)
@@ -216,7 +216,7 @@
 											<a href="{{route('verVistaPagarFacturas',$cuenta->codigo_relacion_pago)}}" class="text-success" title="Pago en proceso haga click para terminar">Editar<i class="fa fa-edit"></i></a>
 											<a href="{{route('desvincularAsientoCuentasPorPagarBolivares',[$cuenta->id,$cuenta->codigo_relacion_pago]) }}" title="sacar de la relacion de pagos">Sacar<i class="fas fa-external-link-alt"></i></a>
 										@else
-											<span style="font-size:11px;">Apartada para pago {{$cuenta->fecha_real_pago}}</span>
+											<span style="font-size:11px">Apartada para pago {{$cuenta->fecha_real_pago}}</span>
 										@endcan	
 									@endif		    							
 								@endif

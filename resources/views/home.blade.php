@@ -39,20 +39,7 @@
             </div>
         </div>
         @endcan
-        <!-- <div class="card m-1 offset-3" style="width: 23rem; border-radius: 6px;">
-            <div class="card-body d-inline-flex m-0 p-0 border" style="border-radius: 6px;">
-                <div class="row-cols">
-                    <div class="bg-modulo-card1 m-0 p-0 d-flex justify-content-center align-content-center" style="width: 7rem; height: 100%; border-radius: 6px;">
-                        <img src="{{--asset('dist/img/bg-card3.png')--}}" class="mt-5" style="width: 92px; height: 92px;">
-                    </div>
-                </div>
-                <div class="row-col m-3">
-                    <h4 class="card-title font-weight-bold text-warning float-right">SOLICITUD DE PAGOS</h4>
-                    <p class="card-text text-dark text-center">Registro y control para solicitud de divisas para pagos, {{--session('nombre_general_empresa')--}}</p>
-                    <a href="{{--route('solicitudDivisaIndex')--}}" class="btn btn-warning d-flex justify-content-center">Ir al modulo<i class="fas fa-arrow-circle-right ml-2 mt-1"></i></a>
-                </div>
-            </div>
-        </div> -->
+
         @can('divisasCustodio.create')
         <div class="card m-1 offset-3" style="width: 23rem; border-radius: 6px;">
             <div class="card-body d-inline-flex m-0 p-0 border" style="border-radius: 6px;">
@@ -80,7 +67,7 @@
                 <div class="row-col m-3">
                     <h4 class="card-title font-weight-bold float-right" style="">Informes Adicionales</h4>
                     <p class="card-text text-dark text-center">Multiples Reportes de, {{session('nombre_general_empresa')}}</p>
-                    <a href="{{route('informesAdicionales.index')}}" class="btn d-flex justify-content-center text-white" style="background-color:#cc5d4c";>Ir al modulo<i class="fas fa-arrow-circle-right ml-2 mt-1"></i></a>
+                    <a href="{{route('informesAdicionales.index')}}" class="btn d-flex justify-content-center text-white" style="background-color:#cc5d4c">Ir al modulo<i class="fas fa-arrow-circle-right ml-2 mt-1"></i></a>
                     <a href="{{url('/informes/habladores/manual')}}" class="float-right">Ayuda</a>
                 </div>
             </div>

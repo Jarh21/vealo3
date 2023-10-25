@@ -48,7 +48,7 @@
         
         <div class="input-group mb-3">
             <span class="mr-2" >Empleados especiales</span>
-            <select name="vendedores_especiales_id[]" class="js-example-basic-single" style="width: 75%"; multiple="multiple" title="al no seleccionar ningun vendedor la configuracion se aplica a todos, de lo contrario, se aplica solo a los vendedores seleccionados">
+            <select name="vendedores_especiales_id[]" class="js-example-basic-single" style="width: 75%" multiple="multiple" title="al no seleccionar ningun vendedor la configuracion se aplica a todos, de lo contrario, se aplica solo a los vendedores seleccionados">
                 <option value=""></option>
                 @if(isset($usuarios))
                     @if(isset($parametroSeleccionado->vendedores_especiales_id))

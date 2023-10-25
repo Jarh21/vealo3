@@ -31,6 +31,11 @@
 <body class="hold-transition sidebar-mini layout-fixed">
 
     <div id="app">
+        <div class="modal fade" id="cotizacion"  aria-labelledby="cotizacionLabel" aria-hidden="true">            
+                
+            <cambio-tasa></cambio-tasa>                
+                
+        </div>
         <div class="wrapper">
 
             <!-- Navbar -->
@@ -46,19 +51,21 @@
 
                 <!-- Right navbar links -->
                 <ul class="navbar-nav ml-auto">
-                                       
+                                 
                     <!-- Notifications Dropdown Menu -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link" data-toggle="dropdown" href="#">
-                            <i class="far fa-bell"></i>
-                            <span class="badge badge-warning navbar-badge">                               
-                                <?php //$cotizacion = HerramientasController::ultimoValorDolar(); ?>
-                                Cotizacion:{{--$cotizacion->fecha ?? ''--}} {{--$cotizacion->tasa_segunda_actualizacion ?? 0--}}
+                        @can('guardarValorTasa')
+                        <a class="nav-link" data-toggle="modal" data-target="#cotizacion">
+                            
+                            <span class="badge badge-warning navbar-badge" >                               
+                                        
+                            <i class="fas fa-dollar-sign"></i> Cotizacion
                             </span>
                         </a>
-                        
+                        @endcan
                     </li> 
                 </ul>
+                 
             </nav>
             <!-- /.navbar -->
 
@@ -145,7 +152,7 @@
                                     <li class="nav-item">
                                         <a href="{{ route('relacionPagoFacturasIndex')}}"
                                             class="{{ Request::path() === 'cuentasporpagar/relacion-pago-facturas' ? 'nav-link active' : 'nav-link' }}">
-                                            <i class="fab fa-buffer nav-icon text-white"></i>
+                                            <i class="fab fa-buffer nav-icon text-primary"></i>
                                             Facturas a relacionar
                                         </a>
                                     </li>

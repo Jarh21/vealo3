@@ -22,7 +22,7 @@
                     <div class="row">
                         <div class="col">
                         <label for="proveedor">Proveedor</label>
-                            <select name="proveedor" class="js-example-basic-single" style="width: 80%"; multiple="multiple" required>
+                            <select name="proveedor" class="js-example-basic-single" style="width: 80%" multiple="multiple" required>
 			    				<option value=""></option>
 			    				@if(isset($proveedores))
 			    				@foreach($proveedores as $proveedor)
@@ -89,7 +89,7 @@
                                 @foreach($documentos as $documento)
                                 <!-- separamos el numero de factura del monto -->
                                 <?php $datosFactura = explode('-',$documento) ?>             
-                                <span @if($datosFactura[2] > 0)style="text-decoration:line-through;" title="Factura cancelada" @endif>{{$datosFactura[0] ?? 'no hay'}} </span><span >{{number_format($datosFactura[1],2)}}</span>
+                                <span @if($datosFactura[2] > 0)style="text-decoration:line-through" title="Factura cancelada" @endif>{{$datosFactura[0] ?? 'no hay'}} </span><span >{{number_format($datosFactura[1],2)}}</span>
                                 <input type="checkbox" checked name="otro{{$pago->empresa_rif}}[]" id="otro{{$pago->empresa_rif}}" value="{{$documento}}" class="d-print-none" onclick="sumarFacturas('{{$pago->empresa_rif}}')">
                                 <br>                                
                                 @endforeach
@@ -104,7 +104,7 @@
                     </tr>                        
                     <?php $sumaDivisa += floatval($pago->divisa);?>
                     @endforeach
-                    <tr style="background-color: #D6DCD9;">
+                    <tr style="background-color: #D6DCD9">
                         <td colspan='2' style="text-align: right">Total a la Fecha: </td>                        
                         <td id='total'>{{number_format($sumaDivisa,3)}}</td>                            
                         <td></td>
