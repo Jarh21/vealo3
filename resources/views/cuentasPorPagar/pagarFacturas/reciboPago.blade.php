@@ -34,7 +34,7 @@
 				<th>Concepto</th>				
 				
 			</tr>
-			<?php $monto=0;$suma=0; ?>
+			<?php $monto=0;$suma=0; $sumaDivisa=0;?>
 			@foreach($datosDelPago as $datos)
 				<tr>
 					<td></td>
@@ -72,7 +72,7 @@
 					<?php
 						if($cxp->concepto=='CAN') 
 						$suma += $cxp->creditos; 
-						
+						$sumaDivisa += $cxp->monto_divisa;
 					?>
 					
 				</tr>
@@ -81,8 +81,9 @@
 
 			@endforeach
 			<tr>
-				<td colspan="1"><b>Total </b></td>
-				<td><b>{{number_format($suma,2)}}</b></td>
+				<td colspan="2"><b>Total </b></td>
+				<td><b> {{number_format($suma,2).'Bs'}} </b></td>
+				<td><b class="text-success" style="font-size:25px">{{number_format($sumaDivisa,2).'$' }}<b></td>
 			</tr>
 		</table>
 		<br><br>

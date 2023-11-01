@@ -32,7 +32,7 @@
                  INICIO DE LOS HABLADORES -->
                     <div class="text-center separador-habladores mt-2 mb-1">
                         <div class="w-100 h-100 rounded img-zoom-seleccion-tienda">
-                            <img class="m-1" src="{{asset($logoEmpresa)}}">
+                            <img class="m-1" src="{{asset($logoEmpresa)}}" style="width: 100px">
                             <p class="h3 font-weight-bold mr-2 ml-2 height-hablador mt-0 pt-0 mb-0">{{$hablador['nombre']}}</p>
                             <div class="bg-navbar-gray">
                                 

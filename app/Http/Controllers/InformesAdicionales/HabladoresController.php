@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Models\Parametro;
+use App\Models\Empresa;
+
 class HabladoresController extends Controller
 {
     private $herramientas='';
@@ -153,7 +155,8 @@ class HabladoresController extends Controller
         $habladores=array();
         $archivo = "";
         $porcentajeIGTF = Parametro::buscarVariable('igtf'); 
-        $logoEmpresa = Parametro::buscarVariable('logo_empresa');
+        $Empresa = Empresa::where('rif',session('empresaRif'))->first();
+        $logoEmpresa = $Empresa->logo;
         if(empty($request->habladores)){
             \Session::flash('message', 'Disculpe no seleccionó ningun producto para generar habladores');
             return redirect('/informes/listar-habladores/'.$request->nombre_lista);

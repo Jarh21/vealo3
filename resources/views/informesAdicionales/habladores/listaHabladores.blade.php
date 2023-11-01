@@ -1,9 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    .alternar:hover{ background-color:#C1BDBC;cursor: pointer}
-</style>
+
 <div class="container">
     <div>
     <h3>Lista Habladores {{$nombreDeLaLista}}</h3>
@@ -21,7 +19,7 @@
         <form action="{{route('imprimirHabladores')}}" method="post" target="_blank" id="formhabladores" name="formhabladores">
             @csrf
             <input type="hidden" name="nombre_lista" value="{{$nombreDeLaLista}}">
-        <table class="table" id="lista">
+        <table class="table table-striped" id="lista">
             <thead>
                 <tr>
                     <th>Codprod</th>
@@ -36,7 +34,7 @@
                 @foreach($habladores as $hablador)
                 @if(isset($hablador['codprod']))
                 @php $idcheck = 'habladores'.$hablador['codprod']; @endphp
-                <tr class="alternar" onclick="selectCelda('{{$idcheck}}');">
+                <tr class="" onclick="selectCelda('{{$idcheck}}');">
                     <td>{{$hablador['codprod']}}</td>
                     <td>{{$hablador['nombre']}}</td>                    
                     <td>{{number_format($hablador['precio'],2,',','.')}}-{{$hablador['tipoIva']}}</td>
@@ -90,7 +88,7 @@
             function Eliminar(lista,id){
             let eliminar = confirm("¿Desea eliminar el producto seleccionado?");
             if(eliminar){
-                window.location="/vealo/public/informes/eliminar-producto-listado-hablador/"+lista+"/"+id; 
+                window.location="{{url('informes/eliminar-producto-listado-hablador')}}/"+lista+"/"+id; 
                
             }
         

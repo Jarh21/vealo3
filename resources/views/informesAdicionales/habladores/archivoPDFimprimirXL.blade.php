@@ -29,9 +29,9 @@
             <!--<tr>
                 <td width="500px">
                  INICIO DE LOS HABLADORES -->
-                    <div class="text-center bg-warning  ">
+                    <div class="text-center ">
                         <div class=" ">
-                            <img class="m-1" src="{{asset('imagen/logofd.png')}}">
+                        <img class="m-1" src="{{asset($logoEmpresa)}}" style="width: 150px">
                             <p class="h1 font-weight-bold mr-2 ml-2 height-hablador mt-0 pt-0 mb-0">{{$hablador['nombre']}}</p>
                             <div class="bg-navbar-gray">
                                 

@@ -30,79 +30,89 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">Inicio de Sessión</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">Correo Electronico</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                    <div class="row">
+                        <div class="col-3 " >
+                            <div class="">
+                                <img src="imagen/logo_vealo.png" alt="" class=""
+                                                            style="opacity: .8; width:200px">
+                            </div>                            
                         </div>
+                        <div class="col">
+                            <div class="card-body">
+                            <form method="POST" action="{{ route('login') }}">
+                                @csrf
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">Contraseña</label>
+                                <div class="row mb-3">
+                                    <label for="email" class="col-md-4 col-form-label text-md-end">Correo Electronico</label>
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+                                    <div class="col-md-6">
+                                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-                        @if(isset($empresas))
-                        <div class="row mb-3">
-                            <label for="empresas" class="col-md-4 col-form-label text-md-end">Empresas</label>
-
-                            <div class="col-md-6">
-                                <select name="empresas" required  id="empresas" class="form-control" >
-                                    <option value="">-- Seleccione la Empresa --</option> 
-                                    @foreach($empresas as $empresa)
-                                        <option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}|{{$empresa->logo ?? 0}}">{{$empresa->nombre}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        @endif
-                        <div class="row mb-3">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                    <label class="form-check-label" for="remember">
-                                        Recordarme <a href="{{ route('registroAlternoUsuarios')}}" class="text-decoration-none" style="cursor: default">.</a>
-                                    </label>
+                                        @error('email')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Ingresar
-                                </button>
+                                <div class="row mb-3">
+                                    <label for="password" class="col-md-4 col-form-label text-md-end">Contraseña</label>
 
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        Olvido su contraseña
-                                    </a>
+                                    <div class="col-md-6">
+                                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+
+                                        @error('password')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                @if(isset($empresas))
+                                <div class="row mb-3">
+                                    <label for="empresas" class="col-md-4 col-form-label text-md-end">Empresas</label>
+
+                                    <div class="col-md-6">
+                                        <select name="empresas" required  id="empresas" class="form-control" >
+                                            <option value="">-- Seleccione la Empresa --</option> 
+                                            @foreach($empresas as $empresa)
+                                                <option value="{{$empresa->rif}}|{{$empresa->nombre}}|{{$empresa->basedata}}|{{$empresa->logo ?? 0}}">{{$empresa->nombre}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                                 @endif
-                            </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6 offset-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+
+                                            <label class="form-check-label" for="remember">
+                                                Recordarme <a href="{{ route('registroAlternoUsuarios')}}" class="text-decoration-none" style="cursor: default">.</a>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-0">
+                                    <div class="col-md-8 offset-md-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            Ingresar
+                                        </button>
+
+                                        @if (Route::has('password.request'))
+                                            <a class="btn btn-link" href="{{ route('password.request') }}">
+                                                Olvido su contraseña
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </div>    
+                
             </div>
         </div>
     </div>
