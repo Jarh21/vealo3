@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 /*use Illuminate\Http\Request; */
 use App\Models\Rrhh;
 use App\Models\Empresa;
-use App\Exports\rrhhExport;
 use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Http\Controllers\Islr\xmlController;
+use App\Exports\dowloadExcelRRHH;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Auth;
-
+use Maatwebsite\Excel\Facades\Excel;
 class rrhhController extends Controller
 {
     public function index()
@@ -100,8 +100,9 @@ class rrhhController extends Controller
     public function exportarRrhhCsv($rif=''){
         //return (new rrhhExport)->download();
         //return Excel::download(new rrhhExport, 'Empleados.csv');
-        return (new rrhhExport($rif))->download('Empleados-'.time().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        //return (new rrhhExport($rif))->download('Empleados-'.time().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         //return (new rrhhExport)->download('invoices.csv', \Maatwebsite\Excel\Excel::CSV);
+        return Excel::download(new dowloadExcelRRHH, 'empleados_grupo_Farma_Descuento.xlsx');
     }
 
     public function create(){
@@ -131,7 +132,7 @@ class rrhhController extends Controller
             $empleado->update(['activo'=>1,'fecha_ingreso'=>$request->get('fecha_ingreso'),'sueldo_base'=>$sueldo,'empresa_rif'=>$empresa_rif[0],'empresa_id'=>$empresaId[0]->id]); 			
             
         } 
-	 return redirect('/islr/rrhh');   
+	 return redirect()->route('rrhh.index');   
         
     }
 

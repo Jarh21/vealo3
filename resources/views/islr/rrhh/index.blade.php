@@ -38,7 +38,7 @@
 	</button>
 	<button type="button" class="btn btn-secondary btn-sm d-inline mb-3 d-print-none" data-toggle="modal" data-target="#exampleModalimportar" disabled><i class="fas fa-arrow-down"></i> Importar Empleados</button>
 	<a href="{{route('rrhh.create')}}" class="btn btn-primary btn-sm mb-3 d-print-none"><i class="fa fa-plus" aria-hidden="true"></i>Nuevo Empleado</a>
-	<!-- <a href="{{--route('rrhh.export',$empresa_seleccionada)--}}" class="btn btn-success btn-sm mb-3 d-print-none" disabled><i class="far fa-file-excel"></i>Exportar Excel</a> -->
+	<a href="{{route('rrhh.export',$empresa_seleccionada)}}" class="btn btn-success btn-sm mb-3 d-print-none" disabled><i class="far fa-file-excel"></i>Exportar Rif Excel</a>
 	</div>
 	@if(isset($messageBueno))
 		<div class="alert alert-success"><p>{{$messageBueno}}</p></div>
