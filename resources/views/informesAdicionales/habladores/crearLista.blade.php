@@ -80,6 +80,10 @@
 		</div>
 		
 		</form>
+		<div>
+		<p class="mx-2 text-danger"><b>Nota:</b> una vez seleccionado todos lo productos asegurece de que no tenga ninguna palabra filtrando el listado, esto es el la casilla que dice Buscar: ya que si hay algun filtro no se guardaran el resto de productos pre-seleccionado.</p>
+		</div>
+		
 	</div>
 </div>
 @endsection

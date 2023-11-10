@@ -74,6 +74,17 @@
 		  <div class="form-group">
 		    <label for="direccion">Direccion</label>
 		    <textarea class="form-control" id="exampleFormControlTextarea5" rows="4" name="direccion">{{$proveedor->direccion}}</textarea>
+		  </div>
+		  <div class="card">
+			<div class="card-body">
+				<h5>Opciones de Cuentas por pagar incluir o excluir al momento de cargar las facturas y relacionar los pagos.</h5><hr>
+				<div><input type="checkbox" name="descontar_nota_credito" id="nota_credito" @if($proveedor->descontar_nota_credito == 1)checked @endif><label for="nota_credito">Descontar Nota de creditos</label></div>
+				<div><input type="checkbox" name="agregar_nota_debito" id="nota_debito" @if($proveedor->agregar_nota_debito == 1)checked @endif><label for="nota_debito">Agregar Notas de Debito</label></div>
+				<div><input type="checkbox" name="agregar_igtf" id="igtf" @if($proveedor->agregar_igtf == 1)checked @endif><label for="igtf">Agregar Impuesto IGTF por pagos en divisa</label></div>
+				
+				
+				
+			</div>
 		  </div>		  
 		 
 		  <button type="submit" class="btn btn-primary">Editar</button>

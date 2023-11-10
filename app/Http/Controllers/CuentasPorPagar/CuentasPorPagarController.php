@@ -369,10 +369,11 @@ class CuentasPorPagarController extends Controller
 	    			//buscamos el porcentaje de retencion del iva
 					$caracteres=array('-',' ','.','*',',','/');
 					$rifProveedorFactura=str_replace($caracteres,'',trim($proveedorRif));	    			
-					$proveedor = DB::select("SELECT rif,porcentaje_retener FROM (SELECT REPLACE(rif,'-','')AS rif,porcentaje_retener FROM proveedors) AS prov WHERE rif=:facRif",['facRif'=>$rifProveedorFactura]);
-	    			foreach($proveedor as $datos){
+					$proveedor = DB::select("SELECT rif,porcentaje_retener,descontar_nota_credito FROM (SELECT REPLACE(rif,'-','')AS rif,porcentaje_retener FROM proveedors) AS prov WHERE rif=:facRif",['facRif'=>$rifProveedorFactura]);
+	    			$descontarNotaCredito=0;
+					foreach($proveedor as $datos){
 						$porcentajeRetencionIva=$datos->porcentaje_retener;
-						
+						$descontarNotaCredito = $datos->descontar_nota_credito;
 					}//fin buscar porcentaje de retencion	
 					
 					//verificar si el proveedor esta registrado en vealo
@@ -495,24 +496,26 @@ class CuentasPorPagarController extends Controller
 		    				self::guardarEnCuentasPorPagar($arrayRegistro);
 		    			}///FIN SI LA FACTURA TIENE DESCUENTO
 
-		    			/////BUSCAR SI LA FACTURA TIENE NOTA DE CREDITO
-		    			$notacreditos = $conexionSQL->select("SELECT SUM(creditos+montoiva)AS credito FROM notacredito WHERE codfact=:keycodigoFac GROUP BY codfact",['keycodigoFac'=>$registro->keycodigo]);
-		    			foreach($notacreditos as $notacredito){
-		    				$credito = floatval($notacredito->credito);
-		    			}
-		    			//si la nota credito es mayor a 0 creamos el asiento
-		    			if($credito > 0.00){
-		    				$arrayRegistro['debitos'] = 0;
-		    				$arrayRegistro['montoiva'] = 0;
-		    				$arrayRegistro['creditos'] = $credito;
-		    				$arrayRegistro['cod_concepto'] = 5;
-		    				$arrayRegistro['concepto'] = 'NCP';
-		    				$arrayRegistro['concepto_descripcion']='NOTA DE CREDITO';
-		    				$arrayRegistro['factura_id']=$facturaPorPagar->id;
-		    				
-		    				self::guardarEnCuentasPorPagar($arrayRegistro);
-		    			}//FIN NOTA CREDITO		
-
+						/////COMPARAMOS SI EL PROVEEDOR TIENE HABILITADO DESCONTAR NOTA DE CREDITO
+						if($descontar_nota_credito == 1){
+							/////BUSCAR SI LA FACTURA TIENE NOTA DE CREDITO
+							$notacreditos = $conexionSQL->select("SELECT SUM(creditos+montoiva)AS credito FROM notacredito WHERE codfact=:keycodigoFac GROUP BY codfact",['keycodigoFac'=>$registro->keycodigo]);
+							foreach($notacreditos as $notacredito){
+								$credito = floatval($notacredito->credito);
+							}
+							//si la nota credito es mayor a 0 creamos el asiento
+							if($credito > 0.00){
+								$arrayRegistro['debitos'] = 0;
+								$arrayRegistro['montoiva'] = 0;
+								$arrayRegistro['creditos'] = $credito;
+								$arrayRegistro['cod_concepto'] = 5;
+								$arrayRegistro['concepto'] = 'NCP';
+								$arrayRegistro['concepto_descripcion']='NOTA DE CREDITO';
+								$arrayRegistro['factura_id']=$facturaPorPagar->id;
+								
+								self::guardarEnCuentasPorPagar($arrayRegistro);
+							}//FIN NOTA CREDITO		
+						}////FIN DE COMPARAR SI EL PROVEEDOR TIENE HABILITADO DESCONTAR NOTA DE CREDITO	
 	    			}//fin si es factura
 	    		
 	    			$mensaje['texto']="Factura ".$nFactura." importada con exito";
