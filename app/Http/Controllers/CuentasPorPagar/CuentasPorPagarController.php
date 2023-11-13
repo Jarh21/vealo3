@@ -369,7 +369,7 @@ class CuentasPorPagarController extends Controller
 	    			//buscamos el porcentaje de retencion del iva
 					$caracteres=array('-',' ','.','*',',','/');
 					$rifProveedorFactura=str_replace($caracteres,'',trim($proveedorRif));	    			
-					$proveedor = DB::select("SELECT rif,porcentaje_retener,descontar_nota_credito FROM (SELECT REPLACE(rif,'-','')AS rif,porcentaje_retener FROM proveedors) AS prov WHERE rif=:facRif",['facRif'=>$rifProveedorFactura]);
+					$proveedor = DB::select("SELECT rif,porcentaje_retener,descontar_nota_credito FROM (SELECT REPLACE(rif,'-','')AS rif,porcentaje_retener,descontar_nota_credito FROM proveedors) AS prov WHERE rif=:facRif",['facRif'=>$rifProveedorFactura]);
 	    			$descontarNotaCredito=0;
 					foreach($proveedor as $datos){
 						$porcentajeRetencionIva=$datos->porcentaje_retener;
@@ -497,7 +497,7 @@ class CuentasPorPagarController extends Controller
 		    			}///FIN SI LA FACTURA TIENE DESCUENTO
 
 						/////COMPARAMOS SI EL PROVEEDOR TIENE HABILITADO DESCONTAR NOTA DE CREDITO
-						if($descontar_nota_credito == 1){
+						if($descontarNotaCredito == 1){
 							/////BUSCAR SI LA FACTURA TIENE NOTA DE CREDITO
 							$notacreditos = $conexionSQL->select("SELECT SUM(creditos+montoiva)AS credito FROM notacredito WHERE codfact=:keycodigoFac GROUP BY codfact",['keycodigoFac'=>$registro->keycodigo]);
 							foreach($notacreditos as $notacredito){
