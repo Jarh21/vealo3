@@ -114,9 +114,9 @@
 	    				
 	    				<td>
 	    					@if($cuenta->is_apartada_pago == 1)
-	    					 	<input type="checkbox" name="igtf[]" value="{{$cuenta->id}}" @if($cuenta->igtf > 0.00)checked @endif disabled>
+	    					 	<input type="checkbox" name="igtf[]" value="{{$cuenta->id}}" @if($cuenta->igtf > 0.00 || $cuenta->is_igtf == true)checked @endif disabled>
 	    					@else
-	    						<input type="checkbox" name="igtf[]" value="{{$cuenta->id}}">
+	    						<input type="checkbox" name="igtf[]" value="{{$cuenta->id}}" @if($cuenta->is_igtf == true)checked @endif >
 	    					@endif	
 	    				</td>
 						<td>

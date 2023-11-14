@@ -465,7 +465,7 @@ class xmlController extends Controller
 		$objetoXML = new XMLWriter();
 
 		// Estructura básica del XML
-		$rutaArchivo="detalleRetencion".$rifAgente."-".$periodo.".xml";
+		$rutaArchivo=public_path("xml/detalleRetencion".$rifAgente."-".$periodo.".xml"); //($rutaArchivo);
 		$objetoXML->openURI($rutaArchivo);
 		$objetoXML->setIndent(true);
 		$objetoXML->setIndentString("\t");
@@ -556,7 +556,7 @@ class xmlController extends Controller
 
 	public function descargarXml($rif,$periodo){
 		
-		$pathtoFile = public_path()."/detalleRetencion".$rif."-".$periodo.".xml";
+		$pathtoFile = public_path("xml/detalleRetencion".$rif."-".$periodo.".xml");
       	return response()->download($pathtoFile);
 	}
 

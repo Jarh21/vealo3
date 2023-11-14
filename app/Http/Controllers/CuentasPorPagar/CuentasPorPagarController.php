@@ -161,6 +161,7 @@ class CuentasPorPagarController extends Controller
 		              'retencion_iva'=>$facturaPorPagar->retencion_iva,
 					  'is_factura_revisada'=>$facturaPorPagar->is_factura_revisada,
 		              'observacion'=>$facturaPorPagar->observacion,
+					  'is_igtf' =>$facturaPorPagar->is_igtf,
 		              'igtf'=>$facturaPorPagar->igtf,
 					  'banderaFacturaSiaceEncontrada'=>$banderaFacturaSiaceEncontrada,
 		              'usuario'=>$facturaPorPagar->usuario,
@@ -197,7 +198,7 @@ class CuentasPorPagarController extends Controller
 			$PorcRetencion = $datos_proveedor->ultimo_porcentaje_retener_islr;
 
 			//si el proveedor tiene porcentaje de retencion islr
-			if($PorcRetencion > 0){
+			if($datos_proveedor->agregar_islr == true or $PorcRetencion > 0){
 				if($datos_proveedor->tipo_contribuyente=="Juridico"){					
 					$sustraendo=0;
 				}else{
@@ -369,11 +370,17 @@ class CuentasPorPagarController extends Controller
 	    			//buscamos el porcentaje de retencion del iva
 					$caracteres=array('-',' ','.','*',',','/');
 					$rifProveedorFactura=str_replace($caracteres,'',trim($proveedorRif));	    			
-					$proveedor = DB::select("SELECT rif,porcentaje_retener,descontar_nota_credito FROM (SELECT REPLACE(rif,'-','')AS rif,porcentaje_retener,descontar_nota_credito FROM proveedors) AS prov WHERE rif=:facRif",['facRif'=>$rifProveedorFactura]);
+					$proveedor = DB::select("SELECT rif,porcentaje_retener,descontar_nota_credito,agregar_igtf,dias_credito,agregar_islr FROM (SELECT REPLACE(rif,'-','')AS rif,porcentaje_retener,descontar_nota_credito,agregar_igtf,dias_credito,agregar_islr FROM proveedors) AS prov WHERE rif=:facRif",['facRif'=>$rifProveedorFactura]);
 	    			$descontarNotaCredito=0;
+					$agregarIgtf =0;
+					$diasCreditoProveedor = 0;
+					$agregarIslr =0;
 					foreach($proveedor as $datos){
 						$porcentajeRetencionIva=$datos->porcentaje_retener;
 						$descontarNotaCredito = $datos->descontar_nota_credito;
+						$agregarIgtf = $datos->agregar_igtf;
+						$agregarIslr = $datos->agregar_islr;
+						$diasCreditoProveedor = $datos->dias_credito;
 					}//fin buscar porcentaje de retencion	
 					
 					//verificar si el proveedor esta registrado en vealo
@@ -398,6 +405,7 @@ class CuentasPorPagarController extends Controller
 		    		$facturaPorPagar->excento = $registro->exento;
 					$facturaPorPagar->observacion = $observacion;
 					$facturaPorPagar->origen = 'siace';
+					$facturaPorPagar->is_igtf = $agregarIgtf;
 		    		//$facturaPorPagar->codigo_relacion_pago = $codigoUnico;
 		    		if(isset($registro->fecha)){
 		    			$fechaFactura = $registro->fecha;
@@ -412,7 +420,10 @@ class CuentasPorPagarController extends Controller
 		    		if(!empty($diasCredito)){
 		    			//si hay modificacion en los dis de credito
 		    			$facturaPorPagar->dias_credito = $diasCredito;
-		    		}
+		    		}else{
+						//si no hay modificaciones en los dias de creditos le colocamos los dias de credito del proveedor
+						$facturaPorPagar->dias_credito = $diasCreditoProveedor;
+					}
 		    		if(!empty($porcDescuento)){
 		    			//si hay modificacion del porcentaje de descuento 
 		    			$facturaPorPagar->porcentaje_descuento = $porcDescuento;

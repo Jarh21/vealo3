@@ -65,7 +65,11 @@
 		  </div>
 		  <div class="form-group">
 		    <label for="direccion">Porcentaje de retención IVA</label>
-		    <input type="text" class="form-control" name="porcentaje_retener" placeholder="100,70 ..." value="{{$proveedor->porcentaje_retener}}">
+		    <input type="text" class="form-control" name="porcentaje_retener" placeholder="100,75 ..." value="{{$proveedor->porcentaje_retener}}">
+		  </div>
+		  <div class="form-group">
+		    <label for="direccion">Porcentaje de retención ISLR</label>
+		    <input type="text" class="form-control" name="ultimo_porcentaje_retener_islr" placeholder="Ejemplo 3 " value="{{$proveedor->ultimo_porcentaje_retener_islr}}">
 		  </div>
 		  <div class="form-group">
 		    <label for="direccion">Codigo Fiscal</label>
@@ -80,7 +84,9 @@
 				<h5>Opciones de Cuentas por pagar incluir o excluir al momento de cargar las facturas y relacionar los pagos.</h5><hr>
 				<div><input type="checkbox" name="descontar_nota_credito" id="nota_credito" @if($proveedor->descontar_nota_credito == 1)checked @endif><label for="nota_credito">Descontar Nota de creditos</label></div>
 				<div><input type="checkbox" name="agregar_nota_debito" id="nota_debito" @if($proveedor->agregar_nota_debito == 1)checked @endif><label for="nota_debito">Agregar Notas de Debito</label></div>
+				<div><input type="checkbox" name="agregar_islr" id="agregar_islr" @if($proveedor->agregar_islr == true) checked @endif> <label for="agregar_islr">Agregar ISLR <span class="text-danger">(Nota: para que realice el calculo debe tener registrado el porcentaje de retencion de ISLR.)</span></label> </div>
 				<div><input type="checkbox" name="agregar_igtf" id="igtf" @if($proveedor->agregar_igtf == 1)checked @endif><label for="igtf">Agregar Impuesto IGTF por pagos en divisa</label></div>
+				<div><label for="">Dias de Credito</label><input type="number" class="form-control w-50" placeholder='ingrese el numero de dias de credito' name="dias_credito" id="dias_credito"></div>
 				
 				
 				

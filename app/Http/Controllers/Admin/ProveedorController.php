@@ -84,6 +84,7 @@ class ProveedorController extends Controller
         $descontarNotaCredito=0;
         $agregar_nota_debito=0;
         $agregar_igtf=0;
+        $agregar_islr=0;
 
         if($request->descontar_nota_credito =='on'){
             $descontarNotaCredito = 1;
@@ -94,7 +95,9 @@ class ProveedorController extends Controller
         if($request->agregar_igtf =='on'){
             $agregar_igtf = 1;
         } 
-
+        if($request->agregar_islr =='on'){
+            $agregar_islr = 1;
+        }
         $proveedor = Proveedor::findOrFail($id);
         $rif = $request->get('tipoRif').'-'.$request->get('rifNumero').'-'.$request->get('rifTerminal');
         $proveedor->rif = $rif;
@@ -107,6 +110,13 @@ class ProveedorController extends Controller
         $proveedor->descontar_nota_credito=$descontarNotaCredito;
         $proveedor->agregar_nota_debito=$agregar_nota_debito;
         $proveedor->agregar_igtf=$agregar_igtf;
+        $proveedor->agregar_islr=$agregar_islr;
+        if(!empty($request->dias_credito)){
+            $proveedor->dias_credito = $request->dias_credito;
+        }
+        if(!empty($request->ultimo_porcentaje_retener_islr)){
+            $proveedor->ultimo_porcentaje_retener_islr = $request->ultimo_porcentaje_retener_islr;
+        }
         $proveedor->update(); 
 
         return self::ver($id,$origen);

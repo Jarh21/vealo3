@@ -45,6 +45,7 @@ class FacturasPorPagar extends Model
               'facturas_por_pagars.retencion_islr',
               'facturas_por_pagars.fecha_real_pago',
               'facturas_por_pagars.retencion_iva',
+              'facturas_por_pagars.is_igtf',
               'facturas_por_pagars.igtf',
               'facturas_por_pagars.monto',
               'facturas_por_pagars.origen',
