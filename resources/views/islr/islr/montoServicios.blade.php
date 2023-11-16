@@ -46,7 +46,16 @@
 					<select name="porcentaje_id" class="form-control rounded-right" required>
 						<option value="">-- Seleccine % --</option>
 						@foreach($porcentajeRetencion as $porcen)
-						<option value="{{$porcen->id}}" @if(isset($islrDetalleEditar) and $islrDetalleEditar->id_porcentaje_retencion== $porcen->id)selected @endif>{{$porcen->procent_retencion}}</option>
+						<option value="{{$porcen->id}}" 
+						@if(isset($islrDetalleEditar) and $islrDetalleEditar->id_porcentaje_retencion== $porcen->id)
+							selected 
+						@else 
+							@if(isset($ultimoPorcentajeProveedor)) 
+								@if($ultimoPorcentajeProveedor == $porcen->procent_retencion) 
+									selected 
+								@endif 
+							@endif 
+						@endif >{{$porcen->procent_retencion}}</option>
 						@endforeach
 					</select>
 					

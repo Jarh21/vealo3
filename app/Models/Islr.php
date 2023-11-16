@@ -9,7 +9,7 @@ class Islr extends Model
 {
     use HasFactory;
     public static function ultimoPorcentajeDelProveedor($proveedorRif,$empresaRif){
-    	$resultado= DB::select('SELECT d.porcentaje_retencion FROM islrs i,islr_detalles d WHERE i.proveedor_rif=:proveedorRif AND i.empresa_rif=:empresaRif AND i.id=d.islr_id ORDER BY i.id DESC LIMIT 1',[$proveedorRif,$empresaRif]);
+    	$resultado= DB::select('SELECT ultimo_porcentaje_retener_islr as porcentaje_retencion FROM proveedors WHERE rif=:proveedorRif ORDER BY id DESC LIMIT 1',['proveedorRif'=>$proveedorRif]);
     	if(!empty($resultado)){
     		return $resultado[0]->porcentaje_retencion;
     	}else{

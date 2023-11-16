@@ -22,7 +22,7 @@
 		      <th scope="row">{{$proveedor->id}}</th>
 		      <td width=100px>{{$proveedor->rif}}</td>
 			  <td>{{$proveedor->nombre}}</td>
-		      <td>{{$proveedor->ultimo_porcentaje_retencion_islr}}</td>
+		      <td>{{$proveedor->ultimo_porcentaje_retener_islr}}</td>
 		      <td>{{$proveedor->codigoFiscal}}</td>
 		      <td>
 		      	<a href="{{route('proveedor.ver',$proveedor->id)}}" class="btn-secondary btn-sm">Ver</a>

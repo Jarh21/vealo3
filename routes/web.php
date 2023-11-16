@@ -195,7 +195,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/regisretenciones/excel',[islrController::class,'index'])->name('islr.export.excel');
     Route::get('/detalleretenciones/delete/{id}/{idRetencion}',[islrController::class,'deleteDetalles'])->name('islr.detalle.destroy');
     Route::put('/regisretenciones/create-detalle/{idRetencion?}/{accion?}/{idxml?}/{fechasPeriodo?}',[islrController::class,'saveRegistroIslrGeneral'])->name('islr.save2');
-    Route::get('/regisretenciones/monto-servicios/{idRetencion?}',[islrController::class,'montoServicios'])->name('islr.montoServicios');
+    Route::get('/regisretenciones/monto-servicios/{idRetencion?}/{ultimoPorcentajeProveedor?}',[islrController::class,'montoServicios'])->name('islr.montoServicios');
     Route::get('/regisretenciones/editDetalle/{id}/{idRetencion}',[islrController::class,'editDetalles'])->name('islr.detalle.edit');
     Route::get('/regisretenciones/delete/{id}/{ncontrol?}/{rifempresa?}',[islrController::class,'eliminarIslr'])->name('islr.delete');
     /*FIN Registro de las retenciones*/

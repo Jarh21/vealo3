@@ -308,7 +308,7 @@ class islrController extends Controller
 	}
 
 
-	public function montoServicios($idRetencion){
+	public function montoServicios($idRetencion,$ultimoPorcentajeProveedor){
 		//en esta funcion se carga el iframe donde se registraran 
 		//los montos de los servicios a retener impuestos
 		$porcentajeRetencion = Retencion::all();
@@ -320,7 +320,7 @@ class islrController extends Controller
 		//buscamos los detalles de retencion de las retenciones para la vista
 		$detalleRetenciones = self::buscarDetalleRetencion($idRetencion);
 
-		return view('islr.islr.montoServicios',['porcentajeRetencion'=>$porcentajeRetencion,'idRetencion'=>$idRetencion,'detalleRetenciones'=>$detalleRetenciones,'datosRetenciones'=>$datosRetencion]);
+		return view('islr.islr.montoServicios',['porcentajeRetencion'=>$porcentajeRetencion,'idRetencion'=>$idRetencion,'detalleRetenciones'=>$detalleRetenciones,'datosRetenciones'=>$datosRetencion,'ultimoPorcentajeProveedor'=>$ultimoPorcentajeProveedor]);
 	}
 	
 	
@@ -382,7 +382,7 @@ class islrController extends Controller
 		//despues de actualizar busco nuevamente los datos y los envio a la vista
 		$datosRetencion = self::buscar($idRetencion);//buscamos los datos de retencion
 		
-		return view('islr.islr.montoServicios',['porcentajeRetencion'=>$porcentajeRetencion,'datosRetenciones'=>$datosRetencion,'detalleRetenciones'=>$detalleRetenciones,'idRetencion'=>$idRetencion]);
+		return view('islr.islr.montoServicios',['porcentajeRetencion'=>$porcentajeRetencion,'datosRetenciones'=>$datosRetencion,'detalleRetenciones'=>$detalleRetenciones,'idRetencion'=>$idRetencion,'ultimoPorcentajeProveedor'=>$pr]);
 	}
 
 

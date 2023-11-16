@@ -100,7 +100,7 @@
 
 			
 			
-			<iframe  style="border:0;" src="{{route('islr.montoServicios',$datosRetencion->id)}}" width="100%" height="400px"></iframe>
+			<iframe  style="border:0;" src="{{route('islr.montoServicios',[$datosRetencion->id,$ultimoPorcentajeProveedor])}}" width="100%" height="400px"></iframe>
 			
 			<div class="fixed-bottom d-flex justify-content-end">
 								
@@ -142,7 +142,7 @@
 			</div>	<!--fin modal-->
 		
 	@endforeach
-	<div class="alert alert-info">
+	<div class="alert alert-ligth">
 			<b>Importante:</b>	
 			<p  class="text-secondary">
 				* Persona JURIDICA: en caso de ser varias facturas se registran cada una de ellas independientes y el sistema calcula el total.</p>
