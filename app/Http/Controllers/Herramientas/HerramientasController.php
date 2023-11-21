@@ -18,7 +18,17 @@ class HerramientasController extends Controller
         buscamos las empresas registradas y sus datos para la vista
         */
         
-	}	
+	}
+	
+	public function obtenerIdUsuarioLogeado()
+    {
+        if (Auth::check()) {
+            $idUsuario = Auth::id();
+            return $idUsuario;
+        }
+        
+        return 0;
+    }
 	
     public static function convertirMonto($valor){
     	//este metodo cambia los montos 1.000.000,00 en validos para mysql 1000000.00
@@ -35,11 +45,14 @@ class HerramientasController extends Controller
 	}
 
 	public function listarEmpresas($usuarioId=0){
+
 		///si se pasa como parametro el id del uisuario, se busca cuales son las empresas  a las cuales tiene acceso y esas son las que le va a mostrar
 		////si no se pasa el usuario id se pasan todas las empresas
+		$usuarioId = self::obtenerIdUsuarioLogeado();
  		$rifs=array();
 		if($usuarioId > 0 ){
-			$permisoEmpresas = DB::connection('mysql')->select('select * from usuarios_acceso_empresas where user_id =:userId',['userId'=>session('usuarioId')]);
+			
+			$permisoEmpresas = DB::connection('mysql')->select('select * from usuarios_acceso_empresas where user_id =:userId',['userId'=>$usuarioId]);
 			if(empty($permisoEmpresas)){
 				dd("Revise las empresas asignadas en los datos del usuario porque al parecer no tiene ninguna empresa asignada");
 			}

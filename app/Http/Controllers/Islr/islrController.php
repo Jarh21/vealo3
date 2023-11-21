@@ -308,7 +308,7 @@ class islrController extends Controller
 	}
 
 
-	public function montoServicios($idRetencion,$ultimoPorcentajeProveedor){
+	public function montoServicios($idRetencion,$ultimoPorcentajeProveedor=0){
 		//en esta funcion se carga el iframe donde se registraran 
 		//los montos de los servicios a retener impuestos
 		$porcentajeRetencion = Retencion::all();

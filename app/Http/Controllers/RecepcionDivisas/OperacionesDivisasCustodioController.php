@@ -381,4 +381,19 @@ class OperacionesDivisasCustodioController extends Controller
 		$recaudos=$conexionSQL->select("SELECT keycodigo,codusua,usuario,fecha FROM operaciones_en_divisas_custodio WHERE fecha=:fecharecaudo GROUP BY usuario",['fecharecaudo'=>$fecha]);
 		return $recaudos;
 	}
+
+	public function reporteRecaudoMovpago(){
+	
+		$herramientas = new HerramientasController();					
+		return view('divisasCustodio.reporteRecaudoMovpago',['empresas'=>$herramientas->listarEmpresas()]);
+	}
+
+	public function buscarReporteRecaudoMovpago(Request $request){
+		$fecha = $request->fecha;
+		$herramientas = new HerramientasController();
+		$empresa = self::datosEmpresa($request->conexion);
+		$conexionSQL = $herramientas->conexionDinamicaBD($request->conexion);
+		$recaudos=$conexionSQL->select("SELECT FECHA, codusua, usuario, DOLARES, ROUND(tasa,2), ROUND((DOLARES*tasa),2) AS Bolivares, codarq FROM (SELECT mov_pagos.Fecha ,mov_pagos.codusua ,mov_pagos.usuario ,SUM(mov_pagos.monto_moneda) AS DOLARES ,mov_pagos.codarq, tipo_moneda_historial_tasa.`nueva_tasa_de_cambio_en_moneda_nacional` AS tasa FROM mov_pagos, tipo_moneda_historial_tasa,(SELECT keycodigo FROM tipo_moneda WHERE is_moneda_secundaria=1 AND is_activo=1)AS tipoMoneda WHERE mov_pagos.fecha = tipo_moneda_historial_tasa.`fecha` AND mov_pagos.codtipomoneda=tipoMoneda.keycodigo AND mov_pagos.FECHA=:fecharecaudo GROUP BY mov_pagos.usuario,mov_pagos.codarq) AS movpagos",['fecharecaudo'=>$fecha]);
+		return view('divisasCustodio.reporteRecaudoMovpago',['recaudos'=>$recaudos,'empresas'=>$herramientas->listarEmpresas(),'datosEmpresa'=>$empresa]);
+	}
 }

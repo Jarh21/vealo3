@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\DB;
 class CuentasPorPagarController extends Controller
 {
     public function seleccionarEmpresa($rutaSolicitante=''){
-
-        return view('cuentasPorPagar.seleccionEmpresa',['empresas'=>Empresa::all(),'rutaSolicitante'=>$rutaSolicitante]);
+		$herramientas  = new HerramientasController();
+        return view('cuentasPorPagar.seleccionEmpresa',['empresas'=>$herramientas->listarEmpresas(),'rutaSolicitante'=>$rutaSolicitante]);
 	}
 
     public function guardarSeleccionEmpresa(Request $request){

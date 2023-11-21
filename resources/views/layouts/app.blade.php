@@ -74,7 +74,7 @@
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
                      
-                    <span class="brand-text font-weight-light h4">{{ config('app.name', 'Laravel') }}</span>
+                    <span class="brand-text font-weight-light h4">{{ config('app.name', 'Laravel') }}.9</span>
                 </a>
 
                 <!-- Sidebar -->
@@ -350,7 +350,11 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{route('divisa.reporte.recaudo')}}"
-                                        class="{{ Request::path() === 'divisas/reporte-recaudo' ? 'nav-link active' : 'nav-link' }}"><i class="fa fa-chart-bar nav-icon "></i>Reporte Recaudo</a>
+                                        class="{{ Request::path() === 'divisas/reporte-recaudo' ? 'nav-link active' : 'nav-link' }}"><i class="fa fa-chart-bar nav-icon "></i>Reporte Recaudo calculadora</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{route('divisa.reporte.recaudo.movpagos')}}"
+                                        class="{{ Request::path() === 'divisas/reporte-recaudo-movpago' ? 'nav-link active' : 'nav-link' }}"><i class="fa fa-chart-bar nav-icon "></i>Reporte Recaudo </a>
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{route('porcentaje.puntosventas')}}" 

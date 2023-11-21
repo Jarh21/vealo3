@@ -160,7 +160,7 @@
 								@endif
 								@if($cuenta->porcentaje_retencion_iva==0.00) 
 								<span  class="right badge badge-warning" >
-									<a href="{{route('proveedor.edit',[$cuenta->proveedor_rif])}}">Error no tiene % retencion IVA</a>
+									<a href="#">Error no tiene % retencion IVA</a>
 								</span>
 								@else
 								{{$cuenta->porcentaje_retencion_iva ?? '0'}}%

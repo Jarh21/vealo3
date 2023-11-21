@@ -275,6 +275,9 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/divisas/custodio/edit/{id}',[OperacionesDivisasCustodioController::class,'edit'])->name('divisas.custodio.edit');
     Route::get('/divisas/reporte-detalle/{co}/{tasa}/{fecha}',[OperacionesDivisasCustodioController::class,'reporteDetalladoGerencia'])->name('divisa.reporte.detallado.gerencia');
     Route::get('/divisas/reporte-recaudo',[OperacionesDivisasCustodioController::class,'reporteRecaudo'])->name('divisa.reporte.recaudo');
+    Route::get('/divisas/reporte-recaudo-movpago',[OperacionesDivisasCustodioController::class,'reporteRecaudoMovpago'])->name('divisa.reporte.recaudo.movpagos');
+    Route::post('/divisas/reporte-recaudo-movpago',[OperacionesDivisasCustodioController::class,'buscarReporteRecaudoMovpago'])->name('buscar.reporte.recaudo.movpagos');
+
     Route::post('/divisas/reporte-buscar-recaudo',[OperacionesDivisasCustodioController::class,'buscarReporteRecaudo'])->name('divisa.buscar.reporte.recaudo');
     Route::get('/divisas/listar-pagos',[OperacionesDivisasCustodioController::class,'listarPagoMovil'])->name('listar.pago.movil');
     Route::post('/divisas/listar-pagos',[OperacionesDivisasCustodioController::class,'buscarListarPagoMovil'])->name('buscar.listar.pago.movil');
