@@ -86,7 +86,7 @@
 				<div><input type="checkbox" name="agregar_nota_debito" id="nota_debito" @if($proveedor->agregar_nota_debito == 1)checked @endif><label for="nota_debito">Agregar Notas de Debito</label></div>
 				<div><input type="checkbox" name="agregar_islr" id="agregar_islr" @if($proveedor->agregar_islr == true) checked @endif> <label for="agregar_islr">Agregar ISLR <span class="text-danger">(Nota: para que realice el calculo debe tener registrado el porcentaje de retencion de ISLR.)</span></label> </div>
 				<div><input type="checkbox" name="agregar_igtf" id="igtf" @if($proveedor->agregar_igtf == 1)checked @endif><label for="igtf">Agregar Impuesto IGTF por pagos en divisa</label></div>
-				<div><label for="">Dias de Credito</label><input type="number" class="form-control w-50" placeholder='ingrese el numero de dias de credito' name="dias_credito" id="dias_credito"></div>
+				<div><label for="">Dias de Credito</label><input type="number" class="form-control w-50" placeholder='ingrese el numero de dias de credito' name="dias_credito" id="dias_credito" value="{{$proveedor->dias_credito ?? 0}}"></div>
 				
 				
 				
