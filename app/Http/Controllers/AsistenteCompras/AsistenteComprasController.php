@@ -35,7 +35,7 @@ class AsistenteComprasController extends Controller
     public function descargarExcel($nombreDrogueria='Drolanca',$farmaciaId='2'){
         $rutaArchivoDestino = public_path()."\cargado.xlsx";
         $rutaArchivo='';
-        
+        $conexionSQL = $this->herramientas->conexionDinamicaBD('hptal');
         //acceder a un archivo fuera del proyecto
         //recorremos la carpeta y copiamos todos los archivos para copiarlos
 
@@ -57,7 +57,8 @@ class AsistenteComprasController extends Controller
         
         
         //buscamos el archivo correspondiente a la drogueria
-        $datosArchivo = DB::connection('slave')->select("SELECT nombre_archivo FROM relacion_proveedores WHERE nombre=:nombreDrogueria",['nombreDrogueria'=>$nombreDrogueria]);
+       // $datosArchivo = DB::connection('slave')->select("SELECT nombre_archivo FROM relacion_proveedores WHERE nombre=:nombreDrogueria",['nombreDrogueria'=>$nombreDrogueria]);
+        $datosArchivo = $conexionSQL->select("SELECT nombre_archivo FROM relacion_proveedores WHERE nombre=:nombreDrogueria",['nombreDrogueria'=>$nombreDrogueria]);
                
         foreach($datosArchivo as $archivo){
             $rutaArchivo = public_path('droguerias/').$archivo->nombre_archivo;
@@ -70,7 +71,8 @@ class AsistenteComprasController extends Controller
         $documento = IOFactory::load($rutaArchivo);
         $hojaActual = $documento->getSheet(0);
         //buscamos los registros de la base de datos a guardar en el archivo
-        $detallesCompras = DB::connection('slave')->select("SELECT a.archivo_pedido_id,a.drogueria,a.id_farmacia,a.cantidad,a.coordenadas_archivo,r.nombre_archivo FROM valores_pred v, asistente_compras_detallado a,relacion_proveedores r WHERE a.archivo_pedido_id = v.id_pedido AND a.drogueria COLLATE utf8mb4_general_ci = r.nombre AND a.drogueria=:drogueria AND a.id_farmacia=:farmaciaId",['drogueria'=>$nombreDrogueria,'farmaciaId'=>$farmaciaId]);
+        //$detallesCompras = DB::connection('slave')->select("SELECT a.archivo_pedido_id,a.drogueria,a.id_farmacia,a.cantidad,a.coordenadas_archivo,r.nombre_archivo FROM valores_pred v, asistente_compras_detallado a,relacion_proveedores r WHERE a.archivo_pedido_id = v.id_pedido AND a.drogueria COLLATE utf8mb4_general_ci = r.nombre AND a.drogueria=:drogueria AND a.id_farmacia=:farmaciaId",['drogueria'=>$nombreDrogueria,'farmaciaId'=>$farmaciaId]);
+        $detallesCompras = $conexionSQL->select("SELECT a.archivo_pedido_id,a.drogueria,a.id_farmacia,a.cantidad,a.coordenadas_archivo,r.nombre_archivo FROM valores_pred v, asistente_compras_detallado a,relacion_proveedores r WHERE a.archivo_pedido_id = v.id_pedido AND a.drogueria COLLATE utf8mb4_general_ci = r.nombre AND a.drogueria=:drogueria AND a.id_farmacia=:farmaciaId",['drogueria'=>$nombreDrogueria,'farmaciaId'=>$farmaciaId]);
         foreach($detallesCompras as $detalles){
             $hojaActual->setCellValue($detalles->coordenadas_archivo,$detalles->cantidad);
         }
