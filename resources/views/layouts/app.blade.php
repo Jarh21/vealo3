@@ -31,11 +31,7 @@
 <body class="hold-transition sidebar-mini layout-fixed">
 
     <div id="app">
-        <div class="modal fade" id="cotizacion"  aria-labelledby="cotizacionLabel" aria-hidden="true">            
-                
-            <cambio-tasa></cambio-tasa>                
-                
-        </div>
+        
         <div class="wrapper">
 
             <!-- Navbar -->
@@ -55,7 +51,7 @@
                     <!-- Notifications Dropdown Menu -->
                     <li class="nav-item dropdown">
                         @can('guardarValorTasa')
-                            <a class="nav-link" data-toggle="modal" data-target="#cotizacion">
+                            <a href="{{route('cotizacion.tasa')}}" class="nav-link" >
                             
                             <span class="badge badge-warning navbar-badge" >                               
                                         

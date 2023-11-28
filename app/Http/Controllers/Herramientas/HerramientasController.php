@@ -337,6 +337,11 @@ class HerramientasController extends Controller
 			
 			return $conversion;
 		}
-		dd("Error no se pudo conectar con el siace para determinar la moneda base de dicho sistema, herraminetasController linea 319");
+		dd("Error no se pudo conectar con el siace para determinar la moneda base de dicho sistema, herraminetasController linea 340");
+	}
+
+	public function cotizacionTasa(){
+		//muestra la vista de la cotizacion de las tasas
+		return view('cuentasPorPagar.cotizacionTasa');
 	}
 }

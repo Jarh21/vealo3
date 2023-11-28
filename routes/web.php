@@ -162,6 +162,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/cuentasporpagar/ReporteBolivares',[CuentasPorPagarController::class,'reportePagoBolivaresDeDolares'])->name('reportePagoBolivares');
     Route::post('/cuentasporpagar/resulReporteBolivares',[CuentasPorPagarController::class,'resulReportePagoBolivaresDeDolares'])->name('resulReportePagoBolivares');
     Route::post('/cuentasporpagar/fecha_facturas-calculadas',[CuentasPorPagarController::class,'seleccionarRangoFechaFacturasCalculadas'])->name('seleccionarRangoFechaFacturasCalculadas');
+    
 
     ///-------------------Fin Relacion Pago de Facturas Cuentas Por Pagar--///// 
 
@@ -339,6 +340,7 @@ Route::middleware(['auth'])->group(function(){
 
 
     /***********************HERRAMINETAS CONTROLLER******* */
+    Route::get('/herramientas/cotizacionTasa',[HerramientasController::class,'cotizacionTasa'])->name('cotizacion.tasa');
     Route::get('/herraminetas/valorTasaActual',[HerramientasController::class,'ultimoValorDolar']);
     Route::get('/herraminetas/listarTodasLasTasas',[HerramientasController::class,'listarTodasLasTasa']);
     Route::post('/herraminetas/guardarTasa',[HerramientasController::class,'guardarTasa'])->name('guardarValorTasa');

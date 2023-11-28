@@ -29,15 +29,10 @@
 			Facturas del Libro de Compras del Siace.
 				<div class="row">
 					
-					<div class="col-2">
-						<div class="form-grup">						
-						<input type="text" id="nfactura" name="nfactura" class="form-control-sm d-inline" placeholder="Numero de factura del siace" autofocus title="Numeros de Facturas del Siace">
-						</div>						
-					</div>
-					
+									
 					<div class="col-5">
 						<div class="form-group">
-						
+						<input type="text" id="nfactura" name="nfactura" class="form-control my-2" placeholder="Numero de factura del siace" autofocus title="Numeros de Facturas del Siace">
 						<select name="proveedorRif" class="js-example-basic-single " style="width: 100%;" title="Seleccionar el proveedor de la facturas del siace" >
 							<option value=""></option>
 							@if(isset($proveedores))
@@ -52,12 +47,13 @@
 					
 					<div class="col-2">
 						<div class="form-group">						
-						<input type="number" name="dias_credito" class="form-control-sm" placeholder="Dias de Credito" title="Dias de Credito acordados con el vendedor">
+						<input type="number" name="dias_credito" class="form-control my-2" placeholder="Dias de Credito" title="Dias de Credito acordados con el vendedor">
+						@can('agregar.tasadivisa.afactura')<input type="number" name="valor_tasa" class="form-control" placeholder="Valor de la Tasa">@endcan
 						</div>
 						
 					</div>
 					<div class="col">
-						<button type="submit" class="btn btn-primary btn-sm d-inline" title="buscar"><i class="fa fa-search"></i></button>
+						<button type="submit" class="btn btn-primary btn-sm d-inline" title="buscar"><i class="fa fa-search"></i>Buscar</button>
 						<a href="#info1" class="inf mx-2">+ Opciones</a>
 					</div>	    				
 				</div>
@@ -247,6 +243,9 @@
 @endsection
 @section('js')
 	<script type="text/javascript">
+		//focus en input
+		$("#nfactura").focus();
+
 		$(function () {
 			//data table
 			$('#articulos').DataTable({

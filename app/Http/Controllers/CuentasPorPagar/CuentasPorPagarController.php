@@ -413,10 +413,14 @@ class CuentasPorPagarController extends Controller
 		    		if(isset($registro->FECHA)){
 		    			$fechaFactura = $registro->FECHA;
 		    		}	
-		    			$facturaPorPagar->fecha_factura = $fechaFactura;
-		    			$monedaSecundaria = HerramientasController::valorDolarPorFecha($fechaFactura);
-		    		
-		    		
+					$facturaPorPagar->fecha_factura = $fechaFactura;
+					//si no se indica el valor de la tasa al momento de cargar la factura, se toma el valor de la tasa de historial dolar o la que este definida como historico
+					if(empty($request->valor_tasa)){
+						$monedaSecundaria = HerramientasController::valorDolarPorFecha($fechaFactura);
+					}else{
+						$monedaSecundaria = $request->valor_tasa;
+					}
+							    		
 		    		if(!empty($diasCredito)){
 		    			//si hay modificacion en los dis de credito
 		    			$facturaPorPagar->dias_credito = $diasCredito;

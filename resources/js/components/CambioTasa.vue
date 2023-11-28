@@ -1,63 +1,86 @@
 <template>
     <div>
         <!-- Modal ingresar Cantidades-->
-        <div class="modal-dialog modal-dialog-scrollable ">
-            <div class="modal-content">
-                <div class="modal-header">
+        
+            <div class="">
+                <div class="">
                     
                     <p>Tasa actual: {{ tasaDelDia.tasa_segunda_actualizacion}}</p>
                     <form action="" method="post">
-
+                <div class="row mb-3">
+                    <div class="col">
                         <label for="fecha">Fecha</label>
-                        <input type="date" v-model="datosForm.fecha" id="fecha" required>
+                        <input type="date" class="form-control" v-model="datosForm.fecha" id="fecha" required>
+                    </div>
+                    <div class="col">
                         <label for="">Tasa</label>
-                        <input type="text" v-model="datosForm.tasa" required style="width: 80px;">
-                        <a @click="guardarTasa()"><i class="fas fa-save text-primary"></i></a>
+                        <input type="text" class="form-control" v-model="datosForm.tasa" required >
+                        <a class="btn btn-primary float-right mt-2 text-white" @click="guardarTasa()"><i class="fas fa-save "></i> Guardar </a>
+                    </div>
+                    
+                </div>
+                       
+                        
+                        
                     </form>
                     
                 </div>
-                <div class="modal-body">
-                    <a class="btn btn-info btn-sm" @click="ListarTodasLasTasas()">Listar todas las tasas</a>
-                    <table id="idTabla" class="table">
+                <div v-if="loading" class="text-center">
+                    <span class="sr-only">Cargando...</span>
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    
+                </div>
+                <div class="">
+                    
+                    <table id="cotizaciones" class="table">
                         <thead>
-                            <th>Fecha</th>
-                            <th>Tasa</th>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tasa</th>
+                            </tr>
+                            
                             
                         </thead>
                         <tbody>
                         
                             <tr v-for="(tasa,a) in listadoTasas" :key="a" @click="seleccionar(tasa.fecha,tasa.tasa_segunda_actualizacion)">
-                                <td>{{ tasa.fecha }}</td>
-                                <td>{{ tasa.tasa_segunda_actualizacion }}</td>
+                                <td><span style="cursor: pointer" alert="click para editar">{{ tasa.fecha }}</span></td>
+                                <td><span style="cursor: pointer" alert ="click para editar">{{ tasa.tasa_segunda_actualizacion }}</span></td>
                                 
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                    
-                </div>
+                
             </div>
-        </div>        
+               
     </div>
     
 </template>
 
 <script>
 import axios from 'axios';
+import DataTable from 'datatables.net-bs4';
+import jszip from 'jszip';
 
+import 'datatables.net-buttons-bs4';
+import 'datatables.net-buttons/js/buttons.colVis.mjs';
+import 'datatables.net-buttons/js/buttons.html5.mjs';
+import 'datatables.net-buttons/js/buttons.print.mjs';
 
-import 'datatables.net-bs4'; // Si estás utilizando Bootstrap 4
+window.JSZip = jszip
     export default{
         mounted(){
-            
+            this.ListarTodasLasTasas();
             this.consultarUltimaTasa();
             
         },
 
         data(){
             return {
+               loading: true, // Inicialmente se muestra el indicador de carga
                tasaDelDia:'',
                listadoTasas:[],
                datosForm:{
@@ -69,19 +92,23 @@ import 'datatables.net-bs4'; // Si estás utilizando Bootstrap 4
         },
         methods:{
             tabla(){ //asi se llama datatabes en vue
-                /* $('#exampleModal').on('shown.bs.modal', () => {
-                    this.$nextTick(() => {
-                        $('#tasas').DataTable({
-                        // Configuración del DataTable
-                        });
-                    });
-                }); */
                 this.$nextTick(()=>{
-                     if (!$.fn.DataTable.isDataTable('#idTabla')) { 
-                        $('#idTabla').DataTable({
-                        // Configuración del DataTable
-                        });
-                     } 
+                    $('#cotizaciones').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                "extend":"copyHtml5",
+                                "text":"Copiar",
+                                "className":"btn btn-secondary mx-1"
+                            },
+                            {
+                                "extend":"excelHtml5",
+                                "text":"Excel",
+                                "className":"btn btn-success mx-1"
+                            },
+                            
+                        ]
+                    });
                 });
             },
             abrirModal(){
@@ -111,8 +138,8 @@ import 'datatables.net-bs4'; // Si estás utilizando Bootstrap 4
             async ListarTodasLasTasas(){
                 let resultado = await axios.get("/vealo3/public/herraminetas/listarTodasLasTasas");
                     this.listadoTasas = resultado.data
-                    /*this.tabla()*/
-                
+                    this.tabla()
+                this.loading = false;
                 
             },
 
@@ -121,6 +148,7 @@ import 'datatables.net-bs4'; // Si estás utilizando Bootstrap 4
                     await axios.post("/vealo3/public/herraminetas/guardarTasa",this.datosForm);
                     this.consultarUltimaTasa();
                     this.ListarTodasLasTasas();
+                    
                 }
                 
             },
