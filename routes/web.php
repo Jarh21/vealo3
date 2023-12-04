@@ -285,6 +285,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/divisas/procesar-pago/{co?}/{id}',[OperacionesDivisasCustodioController::class,'procesarPagoMovil'])->name('procesar.pago.movil');
     Route::PUT('/divisas/procesar-pago/{co?}/{id}',[OperacionesDivisasCustodioController::class,'savePagoMovil'])->name('save.pago.movil');
     Route::get('/divisas/anular-pago/{co?}/{id}',[OperacionesDivisasCustodioController::class,'anularPagoMovil'])->name('anular.pago.movil');
+    Route::get('/divisas/listado-asesores/{fecha}',[OperacionesDivisasCustodioController::class,'listarAsesoresPorFecha']);
         //fin operaciones con divisas
 
     //Relacion porcentual puntos de ventas

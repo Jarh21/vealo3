@@ -30,6 +30,7 @@
         "datatables.net-buttons-bs4": "^2.4.1",
         "jszip": "^3.10.1",
         "pdfmake": "^0.2.7",
-        "select2": "4.0"
+        "select2": "4.0",
+        "vue-select": "^3.20.2"
     }
 }

@@ -32,6 +32,7 @@ Vue.component('cuadre-registrar-transferencias',require('./components/cuadres/Cu
 Vue.component('cuadre-prestamos-efectivo',require('./components/cuadres/CuadresPrestamosEfectivo.vue').default);
 Vue.component('visualizador-precios',require('./components/asistenteCompras/AsistenteVisualizadorPrecios.vue').default);
 Vue.component('cambio-tasa',require('./components/CambioTasa.vue').default);
+Vue.component('listar-asesor-por-fecha',require('./components/ListarAsesoresPorFecha.vue').default);
 
 
 /**
