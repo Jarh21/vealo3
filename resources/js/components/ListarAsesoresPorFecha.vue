@@ -50,17 +50,14 @@
 			</tbody>
             <thead v-show="listadoMovpago.length > 0">
                 <tr>
-                    <td class="text-success">El total Divisas </td>
+                    <td class="text-success"><h4>Total $</h4></td>
                     <td>{{ totalDolaresStr }}</td>
                     <td>Monto Recibido <input type="text" v-model="dolaresRecibidos"></td>
-                    <td>Diferencia: {{ diferenciaUsd }}</td>
+                    <td>
+                         <b v-bind:class="{ 'text-danger': parseFloat(diferenciaUsd) < 0, 'text-success': parseFloat(diferenciaUsd) >= 0  }">Diferencia: {{ diferenciaUsd }}</b>
+                    </td>
                 </tr>
-                <tr>
-                    <td class="text-primary">El total Bolivares: </td>
-                    <td>{{ totalBolivaresStr }}</td>
-                    <td>Monto Recibido <input type="text" v-model="bolivaresRecibidos"></td>
-                    <td>Diferencia: {{ diferenciaBs }}</td>
-                </tr>
+                
             </thead>
 			
 		</table>
@@ -96,12 +93,8 @@
                     asesor:[],
                 },
                 totalDolares:0,
-                totalDolaresStr:0,
-                totalBolivares:0,
-                totalBolivaresStr:0,
-                dolaresRecibidos:0,
-                bolivaresRecibidos:0,
-                diferenciaBs:0,
+                totalDolaresStr:0,                
+                dolaresRecibidos:0,                                
                 diferenciaUsd:0,
                 
             }
@@ -111,13 +104,13 @@
                 handler(newVal, oldVal) {
                     this.totalDolares = 0;
                     newVal.forEach((item) => {
-                        console.log(item);
+                       
                         this.totalDolares += parseFloat(item.DOLARES);
-                        this.totalBolivares += parseFloat(item.Bolivares)
+                        
                     });
                     
                     this.totalDolaresStr = this.totalDolares.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-                    this.totalBolivaresStr = this.totalBolivares.toLocaleString('es-VE', { style: 'currency', currency: 'VES' });
+                    
                 },
                 deep: true
             },
@@ -125,21 +118,10 @@
                 handler(){
                     if (this.listadoMovpago.length > 0 || this.dolaresRecibidos > 0) {
                         
-                            this.diferenciaUsd = this.totalDolares - this.dolaresRecibidos;
-                        
-                        
+                        this.diferenciaUsd =  (this.dolaresRecibidos - this.totalDolares);
                     }
-                }
-           
-            },
-            bolivaresRecibidos:{
-                handler(){
-                    if(this.listadoMovpago.legth >0 || this.bolivaresRecibidos > 0){
-                        this.diferenciaBs = (this.totalBolivares - this.bolivaresRecibidos).toLocaleString('es-VE', { style: 'currency', currency: 'VES' });
-                    }
-                }
-            },
-            
+                }           
+            },           
         },
         methods:{
             tabla() {
