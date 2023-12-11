@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 class CuentasPorPagarController extends Controller
 {
     public function seleccionarEmpresa($rutaSolicitante=''){
-		$herramientas  = new HerramientasController();
+		$herramientas  = new HerramientasController();		
         return view('cuentasPorPagar.seleccionEmpresa',['empresas'=>$herramientas->listarEmpresas(),'rutaSolicitante'=>$rutaSolicitante]);
 	}
 
@@ -29,7 +29,9 @@ class CuentasPorPagarController extends Controller
 		if(empty($empresa[2])){
 			dd('En la tabla empresa debe agregar el nombre de la base de datos de la empresa seleccionada en el campo basedata');
 		}
-        session(['empresaNombre'=>$empresa[1],'empresaRif'=>$empresa[0],'codTipoMoneda'=>$modoPago[0],'modoPago'=>$modoPago[1],'basedata'=>$empresa[2],'logo_empresa'=>$empresa[3]]);
+		$herramientas  = new HerramientasController();
+		$monedaBase = $herramientas->consultarMonedaBase();
+        session(['empresaNombre'=>$empresa[1],'empresaRif'=>$empresa[0],'codTipoMoneda'=>$modoPago[0],'modoPago'=>$modoPago[1],'basedata'=>$empresa[2],'logo_empresa'=>$empresa[3],'monedaBase'=>$monedaBase]);
        
 		if(empty($rutaSolicitante)){
 			return self::facturasPorPagar();
@@ -1143,185 +1145,326 @@ class CuentasPorPagarController extends Controller
 		    	$cuentasPorPagar['empresaRif'] = session('empresaRif');
 		    	$cuentasPorPagar['cierre'] = $datosFactura->fecha_factura;
     			    			  					
-    			if(session('modoPago')=='dolares'){	    		
-	    			//si el monto en divisa de la factura es menor al monto ingresado se descuenta toda la factura
-		    		if($tipoRegistro == 'CAN'){
-			    		//if($montoDivisaFactura < $montoPagoIngresado and $modoPago<>'bolivares'){
-						if($montoDivisaFactura <= $montoPagoIngresado and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
-								//restamos el monto en divisas de la factura cancelada
-							//caso 1
-						    
-						    $cuentasPorPagar['observacion'] = 'caso 1 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
-						    $cuentasPorPagar['concepto'] = $tipoRegistro;
-							$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
-							$cuentasPorPagar[$debeOhaver] = $montoBs;			    	
-					    	//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
-							$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoBs,$tasa);			    	
-					    	$montoPagoIngresado = $montoPagoIngresado - $montoDivisaFactura;
-					    	self::guardarEnCuentasPorPagar($cuentasPorPagar);
-					    	//comparamos si la duda se cancelo en la factura y actualizamos la bandera
-	    					//facturas_pagada
-	    					$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
-				    		if($verificarSiSeCanceloFactura->resto <= $valorCero){
-				    			FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
-				    			// aqui se registrara las deducciones de la sra helen 
-				    		}
-					    	continue;
-			    		}			    		
+    			if(session('modoPago')=='dolares'){
 
-			    		//si es mayor es porque el monto de la siguiente factura es mayor al que queda en las divisas para pagar
-						//if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $modoPago<>'bolivares'){
-						if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
-			    			//el monto registrado es el abonado del saldo que quedo para pagar
-			    			//caso 3
-			    			
-			    			$montoBs = ($montoPagoIngresado) * $tasa;
-			    			$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
-			    			$cuentasPorPagar['concepto'] = $tipoRegistro;
-							$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
-							$cuentasPorPagar[$debeOhaver] = $montoBs;					
-					    	//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
-							$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoBs,$tasa);
-					    	$montoPagoIngresado=0;
-							$cuentasPorPagar['tasa'] = $tipoTasa;
-							
-					    	self::guardarEnCuentasPorPagar($cuentasPorPagar);
-					    	//comparamos si la duda se cancelo en la factura y actualizamos la bandera
-	    					//facturas_pagada
-	    					$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
-				    		if($verificarSiSeCanceloFactura->resto <= $valorCero){
-				    			FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
-				    			// aqui se registrara las deducciones de la sra helen 
-				    		}
-					    	continue;    			
-			    		} 	
-				    	
-						//ver si llegamos al ultimo registro del foreach
-						/* if($index == count($datosPagoFacturas)-1){
-							if($montoPagoIngresado > $valorCero){
-								$notaDebito = $montoPagoIngresado-$montoBs;
-								$cuentasPorPagar['debitos'] = $notaDebito;
-					    		$cuentasPorPagar['concepto']='NDEB';
-					    		$cuentasPorPagar['creditos']=0;
-								$cuentasPorPagar['cod_concepto']= 7;
-					    		$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR DIFERENCIA DE MONTOS';
-					    		self::guardarEnCuentasPorPagar($cuentasPorPagar);
-							}
-						} */
+					//si MonedaBase es NACIONAL y los pagos son en Divisas
 
-				    	//validamos si el modo pago es divisa y un pago se hace en bs y la tasa es la del dia
-				    	 if(session('modoPago')=='dolares' and $modoPago=='bolivares'){							
-				    		//caso 4
-				    		 
-				    		//si el monto de la tasa es mayor al de la factura
-							if($index == count($datosPagoFacturas)-1){
-								$notaDebito = $montoPagoIngresado-$montoBs;
-								if($notaDebito > $valorCero){
-															
-									$cuentasPorPagar['debitos'] = $notaDebito;
-									$cuentasPorPagar['concepto']='NDEB';
-									$cuentasPorPagar['creditos']=0;
-									$cuentasPorPagar['cod_concepto']= 7;
-									$cuentasPorPagar['monto_divisa'] =0;
-									$cuentasPorPagar['monto_bolivares'] =0;
-									$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR AUMENTO DE TASA';
-									self::guardarEnCuentasPorPagar($cuentasPorPagar);
+					if(session('monedaBase')=='nacional'){	    		
+						//si el monto en divisa de la factura es menor al monto ingresado se descuenta toda la factura
+						if($tipoRegistro == 'CAN'){
+							//if($montoDivisaFactura < $montoPagoIngresado and $modoPago<>'bolivares'){
+							if($montoDivisaFactura <= $montoPagoIngresado and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
+									//restamos el monto en divisas de la factura cancelada
+								//caso 1
+								
+								$cuentasPorPagar['observacion'] = 'caso 1 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = $montoBs;			    	
+								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
+								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoBs,$tasa);			    	
+								$montoPagoIngresado = $montoPagoIngresado - $montoDivisaFactura;
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
 								}
-								if($notaDebito < $valorCero){
-									
-									$cuentasPorPagar['creditos'] =$notaDebito;	
-									$cuentasPorPagar['debitos']=0;
-									$cuentasPorPagar['cod_concepto']= 8;		    		
-									$cuentasPorPagar['concepto']='NCP';
-									$cuentasPorPagar['monto_divisa'] =0;
-									$cuentasPorPagar['monto_bolivares'] =0;
-									$cuentasPorPagar['concepto_descripcion']='NOTA DE CREDITOS - POR DISMINUCION DE TASA';
-									self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								continue;
+							}			    		
+
+							//si es mayor es porque el monto de la siguiente factura es mayor al que queda en las divisas para pagar
+							//if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $modoPago<>'bolivares'){
+							if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
+								//el monto registrado es el abonado del saldo que quedo para pagar
+								//caso 3
+								
+								$montoBs = ($montoPagoIngresado) * $tasa;
+								$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = $montoBs;					
+								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
+								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoBs,$tasa);
+								$montoPagoIngresado=0;
+								$cuentasPorPagar['tasa'] = $tipoTasa;
+								
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
 								}
-							} 		    		
-				    		//despues de registrar el debito o credito para que cuadre la factura registramos la cancelacion
-							$montoGuardar=0;
-							switch($montoPagoIngresado){
-								case $montoPagoIngresado >= $montoBs:
-									if($index < count($datosPagoFacturas)-1){
+								continue;    			
+							} 							
+
+							//validamos si el modo pago es divisa y un pago se hace en bs y la tasa es la del dia
+							if(session('modoPago')=='dolares' and $modoPago=='bolivares'){							
+								//caso 4
+								
+								//si el monto de la tasa es mayor al de la factura
+								if($index == count($datosPagoFacturas)-1){
+									$notaDebito = $montoPagoIngresado-$montoBs;
+									if($notaDebito > $valorCero){
+																
+										$cuentasPorPagar['debitos'] = $notaDebito;
+										$cuentasPorPagar['concepto']='NDEB';
+										$cuentasPorPagar['creditos']=0;
+										$cuentasPorPagar['cod_concepto']= 7;
+										$cuentasPorPagar['monto_divisa'] =0;
+										$cuentasPorPagar['monto_bolivares'] =0;
+										$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR AUMENTO DE TASA';
+										self::guardarEnCuentasPorPagar($cuentasPorPagar);
+									}
+									if($notaDebito < $valorCero){
+										
+										$cuentasPorPagar['creditos'] =$notaDebito;	
+										$cuentasPorPagar['debitos']=0;
+										$cuentasPorPagar['cod_concepto']= 8;		    		
+										$cuentasPorPagar['concepto']='NCP';
+										$cuentasPorPagar['monto_divisa'] =0;
+										$cuentasPorPagar['monto_bolivares'] =0;
+										$cuentasPorPagar['concepto_descripcion']='NOTA DE CREDITOS - POR DISMINUCION DE TASA';
+										self::guardarEnCuentasPorPagar($cuentasPorPagar);
+									}
+								} 		    		
+								//despues de registrar el debito o credito para que cuadre la factura registramos la cancelacion
+								$montoGuardar=0;
+								switch($montoPagoIngresado){
+									case $montoPagoIngresado >= $montoBs:
+										if($index < count($datosPagoFacturas)-1){
+											$montoGuardar = $montoBs;
+											$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+										}else{
+											$montoGuardar = $montoPagoIngresado;
+										}
+										break;								
+									case $montoPagoIngresado < $montoBs:
+										$montoGuardar = $montoPagoIngresado;
+										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+										break;
+								}
+								$cuentasPorPagar['observacion'] = 'caso 4';
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = 'PAGO DE FACTURA Bs.';
+								$cuentasPorPagar['creditos'] = $montoGuardar;
+								$cuentasPorPagar['debitos']=0;
+								$cuentasPorPagar['tasa'] = $tipoTasa;
+								$cuentasPorPagar['monto_bolivares'] = $montoGuardar;	
+								//$cuentasPorPagar['monto_divisa'] = ($montoGuardar/$tasa);
+								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoGuardar,$tasa);					
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+								
+								
+							}//fin sesion dolares modo pago Bs y tasa actual 				    	
+
+						}else{///Fin registro 'CAN'	
+						
+						//validamos si se inserta una nota de debito o credito va en bolivares	
+						//caso 6
+							if($idFacturaNotaCreditoDebito==0 and $montoPagoIngresado > $valorCero){
+								//si no seleccionaron ninguna factura pero seleccionaron todas las facturas
+								//se reparte el monto de la nota de credito o debito entre las facturas
+								$montoGuardar=0;
+								switch($montoPagoIngresado){
+									case $montoPagoIngresado >= $montoBs:
 										$montoGuardar = $montoBs;
 										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
-									}else{
+										break;								
+									case $montoPagoIngresado < $montoBs:
 										$montoGuardar = $montoPagoIngresado;
-									}
-									break;								
-								case $montoPagoIngresado < $montoBs:
-									$montoGuardar = $montoPagoIngresado;
-									$montoPagoIngresado = $montoPagoIngresado - $montoBs;
-									break;
-							}
-				    		$cuentasPorPagar['observacion'] = 'caso 4';
-			    			$cuentasPorPagar['concepto'] = $tipoRegistro;
-							$cuentasPorPagar['concepto_descripcion'] = 'PAGO DE FACTURA Bs.';
-							$cuentasPorPagar['creditos'] = $montoGuardar;
-							$cuentasPorPagar['debitos']=0;
-							$cuentasPorPagar['tasa'] = $tipoTasa;
-							$cuentasPorPagar['monto_bolivares'] = $montoGuardar;	
-							//$cuentasPorPagar['monto_divisa'] = ($montoGuardar/$tasa);
-							$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoGuardar,$tasa);					
-					    	self::guardarEnCuentasPorPagar($cuentasPorPagar);
-					    	//comparamos si la duda se cancelo en la factura y actualizamos la bandera
-	    					//facturas_pagada
-	    					$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
-				    		if($verificarSiSeCanceloFactura->resto <= $valorCero){
-				    			FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
-				    			// aqui se registrara las deducciones de la sra helen 
-				    		}
-							 /* if($index == count($datosPagoFacturas)-1){
-								if($montoPagoIngresado > $valorCero){
-									$notaDebito = $montoPagoIngresado;
-									$cuentasPorPagar['debitos'] = $notaDebito;
-									$cuentasPorPagar['concepto']='NDEB';
-									$cuentasPorPagar['creditos']=0;
-									$cuentasPorPagar['cod_concepto']= 7;
-									$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR DIFERENCIA DE MONTOS';
-									self::guardarEnCuentasPorPagar($cuentasPorPagar);
+										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+										break;
 								}
-							} */ 
-				    		//continue;
-				    		
-				    	}//fin sesion dolares modo pago Bs y tasa actual 				    	
+								$cuentasPorPagar['observacion'] = 'caso 6';    	
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);					
+								//$cuentasPorPagar['monto_bolivares'] = $montoGuardar;						
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);
+																
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){								
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+								continue;
+							}	
+						}
+						//FIN MONEDA NACIONAL CON PAGO EN DIVISAS
+					}else{
+						//si la monedaBase es $$$$ EXTRANJERA $$$ Y SE PAGAN EN DIVISAS
+						//si el monto en divisa de la factura es menor al monto ingresado se descuenta toda la factura
+						if($tipoRegistro == 'CAN'){
+							//if($montoDivisaFactura < $montoPagoIngresado and $modoPago<>'bolivares'){
+							if($montoDivisaFactura <= $montoPagoIngresado and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
+									//restamos el monto en divisas de la factura cancelada
+								//caso 1
+								
+								$cuentasPorPagar['observacion'] = 'caso 1 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;			    	
+								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
+								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoPagoIngresado,$tasa);			    	
+								$montoPagoIngresado = $montoPagoIngresado - $montoDivisaFactura;
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+								continue;
+							}			    		
 
-				    }else{///Fin registro 'CAN'	
-				    
-			    	//validamos si se inserta una nota de debito o credito va en bolivares	
-			    	//caso 6
-						if($idFacturaNotaCreditoDebito==0 and $montoPagoIngresado > $valorCero){
-							//si no seleccionaron ninguna factura pero seleccionaron todas las facturas
-							//se reparte el monto de la nota de credito o debito entre las facturas
-							$montoGuardar=0;
-							switch($montoPagoIngresado){
-								case $montoPagoIngresado >= $montoBs:
-									$montoGuardar = $montoBs;
-									$montoPagoIngresado = $montoPagoIngresado - $montoBs;
-									break;								
-								case $montoPagoIngresado < $montoBs:
-									$montoGuardar = $montoPagoIngresado;
-									$montoPagoIngresado = $montoPagoIngresado - $montoBs;
-									break;
-							}
-							$cuentasPorPagar['observacion'] = 'caso 6';    	
-							$cuentasPorPagar['concepto'] = $tipoRegistro;
-							$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
-							$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);					
-							//$cuentasPorPagar['monto_bolivares'] = $montoGuardar;						
-							self::guardarEnCuentasPorPagar($cuentasPorPagar);
-							//comparamos si la duda se cancelo en la factura y actualizamos la bandera
-							//facturas_pagada
-							$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);
-															
-							if($verificarSiSeCanceloFactura->resto <= $valorCero){								
-								FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
-								// aqui se registrara las deducciones de la sra helen 
-							}
-							continue;
-						}	
-			    	}
+							//si es mayor es porque el monto de la siguiente factura es mayor al que queda en las divisas para pagar
+							//if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $modoPago<>'bolivares'){
+							if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
+								//el monto registrado es el abonado del saldo que quedo para pagar
+								//caso 3
+								
+								//$montoBs = ($montoPagoIngresado) * $tasa;
+								$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;					
+								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
+								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoPagoIngresado,$tasa); 
+								$montoPagoIngresado=0;
+								$cuentasPorPagar['tasa'] = $tipoTasa;
+								
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+								continue;    			
+							} 	
+							
+
+							//validamos si el modo pago es divisa y un pago se hace en bs y la tasa es la del dia
+							if(session('modoPago')=='dolares' and $modoPago=='bolivares'){							
+								//caso 4
+
+								$montoPagoIngresado = ($montoPagoIngresado/$tasa);
+								//si el monto de la tasa es mayor al de la factura
+								if($index == count($datosPagoFacturas)-1){
+									
+									$montoNotaDebitoCredito = $montoPagoIngresado-$montoBs;
+									
+									if($montoNotaDebitoCredito > $valorCero){
+																
+										$cuentasPorPagar['debitos'] = $montoNotaDebitoCredito;
+										$cuentasPorPagar['concepto']='NDEB';
+										$cuentasPorPagar['creditos']=0;
+										$cuentasPorPagar['cod_concepto']= 7;
+										$cuentasPorPagar['monto_divisa'] =0;
+										$cuentasPorPagar['monto_bolivares'] =0;
+										$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR AUMENTO DE TASA #'.$tipoTasa;
+										self::guardarEnCuentasPorPagar($cuentasPorPagar);
+									}
+									if($montoNotaDebitoCredito < $valorCero){
+										
+										$cuentasPorPagar['creditos'] =$montoNotaDebitoCredito;	
+										$cuentasPorPagar['debitos']=0;
+										$cuentasPorPagar['cod_concepto']= 8;		    		
+										$cuentasPorPagar['concepto']='NCP';
+										$cuentasPorPagar['monto_divisa'] =0;
+										$cuentasPorPagar['monto_bolivares'] =0;
+										$cuentasPorPagar['concepto_descripcion']='NOTA DE CREDITOS - POR DISMINUCION DE TASA';
+										self::guardarEnCuentasPorPagar($cuentasPorPagar);
+									}
+								} 		    		
+								//despues de registrar el debito o credito para que cuadre la factura registramos la cancelacion
+								$montoGuardar=0;
+								switch($montoPagoIngresado){
+									case $montoPagoIngresado >= $montoBs:
+										if($index < count($datosPagoFacturas)-1){
+											$montoGuardar = $montoBs;
+											$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+										}else{
+											$montoGuardar = $montoPagoIngresado;
+										}
+										break;								
+									case $montoPagoIngresado < $montoBs:
+										$montoGuardar = $montoPagoIngresado;
+										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+										break;
+								}
+								$cuentasPorPagar['observacion'] = 'caso 4';
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = 'PAGO DE FACTURA Bs.';
+								$cuentasPorPagar['creditos'] = $montoPagoIngresado;
+								$cuentasPorPagar['debitos']=0;
+								$cuentasPorPagar['tasa'] = $tasa;
+								$cuentasPorPagar['monto_bolivares'] = $montoGuardar;	
+								//$cuentasPorPagar['monto_divisa'] = ($montoGuardar/$tasa);
+								$cuentasPorPagar['monto_divisa'] = $montoGuardar;					
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+																
+							}//fin sesion dolares modo pago Bs y tasa actual 				    	
+
+						}else{///Fin registro 'CAN'	
+						
+						//validamos si se inserta una nota de debito o credito va en bolivares	
+						//caso 6
+							if($idFacturaNotaCreditoDebito==0 and $montoPagoIngresado > $valorCero){
+								//si no seleccionaron ninguna factura pero seleccionaron todas las facturas
+								//se reparte el monto de la nota de credito o debito entre las facturas
+								$montoGuardar=0;
+								switch($montoPagoIngresado){
+									case $montoPagoIngresado >= $montoBs:
+										$montoGuardar = $montoBs;
+										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+										break;								
+									case $montoPagoIngresado < $montoBs:
+										$montoGuardar = $montoPagoIngresado;
+										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+										break;
+								}
+								$cuentasPorPagar['observacion'] = 'caso 6';    	
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);					
+								//$cuentasPorPagar['monto_bolivares'] = $montoGuardar;						
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);
+																
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){								
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+								continue;
+							}	
+						}
+					}	
     			}//fin session(modoPago)== dolares
     			/////////////////////////////////////////////BOLIVALES//////////////////////////////////////	
 				if(session('modoPago')=='bolivares'){
@@ -1568,6 +1711,7 @@ class CuentasPorPagarController extends Controller
 		$factura = facturasPorPagar::find($id);
 		$factura->dias_credito = $request->dias_credito;
 		$factura->porcentaje_descuento = $request->porcentaje_descuento;
+		$factura->moneda_secundaria = $request->valor_tasa;
 		$factura->update();
 		//si tiene porcfentaje de descuento se agrega en cxp
 		if($request->porcentaje_descuento > 0){

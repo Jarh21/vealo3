@@ -73,7 +73,7 @@
             </div>
         </div>
         @endcan
-        @can('divisasCustodio.create')
+        @can('cuadres.index')
         <div class="card m-1 offset-3" style="width: 23rem; border-radius: 6px;">
             <div class="card-body d-inline-flex m-0 p-0 border" style="border-radius: 6px;">
                 <div class="row-cols">

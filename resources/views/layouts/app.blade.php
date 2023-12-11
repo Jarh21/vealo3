@@ -413,6 +413,36 @@
                                 </ul>
                             </div> <!-- fin de capa Informes Adicionales  -->
                             @endcan
+
+                            <!-- capa Retencion de Iva -->
+                            @can('retencion.iva.index')
+                            <ul class="nav  nav-sidebar flex-column">
+                                <li class="nav-item">
+                                    <a href="#" class="{{ Request::segment(1) === 'retencion-iva' ? 'nav-link active' : 'nav-link border-bottom border-secondary' }}" data-toggle="collapse" data-target="#retencion_iva">
+                                    <i class="fas fa-donate " style="color:#D4A5FB"></i>
+                                        <p>Retencion IVA</p>
+                                    </a>
+                                </li>
+                            </ul>    
+                            <div id="retencion_iva" class=" {{ Request::segment(1) === 'retencion-iva' ? 'collapse show ' : 'collapse' }} ml-2" data-parent="#accordionExample">
+                                <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
+                                    @can('retencion.iva.index')
+                                    <li class="nav-item">
+                                        <a href="{{route('retencion.iva.index')}}"  
+                                        class="{{ Request::path() === 'retencion-iva/index' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-receipt nav-icon mr-2"></i>Registro Documento</a>
+                                    </li>
+                                    @endcan
+                                    @can('comisionPorVentas')
+                                    <li class="nav-item">
+                                        <a href="{{--route('retencion.iva.retener')--}}"
+                                        class="{{ Request::path() === 'retencion-iva/comision-ventas' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-hand-holding-usd nav-icon mr-2"></i>Retención IVA</a>
+                                    </li>
+                                   
+                                    @endcan                                        
+                                </ul>
+                            </div> <!-- fin de capa Retencion Iva -->
+                            @endcan
+
                             @can('proveedor.index')
                             <ul class="nav  nav-sidebar flex-column">
                                 

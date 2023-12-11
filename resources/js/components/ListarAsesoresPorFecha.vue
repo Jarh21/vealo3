@@ -37,14 +37,20 @@
                     <th>Usuario</th>
                     <th>Divisas</th>
                     <th>Tasa</th>
-                    <th>Bolivares</th>
+                    <th>Bolivares</th>                   
                     <th>Cod Arqueo</th>
                 </tr>
 				
 			</thead>
 			<tbody>
                 <tr v-for="(asesor,v) in listadoMovpago" :key="v">
-                    <td>{{ asesor.FECHA }}</td><td>{{ asesor.codusua }}</td><td>{{ asesor.usuario }}</td><td>{{ asesor.DOLARES }}</td><td>{{ asesor.tasa }}</td><td>{{ asesor.Bolivares }}</td><td>{{ asesor.codarq }}</td>
+                    <td>{{ asesor.FECHA }}</td>
+                    <td>{{ asesor.codusua }}</td>
+                    <td>{{ asesor.usuario }}</td>
+                    <td>{{ asesor.DOLARES }}</td>
+                    <td>{{ asesor.tasa }}</td>
+                    <td>{{ asesor.Bolivares }}</td>                    
+                    <td>{{ asesor.codarq }}</td>
                 </tr>
 				
 			</tbody>

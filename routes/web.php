@@ -29,6 +29,7 @@ use App\Http\Controllers\InformesAdicionales\InformesAdicionalesController;
 use App\Http\Controllers\InformesAdicionales\VendedorComisionController;
 use App\Http\Controllers\InformesAdicionales\HabladoresController;
 use App\Http\Controllers\AsistenteCompras\AsistenteComprasController;
+use App\Http\Controllers\RetencionIva\RetencionIvaController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -277,7 +278,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/divisas/reporte-detalle/{co}/{tasa}/{fecha}',[OperacionesDivisasCustodioController::class,'reporteDetalladoGerencia'])->name('divisa.reporte.detallado.gerencia');
     Route::get('/divisas/reporte-recaudo',[OperacionesDivisasCustodioController::class,'reporteRecaudo'])->name('divisa.reporte.recaudo');
     Route::get('/divisas/reporte-recaudo-movpago',[OperacionesDivisasCustodioController::class,'reporteRecaudoMovpago'])->name('divisa.reporte.recaudo.movpagos');
-    Route::post('/divisas/reporte-recaudo-movpago',[OperacionesDivisasCustodioController::class,'buscarReporteRecaudoMovpago'])->name('buscar.reporte.recaudo.movpagos');
+    
 
     Route::post('/divisas/reporte-buscar-recaudo',[OperacionesDivisasCustodioController::class,'buscarReporteRecaudo'])->name('divisa.buscar.reporte.recaudo');
     Route::get('/divisas/listar-pagos',[OperacionesDivisasCustodioController::class,'listarPagoMovil'])->name('listar.pago.movil');
@@ -285,7 +286,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/divisas/procesar-pago/{co?}/{id}',[OperacionesDivisasCustodioController::class,'procesarPagoMovil'])->name('procesar.pago.movil');
     Route::PUT('/divisas/procesar-pago/{co?}/{id}',[OperacionesDivisasCustodioController::class,'savePagoMovil'])->name('save.pago.movil');
     Route::get('/divisas/anular-pago/{co?}/{id}',[OperacionesDivisasCustodioController::class,'anularPagoMovil'])->name('anular.pago.movil');
-    Route::get('/divisas/listado-asesores/{fecha}',[OperacionesDivisasCustodioController::class,'listarAsesoresPorFecha']);
+    
         //fin operaciones con divisas
 
     //Relacion porcentual puntos de ventas
@@ -346,7 +347,12 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/herraminetas/listarTodasLasTasas',[HerramientasController::class,'listarTodasLasTasa']);
     Route::post('/herraminetas/guardarTasa',[HerramientasController::class,'guardarTasa'])->name('guardarValorTasa');
 
+    /***********************RETENCION DE IVA  ************/
+    Route::get('/retencion-iva/index',[RetencionIvaController::class,'index'])->name('retencion.iva.index');
+
 
 });
-
-
+//se sacaron del middleware Auth para que no requiere de inicio de sesion al momento de buscar informacion
+//esto ayuda a que el arqueador no le quede la pagina sin respuesta despues de expirar el tiempo de sesion
+Route::get('/divisas/listado-asesores/{fecha}',[OperacionesDivisasCustodioController::class,'listarAsesoresPorFecha']);
+Route::post('/divisas/reporte-recaudo-movpago',[OperacionesDivisasCustodioController::class,'buscarReporteRecaudoMovpago'])->name('buscar.reporte.recaudo.movpagos');

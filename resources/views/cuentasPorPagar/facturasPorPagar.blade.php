@@ -102,8 +102,8 @@
     				<th>Nº</th>    				
     				<th>Proveedor</th>
     				<th>Nº Factura</th>
-    				<th>Debito</th>
-    				<th>Creditos</th>
+    				<th>Monto</th>
+    				<!-- <th>Creditos</th> -->
     				<th>Retencion</th>	
     				<th>Fecha Factura</th>
     				<th>Dias Credito</th>   				
@@ -162,9 +162,9 @@
 								{{$cuenta->porcentaje_retencion_iva ?? '0'}}%
 								@endif
 							</td>
-							<td>{{$cuenta->documento}}</td>	    				   				
+							<td>{{$cuenta->documento}} {{'tasa:'.$cuenta->moneda_secundaria ?? 'no hay'}}</td>	    				   				
 							<td>{{number_format($cuenta->debitos,2,',','.')}}</td>
-							<td>{{number_format($cuenta->creditos,2,',','.')}}</td>
+							<!-- <td>{{--number_format($cuenta->creditos,2,',','.')--}}</td> -->
 							<td>
 								<a class="text-success">{{'islr '.$cuenta->retencion_islr}}</a>
 								<a class="text-primary d-block">{{'iva '.$cuenta->retencion_iva}}</a>
@@ -172,6 +172,7 @@
 							<td>Fact{{$cuenta->fecha_factura}} Pago{{$cuenta->fecha_pago}}</td>
 							<td>
 								@if($cuenta->fecha_pago > date('Y-m-d'))
+									
 									@if($cuenta->dias_para_pago >= 15 )
 										<span class="right badge badge-success">{{$cuenta->dias_para_pago}} dias Pagar</span>
 									@endif
@@ -181,9 +182,14 @@
 									@if($cuenta->dias_para_pago < 8 )
 									<span class="right badge badge-warning">{{$cuenta->dias_para_pago}} proximo vencer</span>
 									@endif
+									
 								@else  					
+									@if($cuenta->dias_para_pago > 1900)
+									<span class="right badge badge-secondary">0 dias</span>
+									@else
+									<span class="right badge badge-danger">{{$cuenta->dias_para_pago}} dias Vencida</span>
+									@endif
 								
-								<span class="right badge badge-danger">{{$cuenta->dias_para_pago}} dias Vencida</span>
 								@endif
 
 							</td>	    				

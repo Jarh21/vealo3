@@ -29,6 +29,12 @@
                     <label for="">Porcentaje de Descuento</label>
                     <input type="text" name="porcentaje_descuento" value="{{$factura->porcentaje_descuento}}" class="form-control">
                 </div>
+                @can('agregar.tasadivisa.afactura')
+                <div class="col">
+                    <label for="">Valor Tasa Factura</label>
+                   <input type="text" name="valor_tasa" value="{{$factura->moneda_secundaria}}" class="form-control" placeholder="Valor de la Tasa">
+                </div>
+                @endcan
              </div>             
              <div class="float-end">
                 <button class="btn btn-primary float-right my-3">Actualizar</button> 

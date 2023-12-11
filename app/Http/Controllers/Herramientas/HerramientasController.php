@@ -300,6 +300,38 @@ class HerramientasController extends Controller
 		 return $dias;
 	}
 
+	public function consultarMonedaBase(){
+		$monedaBase="nacional";
+		if(!empty(session('basedata'))){
+			
+			$configuracion =  Parametro::buscarVariable('base_datos_tipo_moneda');
+			if(empty($configuracion)){
+				Parametro::actualizarVariable('base_datos_tipo_moneda','tipo_moneda_vealo');
+				$tipoMonedas = DB::select("SELECT * FROM tipo_moneda WHERE is_moneda_base=1 ");
+			}else{
+				if($configuracion=='tipo_moneda_vealo'){
+					$tipoMonedas = DB::select("SELECT * FROM tipo_moneda WHERE is_moneda_base=1 ");
+				}
+				if($configuracion == 'tipo_moneda_siace'){
+					$conexionSQL = self::conexionDinamicaBD(session('basedata'));
+					$tipoMonedas = $conexionSQL->select("SELECT * FROM tipo_moneda WHERE is_moneda_base=1 ");
+				}
+				
+			}
+			
+			foreach($tipoMonedas as $tipoMoneda){
+				
+				if($tipoMoneda->is_nacional == 1){
+					$monedaBase="nacional";
+				}else{
+					$monedaBase="extranjera";
+				}
+			}
+			
+			return $monedaBase;
+		}
+		dd("Error no se pudo conectar con el siace para determinar la moneda base de dicho sistema, herraminetasController linea 340");
+	}
 	
 	public static function valorAlCambioMonedaSecundaria($monto,$tasa=0){
 		//este metodo convierte el monto de bolivares en divisa identificando el tipo de moneda del siace, 
