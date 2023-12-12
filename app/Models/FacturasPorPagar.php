@@ -156,12 +156,14 @@ class FacturasPorPagar extends Model
           pago_proveedor.proveedor_nombre,
           pago_proveedor.fecha_real_pago,
           SUM(pago_proveedor.pago_divisa) AS pago_divisas,
-          SUM(pago_proveedor.pago_bolivares)As pago_bolivares
+          SUM(pago_proveedor.pago_bolivares)As pago_bolivares,
+          pago_proveedor.moneda_secundaria
       FROM   
         (SELECT
         detalle_fac.proveedor_rif,
         detalle_fac.proveedor_nombre,
         detalle_fac.fecha_real_pago,
+        detalle_fac.moneda_secundaria,
         SUM(detalle_fac.debitos-detalle_fac.creditos)AS pago_bolivares,
         ROUND(SUM(detalle_fac.debitos-detalle_fac.creditos)/detalle_fac.moneda_secundaria,2) AS pago_divisa
         FROM

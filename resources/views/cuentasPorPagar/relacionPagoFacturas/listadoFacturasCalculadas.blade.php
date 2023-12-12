@@ -3,7 +3,11 @@
 <!-- <link rel="stylesheet" type="text/css" href="{{asset('css/daterangepicker.css')}}"> -->
 
 @section('content')
-
+	@php 
+		//si monedaBase es nacional s calcula el valor de la divisa dividiendo el monto entre la tasa y si es extranjera se multiplica el monto por el valor de la tasa
+		$monedaBase = session('monedaBase'); 
+		
+	@endphp
 <div class="container-fluid mt-5 bg-white">
 	<div class="row">
 		<div class="col-3">
@@ -19,7 +23,7 @@
 	
 	<a href="#" onclick="javascript:window.print();" class="float-right d-print-none"><i class="fas fa-print mx-1"></i>Imprimir</a>
 	
-	<p class="d-print-none">Tipo Moneda 
+	<p class="d-print-none">Modo de Pago 
 		@if(session('modoPago') == 'bolivares')
 			<span class="right badge badge-primary">
 				{{session('modoPago')}}</td>
@@ -29,6 +33,7 @@
 				{{session('modoPago')}}</td>
 			</span>
 		@endif
+		Tipo Moneda:<b>{{' '.$monedaBase}}</b>
 	</p>
 	<div class="d-print-none">
 		<form action="{{route('seleccionarRangoFechaFacturasCalculadas')}}" method="post">
@@ -159,7 +164,15 @@
 									if(floatval($cuenta->moneda_secundaria) > 0.0){
 										$monedaSecundaria = $cuenta->moneda_secundaria;
 									}
-									$pagoTotal = (floatval($cuenta->resto)/$monedaSecundaria);
+									//validamos si la moneda usada es nacional o extranjera
+									if($monedaBase=='nacional'){
+										$pagoTotal = (floatval($cuenta->resto)/$monedaSecundaria);
+									}else{
+										//en caso que la moneda base sea extranjera
+										$pagoTotal = (floatval($cuenta->resto));
+										
+									}
+									
 									$sumaPagoTotalFecha += $pagoTotal;
 									$sumaNotasDebitos +=floatval($cuenta->ndebAumentoTasa); 
 

@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('content')
+@php 
+    //si monedaBase es nacional s calcula el valor de la divisa dividiendo el monto entre la tasa y si es extranjera se multiplica el monto por el valor de la tasa
+    $monedaBase = session('monedaBase'); 
+    
+@endphp
 <div class="container-fluid">
     <div class="row">
 		<div class="col-3">			
@@ -21,11 +26,11 @@
                     <div class="row">
                         <div class="col">
                             <label>Fecha Inicio</label>
-                            <input type="date" name="fechaIni" class="form-control">
+                            <input type="date" name="fechaIni" @if(isset($fechaini)) value="{{$fechaini}}" @endif class="form-control">
                         </div>
                         <div class="col">
                             <label>Fecha Final</label>
-                            <input type="date" name="fechaFin" class="form-control">
+                            <input type="date" name="fechaFin" @if(isset($fechafin)) value="{{$fechafin}}" @endif class="form-control">
                         </div>
                         <div class="col">
                             <div class=" mt-4">
@@ -58,7 +63,7 @@
                         <th>Firma</th>
                     </tr>
                 </thead>
-                
+                @if($monedaBase=='nacional')
                 <tboby>
                     @foreach($pagos as $pago)
                         <?php $sumaBs=0;$sumaDivisa=0; ?>
@@ -85,7 +90,35 @@
                         </tr>
                     @endforeach    
                 </tbody>
-
+                @else
+            <!--     en caso de ser moneda extranjera -->
+                <tboby>
+                    @foreach($pagos as $pago)
+                        <?php $sumaBs=0;$sumaDivisa=0; ?>
+                        @foreach($pago->pagoProveedores as $pagoProveedor)
+                        <tr>
+                        <td>{{$pagoProveedor->proveedor_rif}} {{$pagoProveedor->proveedor_nombre}}
+                        @if(!empty($cuenta->observacion))
+								<span class="right badge badge-warning d-print-none">{{$cuenta->observacion}}</span>
+								@endif
+                        </td>
+                        <td>{{$pagoProveedor->fecha_real_pago}}</td>
+                        <td>{{number_format($pagoProveedor->pago_bolivares*$pagoProveedor->moneda_secundaria,2).' Bs.'}}</td>
+                        <td>{{number_format($pagoProveedor->pago_bolivares,2).' $'}}</td>
+                        <td style=" border-bottom: 2px solid ;"></td>
+                        </tr>
+                        <?php $sumaBs += floatval($pagoProveedor->pago_bolivares*$pagoProveedor->moneda_secundaria);?>
+                        <?php $sumaDivisa += floatval($pagoProveedor->pago_bolivares);?>
+                        @endforeach
+                        <tr style="background-color: #D6DCD9;">
+                            <td colspan='2' style="text-align: right">Total a la Fecha: {{$pago->fechaPagoAcordado}}</td>
+                            <td>{{number_format($sumaBs,2).' Bs.'}}</td>
+                            <td>{{number_format($sumaDivisa,2).' $'}}</td>
+                            <td></td>
+                        </tr>
+                    @endforeach    
+                </tbody>
+                @endif
             </table>
         @endif
     </div>

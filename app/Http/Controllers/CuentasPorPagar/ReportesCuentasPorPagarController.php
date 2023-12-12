@@ -92,7 +92,7 @@ class ReportesCuentasPorPagarController extends Controller
 	    if(!empty(session('logo'))){
 			$logo = session('logo');
 		}
-        return view('cuentasPorPagar.reportes.reporteRelacionPagoPorEmpresa',['pagos'=>$arrayFechas,'logo'=>$logo]);
+        return view('cuentasPorPagar.reportes.reporteRelacionPagoPorEmpresa',['pagos'=>$arrayFechas,'logo'=>$logo,'fechaini'=>$fechaini,'fechafin'=>$fechafin]);
 
     }
 
@@ -115,13 +115,17 @@ class ReportesCuentasPorPagarController extends Controller
 		facturas.empresa_rif,
 		empresas.nombre as empresa_nombre,
 		SUM(facturas.divisa) AS divisa,
-		GROUP_CONCAT(facturas.documento) AS documento
+		SUM(facturas.monto_real) AS monto_real,
+		GROUP_CONCAT(facturas.documento) AS documento,
+		GROUP_CONCAT(facturas.documento_real) AS documento_real
 		FROM
 			(SELECT
 			CONCAT(f.documento,' monto -',SUM(c.debitos - c.creditos)/f.moneda_secundaria,'-',f.pago_efectuado) AS documento,
+			CONCAT(f.documento,' monto -',SUM(c.debitos - c.creditos),'-',f.pago_efectuado) AS documento_real,
 			f.fecha_real_pago,
 			f.empresa_rif,	  
-			SUM(c.debitos - c.creditos)/f.moneda_secundaria AS divisa	  
+			SUM(c.debitos - c.creditos)/f.moneda_secundaria AS divisa,
+			SUM(c.debitos - c.creditos)AS monto_real	  
 			FROM
 			facturas_por_pagars f,
 			cuentas_por_pagars c
@@ -145,7 +149,8 @@ class ReportesCuentasPorPagarController extends Controller
 			'pagos'=>$facturasDelProveedor,
 			'proveedorSeleccionado'=>$proveedorRif.' '.$proveedorNombre,
 			'fechaIni'=>$fechaIni,
-			'fechaFin'=>$fechaFin
+			'fechaFin'=>$fechaFin,
+			'proveedorRif'=>$proveedorRif
 		]);
 
 	}
