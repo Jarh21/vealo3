@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('content')
-
+@php 
+	//si monedaBase es nacional s calcula el valor de la divisa dividiendo el monto entre la tasa y si es extranjera se multiplica el monto por el valor de la tasa
+	$monedaBase = session('monedaBase'); 
+	
+@endphp
 <div class="content">
 	<div>
 		<a href="" class="btn btn-warning btn-sm float-right d-print-none" onclick="javascript:window.print();" >Imprimir</a>
@@ -11,7 +15,7 @@
 				<img src="{{ asset(session('logo_empresa'))}}" alt="AdminLTE Logo" class="" style="opacity: .8" width="100px">
             </td>
 			<td>
-				<p>{{session('nombre_general_empresa').' '.date('d-m-Y')}}</p>
+				
 			</td>
 		</tr>
 	</table>
@@ -19,17 +23,21 @@
 	<h4 class="my-3 mx-5">{{session('empresaNombre')}} {{session('empresaRif')}} </h4>
 	<div class="my-3 mx-5">
 		{{$datosDelPago[0]['cxp'][0]->proveedor_nombre}} {{$datosDelPago[0]['cxp'][0]->proveedor_rif}}
+		<p>Fecha {{date('d-m-Y')}}</p>
 	</div>	
 	<div class="row">
-		<div class="col-6">
+		<div class="col-8">
 		<table border="1" class="ml-5" style="width: 800px; height: 50px;">
 			
 			<tr>
 				<th>Factura</th>
 				<th>Debitos</th>
-				<th>Creditos</th>			
+				<th>Creditos</th>
+				@if($monedaBase=='nacional')			
 				<th>Divisas</th>				
-				<th>Bolivares</th>
+				@else
+				<th>Bolivares</th>				
+				@endif
 				<th>Tasa</th>
 				<th>Concepto</th>				
 				
@@ -44,20 +52,21 @@
 				<tr>
 					<td  class="mx-3">{{$cxp->documento}}</td><!--Factura-->
 					<td>{{$cxp->debitos ?? 0}}</td>
-					<td>{{$cxp->creditos ?? 0}}</td>				
-					<td><!--Divisa Entregadas-->
-						@if($cxp->monto_divisa > 0.00)
-							
-							{{$cxp->monto_divisa.'Monto Divisa'}}
-													
-						@endif
-					</td>
-					
-					<td>
-						@if($cxp->monto_bolivares > 0.00)
-							{{$cxp->monto_bolivares}}		
-						@endif
-					</td>
+					<td>{{$cxp->creditos ?? 0}}</td>
+					@if($monedaBase=='nacional')				
+						<td><!--Divisa Entregadas-->
+							@if($cxp->monto_divisa > 0.00)							
+								{{$cxp->monto_divisa.' Monto Divisa'}}													
+							@endif
+						</td>		
+					@else
+						<!-- monedaBase =='extranjera' -->
+						<td><!--Bolivares Entregadas-->
+							@if($cxp->tasa > 0.00)							
+								{{$cxp->creditos*$cxp->tasa.' Bolivares'}}													
+							@endif
+						</td>
+					@endif
 					<td>
 					{{$cxp->tasa}}
 					</td> 
@@ -66,13 +75,25 @@
 						{{"MONTO FACTURA"}}		
 						@else
 						{{$cxp->concepto_descripcion}}
+						{{$cxp->nombre ?? ''}}
+						{{'#'.$cxp->referencia_pago ?? ''}}
 						@endif
 					</td>					
 					
 					<?php
-						if($cxp->concepto=='CAN') 
-						$suma += $cxp->creditos; 
-						$sumaDivisa += $cxp->monto_divisa;
+						if($monedaBase=='nacional'){
+							if($cxp->concepto=='CAN'): 
+								$suma += $cxp->creditos; 
+								$sumaDivisa += $cxp->monto_divisa;
+							endif;	
+						}else{
+							//moneda base extranjera
+							if($cxp->concepto=='CAN'):
+								$suma += $cxp->creditos; 
+								$sumaDivisa += ($cxp->creditos*$cxp->tasa);
+							endif;
+						}
+						
 					?>
 					
 				</tr>
@@ -82,8 +103,14 @@
 			@endforeach
 			<tr>
 				<td colspan="2"><b>Total </b></td>
-				<td><b> {{number_format($suma,2).'Bs'}} </b></td>
-				<td><b class="text-success" style="font-size:25px">{{number_format($sumaDivisa,2).'$' }}<b></td>
+				@if($monedaBase=='nacional')
+					<td><b> {{number_format($suma,2).'Bs'}} </b></td>
+					<td><b class="text-success" style="font-size:25px">{{number_format($sumaDivisa,2).' Divisa' }}<b></td>
+				@else
+					<td><b> {{number_format($suma,2).' Divisa'}} </b></td>
+					<td><b class="text-success" style="font-size:25px">{{number_format($sumaDivisa,2).'Bs.' }}<b></td>
+				@endif
+				
 			</tr>
 		</table>
 		<br><br>

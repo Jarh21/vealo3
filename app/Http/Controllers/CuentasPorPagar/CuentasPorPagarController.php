@@ -880,21 +880,34 @@ class CuentasPorPagarController extends Controller
 
     }
 
-    public function verVistaPagarFacturas($codigoUnico=''){
+    public function verVistaPagarFacturas($codigoUnico=0,$facturaId=0){
     	//abre la vista de pagar facturas ya calculadas con el codigo de relacion
     	$modoPago = session('modoPago');
-    	$bancos = Banco::all();    	
-    	//$codigoUnico = uniqid();//genera un codigo unico en php
-    	$facturas = array();
-    	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
+    	$bancos = Banco::all();    
 
-    	//optenemos los id de las facturas para retornar
-    	foreach($todosRegistros as $registro){
-    		$facturas[]=$registro['factura_id'];
-    	}    	
-		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
-		$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');  
-    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
+
+			$facturas = array();
+			$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
+
+    		//optenemos los id de las facturas para retornar
+			foreach($todosRegistros as $registro){
+				$facturas[]=$registro['factura_id'];
+			}
+		if(empty($facturas)){
+			
+			$mensaje['texto']="ocurrio un erro, vuelva a editar el registro de pagos anterior";
+			$mensaje['tipo']="alert-info";
+			return self::facturasPorPagar($mensaje);
+		}else{
+			//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
+			$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');  
+    		return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
+		}
+			
+		
+    	
+    	    	
+		
     }
 
     public function prepararPagarFacturas($codigoUnico,$facturasId){
@@ -912,8 +925,9 @@ class CuentasPorPagarController extends Controller
     	}
     	
 		//buscamos el valor de la tasa del dia
+		$tasaDelDia=1;
 		$tasaDelDia = HerramientasController::valorDolarPorFecha(date('Y-m-d'));    	
-
+		
     	//buscamos los datos de las facturas
     	$color1='#FDEBD0';
     	$color2='#D4EFDF';
@@ -982,9 +996,12 @@ class CuentasPorPagarController extends Controller
     public function guardarPagarFacturas(Request $request){
     	//el select tipo tasa esta concatenada con los datos que el formulario necesita para hacer los calculo
     	//por esto el se aplica el explode para que la posicion 0 es el valor y la 1 es tasaActual 
+		//$tasaManual = Parametro::buscarVariable('cxp_valor_tasa_is_manual_en_cancelar_factura');//si el valo de esta variable es 1 el valor de la tasa al cancelar las facturas en manual
     	$seleccionTasaFormulario = $request->tipo_tasa;
     	$seleccionTasaFormulario = explode('|', $seleccionTasaFormulario);
-    	$tipoTasa = $seleccionTasaFormulario[0];
+		$tipoTasa = $seleccionTasaFormulario[0];
+		
+    
     	$valorCero=0.01;//esto indica si al cancelar la factura los debitos - creditos cuando se considera pago
     	$tipoRegistro = $request->tipo_registro;
     	$modoPago = $request->modo_pago;		
@@ -1017,6 +1034,12 @@ class CuentasPorPagarController extends Controller
 		$cuentasPorPagarNCP['cierre'] = $fechaPago;		   	
 		$cuentasPorPagarNCP['concepto'] = $tipoRegistro;
 		
+		//si la moneda usada es extranjera y la sesion de pago es divisas pero el pago de las facturas es en bolivares
+		//el monto que viene del formulario es en bolivares y se debe convertir para poder hacer los calculos correctos
+		if(session('monedaBase')=='extranjera' and session('modoPago')=='dolares' and $modoPago=='bolivares'){
+			$montoPagoIngresado = round($montoPagoIngresado / $tipoTasa,2);
+			$tasa = $tipoTasa;
+		}
 		
 		if(session('modoPago')=='bolivares'){
 		$cuentasPorPagarNCP['monto_bolivares'] = $montoPagoIngresado;	
@@ -1031,6 +1054,7 @@ class CuentasPorPagarController extends Controller
     			$debeOhaver='creditos';
 				$codConcepto=5;				
 		    	if($idFacturaNotaCreditoDebito<>0){
+					
 					$cuentasPorPagarNCP['cod_concepto'] =$codConcepto;
 					$cuentasPorPagarNCP['concepto_descripcion'] = $conceptoDescripcion;
 					$cuentasPorPagarNCP[$debeOhaver] = round($montoPagoIngresado,2);						
@@ -1044,10 +1068,12 @@ class CuentasPorPagarController extends Controller
 				$debeOhaver='creditos';
 				$codConcepto=4;				
 				if($idFacturaNotaCreditoDebito<>0){
+					
 					$cuentasPorPagarNCP['cod_concepto'] =$codConcepto;
 					$cuentasPorPagarNCP['concepto_descripcion'] = $conceptoDescripcion;
 					$cuentasPorPagarNCP[$debeOhaver] = round($montoPagoIngresado,2);
-					$cuentasPorPagarNCP['monto_bolivares'] =0;						
+					$cuentasPorPagarNCP['monto_bolivares'] =0;		
+					$cuentasPorPagarNCP['tasa'] = $tipoTasa;				
 					self::guardarEnCuentasPorPagar($cuentasPorPagarNCP);
 				}
 							
@@ -1058,6 +1084,7 @@ class CuentasPorPagarController extends Controller
 					$debeOhaver='creditos';
 					$codConcepto=2;
 					if($idFacturaNotaCreditoDebito<>0){
+						
 						$cuentasPorPagarNCP['cod_concepto'] =$codConcepto;
 						$cuentasPorPagarNCP['concepto_descripcion'] = $conceptoDescripcion;
 						$cuentasPorPagarNCP[$debeOhaver] = round($montoPagoIngresado,2);						
@@ -1070,6 +1097,7 @@ class CuentasPorPagarController extends Controller
 						$debeOhaver='creditos';
 						$codConcepto=2;
 						if($idFacturaNotaCreditoDebito<>0){
+							
 							$cuentasPorPagarNCP['cod_concepto'] =$codConcepto;
 							$cuentasPorPagarNCP['concepto_descripcion'] = $conceptoDescripcion;
 							$cuentasPorPagarNCP[$debeOhaver] = round($montoPagoIngresado,2);						
@@ -1082,6 +1110,7 @@ class CuentasPorPagarController extends Controller
     			$debeOhaver='debitos';
 				$codConcepto=7;
 				if($idFacturaNotaCreditoDebito<>0){
+					
 					$cuentasPorPagarNCP['cod_concepto'] =$codConcepto;
 					$cuentasPorPagarNCP['concepto_descripcion'] = $conceptoDescripcion;
 					$cuentasPorPagarNCP[$debeOhaver] = round($montoPagoIngresado,2);						
@@ -1104,8 +1133,8 @@ class CuentasPorPagarController extends Controller
     	foreach ($datosPagoFacturas as $index => $datos) {
 			
     		$datosPagoFactura = explode("|",$datos);
-    		$montoBs = floatval($datosPagoFactura[0]);//el monto de la factura
-    		$tasa = $datosPagoFactura[1];//valor de la tasa del dolar en bs
+    		$montoBs = floatval($datosPagoFactura[0]);//el monto de la factura			
+			$tasa = $datosPagoFactura[1];//valor de la tasa del dolar en bs    		
     		$montoDivisaFactura = floatval($datosPagoFactura[2]);//monto en divisa de la factura
 			
     		$proveedorRif = $datosPagoFactura[3];
@@ -1160,7 +1189,8 @@ class CuentasPorPagarController extends Controller
 								$cuentasPorPagar['observacion'] = 'caso 1 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
-								$cuentasPorPagar[$debeOhaver] = $montoBs;			    	
+								$cuentasPorPagar[$debeOhaver] = $montoBs;	
+								$cuentasPorPagar['tasa'] = $tipoTasa;		    	
 								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
 								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoBs,$tasa);			    	
 								$montoPagoIngresado = $montoPagoIngresado - $montoDivisaFactura;
@@ -1290,7 +1320,8 @@ class CuentasPorPagarController extends Controller
 								$cuentasPorPagar['observacion'] = 'caso 6';    	
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
-								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);					
+								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);		
+								$cuentasPorPagar['tasa'] = $tipoTasa;			
 								//$cuentasPorPagar['monto_bolivares'] = $montoGuardar;						
 								self::guardarEnCuentasPorPagar($cuentasPorPagar);
 								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
@@ -1309,18 +1340,19 @@ class CuentasPorPagarController extends Controller
 						//si la monedaBase es $$$$ EXTRANJERA $$$ Y SE PAGAN EN DIVISAS
 						//si el monto en divisa de la factura es menor al monto ingresado se descuenta toda la factura
 						if($tipoRegistro == 'CAN'){
-							//if($montoDivisaFactura < $montoPagoIngresado and $modoPago<>'bolivares'){
-							if($montoDivisaFactura <= $montoPagoIngresado and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
+							
+							if($montoBs <= $montoPagoIngresado and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
 									//restamos el monto en divisas de la factura cancelada
 								//caso 1
 								
-								$cuentasPorPagar['observacion'] = 'caso 1 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] = 'caso 1.1 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
-								$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;			    	
+								$cuentasPorPagar[$debeOhaver] = $montoBs;	
+								$cuentasPorPagar['tasa'] = $tipoTasa;		    	
 								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
 								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoPagoIngresado,$tasa);			    	
-								$montoPagoIngresado = $montoPagoIngresado - $montoDivisaFactura;
+								$montoPagoIngresado = $montoPagoIngresado - $montoBs;
 								self::guardarEnCuentasPorPagar($cuentasPorPagar);
 								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
 								//facturas_pagada
@@ -1330,16 +1362,41 @@ class CuentasPorPagarController extends Controller
 									// aqui se registrara las deducciones de la sra helen 
 								}
 								continue;
-							}			    		
+							}
+							
+							//si el monto de la facturas en menor al monto ingresado es en sesion divisas y se cancela en bolivares
+							if($montoBs <= $montoPagoIngresado and $datosFactura->pago_efectuado==0 and $modoPago=='bolivares'){
+								
+								//restamos el monto en divisas de la factura cancelada
+								//caso 1.2
+								
+								$cuentasPorPagar['observacion'] = 'caso 1.2 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = $montoBs;			    	
+								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
+								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoPagoIngresado,$tasa);
+								$cuentasPorPagar['tasa'] = $tipoTasa;			    	
+								$montoPagoIngresado = $montoPagoIngresado - $montoBs;
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+								continue;
+							}
 
 							//si es mayor es porque el monto de la siguiente factura es mayor al que queda en las divisas para pagar
-							//if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $modoPago<>'bolivares'){
-							if($montoDivisaFactura > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
+							
+							if($montoBs > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago<>'bolivares'){
 								//el monto registrado es el abonado del saldo que quedo para pagar
 								//caso 3
 								
 								//$montoBs = ($montoPagoIngresado) * $tasa;
-								$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;					
@@ -1359,12 +1416,38 @@ class CuentasPorPagarController extends Controller
 								continue;    			
 							} 	
 							
+							//si es mayor es porque el monto de la siguiente factura es mayor al que queda en las divisas para pagar esto es con modo de pago bolivares
+							
+							if($montoBs > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago=='bolivares'){
+								//el monto registrado es el abonado del saldo que quedo para pagar
+								//caso 3.2
+								
+								//$montoBs = ($montoPagoIngresado) * $tasa;
+								$cuentasPorPagar['observacion'] = 'caso 3.2 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['concepto'] = $tipoRegistro;
+								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
+								$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;					
+								//$cuentasPorPagar['monto_divisa'] = ($montoBs/$tasa);
+								$cuentasPorPagar['monto_divisa'] = HerramientasController::valorAlCambioMonedaSecundaria($montoPagoIngresado,$tasa); 
+								$montoPagoIngresado=0;
+								$cuentasPorPagar['tasa'] = $tipoTasa;
+								
+								self::guardarEnCuentasPorPagar($cuentasPorPagar);
+								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
+								//facturas_pagada
+								$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($facturaId);		
+								if($verificarSiSeCanceloFactura->resto <= $valorCero){
+									FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>1,'fecha_real_pago'=>$fechaRealPago]);
+									// aqui se registrara las deducciones de la sra helen 
+								}
+								continue;    			
+							}
 
 							//validamos si el modo pago es divisa y un pago se hace en bs y la tasa es la del dia
-							if(session('modoPago')=='dolares' and $modoPago=='bolivares'){							
+							/* if(session('modoPago')=='dolares' and $modoPago=='bolivares'){							
 								//caso 4
 
-								$montoPagoIngresado = ($montoPagoIngresado/$tasa);
+								//$montoPagoIngresado = ($montoPagoIngresado/$tasa);
 								//si el monto de la tasa es mayor al de la factura
 								if($index == count($datosPagoFacturas)-1){
 									
@@ -1409,7 +1492,7 @@ class CuentasPorPagarController extends Controller
 										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
 										break;
 								}
-								$cuentasPorPagar['observacion'] = 'caso 4';
+								$cuentasPorPagar['observacion'] = 'caso 4 extranje';
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = 'PAGO DE FACTURA Bs.';
 								$cuentasPorPagar['creditos'] = $montoPagoIngresado;
@@ -1427,13 +1510,14 @@ class CuentasPorPagarController extends Controller
 									// aqui se registrara las deducciones de la sra helen 
 								}
 																
-							}//fin sesion dolares modo pago Bs y tasa actual 				    	
+							} *///fin sesion dolares modo pago Bs y tasa actual 				    	
 
 						}else{///Fin registro 'CAN'	
 						
-						//validamos si se inserta una nota de debito o credito va en bolivares	
+						//validamos si se inserta una nota de debito o credito va en la monedaBase	
 						//caso 6
 							if($idFacturaNotaCreditoDebito==0 and $montoPagoIngresado > $valorCero){
+								//dd('estoy linea 1497',$tipoTasa);
 								//si no seleccionaron ninguna factura pero seleccionaron todas las facturas
 								//se reparte el monto de la nota de credito o debito entre las facturas
 								$montoGuardar=0;
@@ -1450,7 +1534,8 @@ class CuentasPorPagarController extends Controller
 								$cuentasPorPagar['observacion'] = 'caso 6';    	
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
-								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);					
+								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);	
+								$cuentasPorPagar['tasa'] = $tipoTasa;				
 								//$cuentasPorPagar['monto_bolivares'] = $montoGuardar;						
 								self::guardarEnCuentasPorPagar($cuentasPorPagar);
 								//comparamos si la duda se cancelo en la factura y actualizamos la bandera
@@ -1713,8 +1798,13 @@ class CuentasPorPagarController extends Controller
 		$factura->porcentaje_descuento = $request->porcentaje_descuento;
 		$factura->moneda_secundaria = $request->valor_tasa;
 		$factura->update();
+
+		//eliminamos de cuentas por pagar el registro de porcentaje de descuento previo si lo hay
+		CuentasPorPagar::where('factura_id',$id)->where('cod_concepto',4)->delete();
+
 		//si tiene porcfentaje de descuento se agrega en cxp
 		if($request->porcentaje_descuento > 0){
+			
 			$porcDescuento = $request->porcentaje_descuento;
 			$monto = $factura->debitos;
 
@@ -1771,18 +1861,22 @@ class CuentasPorPagarController extends Controller
     public function elimarAsientoCuentasPorPagar($id=0,$codigoRelacion=0){
 
     	//eliminar los registros de cuentas_por_pagar, por pagar esto es desde la vista indexPagar    	
-    	$eliminarAsiento = CuentasPorPagar::findOrFail($id);		   	
-    	$eliminarAsiento->delete();
-		//comparamos si la duda se cancelo en la factura y actualizamos la bandera
-		//facturas_pagada
-		$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($eliminarAsiento->factura_id);
+    	$eliminarAsiento = CuentasPorPagar::findOrFail($id);
+		
+		if($eliminarAsiento->cod_concepto==4){
+			//si el registro a leiminar es descuento(cod_concepto==4) buscamos en facturas por pagar y editamos el campo de % desceunto a 0
+			facturasPorPagar::where('id',$eliminarAsiento->factura_id)->update(['porcentaje_descuento'=>0.00]);
+		}		   	
+    	$eliminarAsiento->delete();//eliminamos en cuentas por pagar
+		
+		$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($eliminarAsiento->factura_id); //validamos que la factura este cancelada o no
 											
 		if(floatval($verificarSiSeCanceloFactura->resto) > 0.00){								
 			FacturasPorPagar::where('id',$verificarSiSeCanceloFactura->factura_id)->update(['pago_efectuado'=>0]);
 			
 			// aqui se registrara las deducciones de la sra helen 
 		}     	
-    	return self::verVistaPagarFacturas($codigoRelacion);
+    	return self::verVistaPagarFacturas($codigoRelacion,$id);
     }
 
 

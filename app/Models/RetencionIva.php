@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class RetencionIva extends Model
 {
     use HasFactory;
+    protected $table="retenciones";
+
 }

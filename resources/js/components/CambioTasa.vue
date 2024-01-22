@@ -5,7 +5,7 @@
             <div class="">
                 <div class="">
                     
-                    <p>Tasa actual: {{ tasaDelDia.tasa_segunda_actualizacion}}</p>
+                    <h3>Tasa actual: {{ tasaDelDia.tasa_segunda_actualizacion}}</h3>
                     <form action="" method="post">
                 <div class="row mb-3">
                     <div class="col">
@@ -95,6 +95,7 @@ window.JSZip = jszip
                 this.$nextTick(()=>{
                     $('#cotizaciones').DataTable({
                         dom: 'Bfrtip',
+                        ordering:  false,
                         buttons: [
                             {
                                 "extend":"copyHtml5",

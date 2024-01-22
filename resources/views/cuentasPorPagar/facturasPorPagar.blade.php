@@ -14,7 +14,8 @@
 			<a href="{{route('sincorinzarServidoresTodo')}}" class="btn btn-outline-warning btn-sm" title="la ultima actualizacion fue: {{$fecha_actualizacion_servidor_remoto}}">Sincronizar todas las sucursales</a>
 		</div>
 		@endif
-		<div class="mb-3">				
+		<div class="mb-3">
+		 <span>Facturas del Libro de Compras del Siace.</span>					
 			<a href="{{route('nuevafacturaporpagar.index')}}" class="btn btn-outline-success btn-sm mx-3 ">
 			<i class="fas fa-file-invoice-dollar text-success" title="Ingresar Factura Manual"></i>Ingresar Factura Manual
     		</a>
@@ -26,7 +27,7 @@
 			
 			<input type="hidden" name="empresa" value="{{session('empresaRif')}}|{{session('basedata')}}">
 			<input type="hidden" name="modo_pago" value="{{session('modoPago')}}">
-			Facturas del Libro de Compras del Siace.
+			
 				<div class="row">
 					
 									
@@ -48,7 +49,7 @@
 					<div class="col-2">
 						<div class="form-group">						
 						<input type="number" name="dias_credito" class="form-control my-2" placeholder="Dias de Credito" title="Dias de Credito acordados con el vendedor">
-						@can('agregar.tasadivisa.afactura')<input type="number" name="valor_tasa" class="form-control" placeholder="Valor de la Tasa">@endcan
+						@can('agregar.tasadivisa.afactura')<input type="text" name="valor_tasa" class="form-control" placeholder="Valor de la Tasa">@endcan
 						</div>
 						
 					</div>

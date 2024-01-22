@@ -5,7 +5,7 @@
 		$monedaBase = session('monedaBase'); 
 		
 	@endphp
-	<div class="container">
+	<div class="container-fluid">
 		<h3>Pagar Facturas {{session('empresaNombre')}} {{session('empresaRif')}} <!-- <a href="{{--route('cuentasporpagar.facturasPorPagar')--}}" class="btn btn-warning btn-sm float-right"><i class="fa fa-step-backward"></i> Regresar</a> --></h3><hr>
 		<p>Modo de Pago 
 			@if(session('modoPago') == 'bolivares')
@@ -55,12 +55,16 @@
 					</tr>
 				</thead>				
 				<tbody>
-					<?php $sumaDebito=0;$sumaCredito=0; $tasa=1; $totalFacturas=0; $totalBs=0; $totalFacturasDivisa=0; ?>
+					<?php $sumaDebito=0;$sumaCredito=0; $tasa=1; $totalFacturas=0; $totalBs=0; $totalFacturasDivisa=0; $totalDivisa=0; $tasaDelDia=0;?>
 
 					@foreach($cuentas as $cuenta)
 						
 						@foreach($cuenta['cxp'] as $registro)
-						<?php if($cuenta['tasa']>0){ $tasa=$cuenta['tasa']; } ?>
+
+						<?php 
+							if($cuenta['tasa']>0){ $tasa=$cuenta['tasa']; } 
+							
+						?>
 							<tr style="background-color: {{$cuenta['color']}}">
 								<td><!--Facturas -->
 									{{$registro->documento}}
@@ -80,12 +84,12 @@
 								</td>							
 								<td><!--Debitos -->
 									@if($registro->debitos > 0.00)
-										{{$registro->debitos}}
+										{{number_format($registro->debitos,2)}}
 									@endif
 								</td> 
 								<td class="text-danger"><!--Creditos -->
 									@if($registro->creditos > 0.00)
-										-{{$registro->creditos}}
+										-{{number_format($registro->creditos,2)}}
 									@endif
 								</td>
 								<td><!-- Total Bs. -->																
@@ -109,45 +113,56 @@
 													
 												@if($registro->tasa >0.00)
 													@if($registro->monto_divisa <= 0.00)
-														{{'- '.round($registro->creditos/$registro->tasa,2).'$'}}
+														{{'- '.number_format($registro->creditos/$registro->tasa,2).'$'}}
 													@else	
-													{{'-'.$registro->monto_divisa.'$'}}
+													{{'--'.$registro->monto_divisa.'$'}}
 													@endif
 												@else
-												{{'- '.round($registro->creditos/$tasa,2).'$'}}
+												{{'---'.number_format($registro->creditos/$tasa,2).'$'}}
 												@endif	
 											
 										@endif	
 									
 										@if($registro->concepto=='FAC' or $registro->concepto=='NDEB')
-										{{round($registro->debitos/$tasa,2).'$'}}
+										{{number_format($registro->debitos/$tasa,2).'$'}}
 										@endif
 										@if($registro->concepto=='RIVA' or $registro->concepto=='RISLR' or $registro->concepto=='DESC')
-										{{'-'.round($registro->creditos/$tasa,2).'$'}}
+										{{'-'.number_format($registro->creditos/$tasa,2).'$'}}
 										@endif
 									@endif
 								@endif <!-- fin monedaBase -->
 								@if($monedaBase=='extranjera')
 									@if(session('modoPago')<>'bolivares')
+
+										@if($registro->concepto=='FAC' or $registro->concepto=='NDEB')
+										{{number_format($registro->debitos*$tasa,2).'Bs'}}
+										<!-- asignamos a la cuenta el valor de la factura * la tasa registrada -->	
+										@php $totalDivisa = $totalDivisa + $registro->debitos*$tasa;  @endphp
+
+										@endif
+
 										@if($registro->concepto=='CAN')
 													
 												@if($registro->tasa >0.00)
 													@if($registro->monto_divisa <= 0.00)
-														{{'- '.round($registro->creditos*$registro->tasa,2).'Bs'}}
+														{{'- '.number_format($registro->creditos*$registro->tasa,2).'Bs'}}
 													@else	
-													{{'-'.$registro->monto_divisa*$tasa.'Bs'}}
+													{{'-'.number_format($registro->creditos*$registro->tasa).'Bs'}}
 													@endif
 												@else
-												{{'- '.round($registro->creditos*$tasa,2).'Bs'}}
-												@endif	
+												{{'-'.number_format($registro->creditos*$tasa,2).'Bs'}}
+												@endif
+												<!-- restamos a la cuenta el valor de la deduccion * la tasa registrada -->	
+												@php $totalDivisa = $totalDivisa - $registro->creditos*$registro->tasa;  @endphp
 											
 										@endif	
 									
-										@if($registro->concepto=='FAC' or $registro->concepto=='NDEB')
-										{{round($registro->debitos*$tasa,2).'Bs'}}
-										@endif
+										
 										@if($registro->concepto=='RIVA' or $registro->concepto=='RISLR' or $registro->concepto=='DESC')
-										{{'-'.round($registro->creditos*$tasa,2).'Bs'}}
+										{{'-'.number_format($registro->creditos*$registro->tasa,2).'Bs'}}
+										<!-- restamos a la cuenta el valor de la deduccion * la tasa registrada -->
+										@php $totalDivisa = $totalDivisa - $registro->creditos*$registro->tasa; @endphp
+
 										@endif
 									@endif
 								@endif <!-- fin monedaBase -->
@@ -241,6 +256,7 @@
 								</td>
 							</tr>
 							<?php
+								
 								//$sumaDebito += $registro->debitos;
 								//$sumaCredito += $registro->creditos;
 							?>
@@ -250,7 +266,7 @@
 
 						<?php $totalBs = $cuenta['restaTotal'];  ?>
 						<?php
-							if($monedaBase=='nacional'){
+					/*		if($monedaBase=='nacional'){
 								if($totalBs >0.00){
 									$totalDivisa = ($totalBs/$cuenta['tasa']);
 									//$totalDivisa = 0;//valor falso
@@ -265,7 +281,7 @@
 								}else{
 									$totalDivisa = 0;
 								}
-							} 						
+							} 		*/				
 
 						?>
 						<?php $totalDivisaFormato = number_format($totalDivisa,3) ?>
@@ -274,9 +290,9 @@
 								<td colspan="3">Total Factura--</td>
 								<td>{{--$cuenta['sumaDebito']--}}</td>
 								<td class="text-danger">{{--$cuenta['sumaCredito']--}}</td>
-								<td>Bs. {{$totalBs}}</td>							
+								<td>Bs. {{number_format($totalBs,2)}}</td>							
 								@if(session('modoPago')<>'bolivares')
-								<td>{{$cuenta['tasa']}}</td>
+								<td>{{--$cuenta['tasa']--}}</td>
 								<td class="text-success">
 									Divisa$ {{number_format($totalDivisa,3) ?? 0}}
 								</td>
@@ -284,28 +300,30 @@
 							@endif <!-- fin moneda base -->
 							
 							@if($monedaBase=='extranjera')
+							
 								<td colspan="3">Total Factura--</td>
 								<td>{{--$cuenta['sumaDebito']--}}</td>
 								<td class="text-danger">{{--$cuenta['sumaCredito']--}}</td>
-								<td>Usd. {{$totalBs}}</td>							
+								<td>Usd. {{number_format($totalBs,2)}}</td>							
 								@if(session('modoPago')<>'bolivares')
-								<td>{{$cuenta['tasa']}}</td>
+								<td>{{--$cuenta['tasa']--}}</td>
 								<td class="text-success">
-									Bs. {{number_format($totalDivisa,3) ?? 0}}
+									{{number_format($totalDivisa,3) ?? 0}}
 								</td>
 								@endif
 							@endif <!-- fin moneda base -->
-				<!-- va hidden	 -->		<input type="hidden" name="datosPagoFactura[]" value="{{$totalBs}}|{{$cuenta['tasa']}}|{{$totalDivisa}}|{{$cuenta['proveedor_rif']}}|{{$cuenta['documento']}}|{{$cuenta['n_control']}}|{{$cuenta['igtf']}}|{{$cuenta['factura_id']}}">
+				<!-- va hidden	 --><input type="hidden" name="datosPagoFactura[]" value="{{$totalBs}}|{{$cuenta['tasa']}}|{{$totalDivisa}}|{{$cuenta['proveedor_rif']}}|{{$cuenta['documento']}}|{{$cuenta['n_control']}}|{{$cuenta['igtf']}}|{{$cuenta['factura_id']}}">
 							
 
 							
 						</tr>
-						<?php 
+						<?php
+							
 							$totalFacturas += $totalBs;
 						    $totalFacturasDivisa += $totalDivisa;
 						    $sumaDebito=0; 
 						    $sumaCredito=0;
-							
+							$totalDivisa=0; //iniciamos el contador de los montos de la moneda secundaria en 0 esto es en total facturas 
 						    $totalBs=0;
 						    $tasaDelDia =$cuenta['tasaDelDia']; 
 						  ?>	
@@ -321,7 +339,7 @@
 							
 						@endif
 					@endif
-					@if($monedaBase=='extranjera')
+					@if($monedaBase=='extranjera')					
 						<td colspan="5"><b>Pendiente Por Cancelar</b></td>
 						<td><b>Usd. {{number_format($totalFacturas,2)}}</b></td>
 						@if(session('modoPago')<>'bolivares')
@@ -394,8 +412,8 @@
 									<label>Valor Tasa</label>
 									<select class="form-control" name="tipo_tasa" id="tipo_tasa" >
 																	
-										<option value="{{$cuenta['tasa']}}|tasaFactura" @if(session('modoPago')=='bolivares')selected @endif>Tasa de la Factura {{$cuenta['tasa']}}</option>								
-										<option value="{{$cuenta['tasaDelDia']}}|tasaActual" @if(session('modoPago')<>'bolivares')selected @endif>Tasa Actual {{$cuenta['tasaDelDia']}}</option>								
+									<option value="{{$cuenta['tasa']}}|tasaFactura" @if(session('modoPago')=='bolivares')selected @endif>Tasa de la Factura {{$cuenta['tasa']}}</option>								
+									<option value="{{$cuenta['tasaDelDia']}}|tasaActual" @if(session('modoPago')<>'bolivares')selected @endif>Tasa Actual {{$cuenta['tasaDelDia']}}</option>								
 									</select>
 									
 								</div>
@@ -666,6 +684,29 @@
 			}
 			
 		});
+		/*$("#tipo_tasa").keyup(function(){
+			
+			var tipoTasa = $("#tipo_tasa").val();
+			var modopago = $("#modo_pago  option:selected").val();
+			var monedaBase = '<?php echo $monedaBase; ?>';
+			
+
+			if(modopago == 'bolivares'){
+				if(monedaBase =='nacional'){
+					// Moneda Nacional /////
+					
+
+					document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3) ?>* tipoTasa;
+						
+				}else{
+					// Moneda Extranjera ////
+					document.getElementById('moneda1').value= <?php echo round($totalFacturas,3) ?>* tipoTasa;
+
+				}
+				
+			}
+			
+		});*/
     </script>
 
     <script type="text/javascript">

@@ -159,7 +159,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/cuentasporpagar/calculo-pagos',[CuentasPorPagarController::class,'calculoDeDeudasPorFacturas'])->name('calculoDeDeudasPorFacturas');
     Route::get('/cuentasporpagar/facturas-calculadas',[CuentasPorPagarController::class,'listadoFacturasCalculadas'])->name('listadoFacturasCalculadas');
     Route::get('/cuentasporpagar/sacar-facturas-calculadas/{id}',[CuentasPorPagarController::class,'eliminaFacturaCalculada'])->name('eliminaFacturaCalculada');	
-    Route::get('/cuentasporpagar/verPagarFacturas/{codigoRelacion?}',[CuentasPorPagarController::class,'verVistaPagarFacturas'])->name('verVistaPagarFacturas');
+    Route::get('/cuentasporpagar/verPagarFacturas/{codigoRelacion?}/{id?}',[CuentasPorPagarController::class,'verVistaPagarFacturas'])->name('verVistaPagarFacturas');
     Route::get('/cuentasporpagar/ReporteBolivares',[CuentasPorPagarController::class,'reportePagoBolivaresDeDolares'])->name('reportePagoBolivares');
     Route::post('/cuentasporpagar/resulReporteBolivares',[CuentasPorPagarController::class,'resulReportePagoBolivaresDeDolares'])->name('resulReportePagoBolivares');
     Route::post('/cuentasporpagar/fecha_facturas-calculadas',[CuentasPorPagarController::class,'seleccionarRangoFechaFacturasCalculadas'])->name('seleccionarRangoFechaFacturasCalculadas');
@@ -349,6 +349,9 @@ Route::middleware(['auth'])->group(function(){
 
     /***********************RETENCION DE IVA  ************/
     Route::get('/retencion-iva/index',[RetencionIvaController::class,'index'])->name('retencion.iva.index');
+    Route::post('/retencion-iva/buscar-documento',[RetencionIvaController::class,'guardarFacturaRetencionIva'])->name('retencion.iva.buscarFacturasSiace');
+    Route::get('/retencion-iva/eliminar-factura/{id}',[RetencionIvaController::class,'eliminarFactura'])->name('retencion.iva.eliminarFactura');
+    Route::post('/retencion-iva/generar-retencion',[RetencionIvaController::class,'generarRetencionIva'])->name('retencion.iva.generar');
 
 
 });
