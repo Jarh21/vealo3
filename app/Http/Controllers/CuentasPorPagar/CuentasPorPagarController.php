@@ -92,7 +92,8 @@ class CuentasPorPagarController extends Controller
     		foreach($listar_cuentas_por_pagar as $facturaPorPagar){
 				$banderaFacturaSiaceEncontrada=0;
     			$retencionIslr=0;
-    			$banderaIslar=0;    			
+    			$banderaIslar=0;
+				$montoOrigenFactura = 0;    			
     			$fechaPago = $herramientas->sumarDiasAFecha($facturaPorPagar->fecha_factura,$facturaPorPagar->dias_credito);
     			$diasParaPago = $herramientas->diferenciaEntreFechas($fechaPago,date('Y-m-d'));
     			$porcentajeRetencionIva=0.00;
@@ -114,10 +115,11 @@ class CuentasPorPagarController extends Controller
 				//ya que si las elimnan no se les debe pagar all proveedor bien sea por devolucion
 				if($verificarFacturaSiace==1 and $facturaPorPagar->origen=='siace'){
 					$conexionSQL = $herramientas->conexionDinamicaBD(session('basedata'));    				
-					$registros = $conexionSQL->select("SELECT keycodigo from cxp where codorigen=2000 and documento=:nfactura and rif=:rifProveedor order by keycodigo",['nfactura'=>$facturaPorPagar->documento,'rifProveedor'=>$facturaPorPagar->proveedor_rif]);
+					$registros = $conexionSQL->select("SELECT keycodigo,debitos from cxp where codorigen=2000 and documento=:nfactura and rif=:rifProveedor order by keycodigo",['nfactura'=>$facturaPorPagar->documento,'rifProveedor'=>$facturaPorPagar->proveedor_rif]);
 					foreach($registros as $registro){
 						if($registro->keycodigo > 0){
 							$banderaFacturaSiaceEncontrada=1;
+							$montoOrigenFactura = $registro->debitos;
 						}
 					}
 				}else{
@@ -168,7 +170,7 @@ class CuentasPorPagarController extends Controller
 					  'banderaFacturaSiaceEncontrada'=>$banderaFacturaSiaceEncontrada,
 		              'usuario'=>$facturaPorPagar->usuario,
 		              'porcentaje_retencion_iva'=>$porcentajeRetencionIva,
-		              
+		              'montoOrigenFactura'=>$montoOrigenFactura,
     				);
     				$listadoFacturasPorPagar[]=(object)$factura;   			
     			
@@ -2046,12 +2048,23 @@ class CuentasPorPagarController extends Controller
     	}
     	$fechaini='';
     	$fechafin='';
+		$banderaFacturaSiaceEncontrada = 0;
+		$montoOrigenFactura = 0;
     	$fechaini = session('fecha_ini_relacion_pago');
     	$fechafin = session('fecha_fin_relacion_pago');
     	$arrayFechas=[];
     	$arrayFacturas=[];
-					//buscamos en cuentas por pagars el total a cancelar
-    				//$totalCancelar = CuentasPorPagar::debitosMenosCredito($facturaPorPagar->id);
+		$herramientas  = new HerramientasController();
+
+		//comprobar si esta activa la opcion de verificar facturas en el siace
+		//si lo esta la buscamos en la tabla cxp del siace en caso de no encontrarla enviar una bandera par resaltar el error
+		$verificarFacturaSiace = Parametro::buscarVariable('verificar_facturas_en_siace');
+		if($verificarFacturaSiace==''){
+			dd('No esta definido en la configuracion si se puede o no verificar facturas en el siace');
+		}
+
+		//buscamos en cuentas por pagars el total a cancelar
+    	//$totalCancelar = CuentasPorPagar::debitosMenosCredito($facturaPorPagar->id);
     	if(session('fecha_ini_relacion_pago')<> null){
     		$facturasCalculadas = new FacturasPorPagar();
 	    	$fechasPagos = $facturasCalculadas->fechasPagoFacturasApartadas($fechaini,$fechafin);
@@ -2065,6 +2078,24 @@ class CuentasPorPagarController extends Controller
 					$notasDebitoAumentoTasa = CuentasPorPagar::sumaDebitosPorAumentoTasa($facturaPorPagar->id);
 					$totalFactutrasPorProveedor = $facturasCalculadas->contarFacturasDelProveedorPorRangoDeFechaCalculada($facturaPorPagar->fecha_real_pago,$facturaPorPagar->proveedor_rif);
 					
+					//verificar si hay que verificar la factura y buscar en el siace
+					//esto es por si elimina del siace una factura por relacionar o ya relacionada
+					//ya que si las elimnan no se les debe pagar all proveedor bien sea por devolucion
+					if($verificarFacturaSiace==1 and $facturaPorPagar->origen=='siace'){
+						$conexionSQL = $herramientas->conexionDinamicaBD(session('basedata'));    				
+						$registros = $conexionSQL->select("SELECT keycodigo,debitos from cxp where codorigen=2000 and documento=:nfactura and rif=:rifProveedor order by keycodigo",['nfactura'=>$facturaPorPagar->documento,'rifProveedor'=>$facturaPorPagar->proveedor_rif]);
+						foreach($registros as $registro){
+							if($registro->keycodigo > 0){
+								$banderaFacturaSiaceEncontrada=1;
+								$montoOrigenFactura = $registro->debitos;
+							}
+						}
+					}else{
+						//si no esta habilitada la configuracion de veriifcar las facturas en el siace, la bandela la dejamos en 1 
+						//para que asuma que la encontron y no tilde de rojo la factura ya que la verificacion esta desactivada
+						$banderaFacturaSiaceEncontrada=1;
+					}
+
 					$factura= array(
     				  'id'=>$facturaPorPagar->id,
 		              'empresa_rif'=>$facturaPorPagar->empresa_rif,		              
@@ -2101,7 +2132,9 @@ class CuentasPorPagarController extends Controller
 		              'observacion'=>$facturaPorPagar->observacion,
 		              'igtf'=>$facturaPorPagar->igtf,
 		              'usuario'=>$facturaPorPagar->usuario,	
-					  'totalFactutrasPorProveedor'=>$totalFactutrasPorProveedor,	              
+					  'totalFactutrasPorProveedor'=>$totalFactutrasPorProveedor,
+					  'montoOrigenFactura'=>$montoOrigenFactura,	
+					  'banderaFacturaSiaceEncontrada'=>$banderaFacturaSiaceEncontrada,              
     				);
     				$listadoFacturasPorPagar[]=(object)$factura;
 					

@@ -145,14 +145,16 @@
 							</td>
 							<td>{{$cuenta->documento}}</td><!-- NRO FACTURA -->		    				   				
 							<td>{{$cuenta->fecha_factura}}</td>	<!-- FECHA FACTURA -->    				
-							<td class="d-print-none">
+							<td class="d-print-none"> <!-- Monto -->
 								{{number_format($cuenta->debitos,2,',','.')}}
-								
+								@if($cuenta->montoOrigenFactura > 0 and $cuenta->montoOrigenFactura<>$cuenta->debitos)
+								<b class="text-danger d-print-none">distinto del siace {{number_format($cuenta->montoOrigenFactura,2,',','.')}}</b>
+								@endif
 							</td> <!-- MONTO -->						
 							<td class="d-print-none">{{$cuenta->retencion_iva}}</td><!-- RETENCION IVA -->
 							<td class="d-print-none">{{$cuenta->retencion_islr}}</td><!-- RETENCION ISLR -->
 																
-							<td class="d-print-none"><!-- PAGO BOLIVARES -->
+							<td class="d-print-none"><!-- 	Monto Fac. -->
 								<?php 
 									$pagoBolivares = $cuenta->debitos-$cuenta->retencion_iva-$cuenta->retencion_islr;
 									if($cuenta->porcentaje_descuento > 0.00){
@@ -209,7 +211,7 @@
 								@endif
 								
 							</td>
-							<td class="d-print-none">{{number_format($cuenta->resto,2)}}</td>						
+							<td class="d-print-none">{{number_format($cuenta->resto,2)}}</td> <!-- Monto pagar.	 -->					
 							<td>{{$cuenta->moneda_secundaria}}</td><!-- TASA -->
 							<td>{{number_format($cuenta->igtf,2,'.',',')}}</td><!-- IGTF -->
 							<td>{{number_format($pagoTotal,2)}}</td> <!-- pago en Divisas -->

@@ -352,6 +352,9 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/retencion-iva/buscar-documento',[RetencionIvaController::class,'guardarFacturaRetencionIva'])->name('retencion.iva.buscarFacturasSiace');
     Route::get('/retencion-iva/eliminar-factura/{id}',[RetencionIvaController::class,'eliminarFactura'])->name('retencion.iva.eliminarFactura');
     Route::post('/retencion-iva/generar-retencion',[RetencionIvaController::class,'generarRetencionIva'])->name('retencion.iva.generar');
+    Route::post('/retencion-iva/guardar-retencion',[RetencionIvaController::class,'guardarComprobanteRetencionIva'])->name('retencion.iva.guardar');
+    Route::get('/retencion-iva/listar-retencion',[RetencionIvaController::class,'listarRetencionesIva'])->name('retencion.iva.listar');
+    Route::get('/retencion-iva/generar-comprobante/{comprobanteRetencion}',[RetencionIvaController::class,'mostrarComprobanteRetencionIva'])->name('retencion.iva.generar_comprobante');
 
 
 });

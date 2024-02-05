@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\RetencionIva;
 
 use App\Http\Controllers\Controller;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use App\Models\Proveedor;
 use App\Models\RetencionIvaDetalle;
@@ -17,10 +19,10 @@ class RetencionIvaController extends Controller
 		$herramientas = new HerramientasController();
     	//$conexionSQL = $herramientas->conexionDinamicaBD(session('basedata')); 
 		/* $registros = DB::select("SELECT * FROM retencion_iva_detalles WHERE estatus='N'"); */
-		$registros = RetencionIvaDetalle::where('estatus','N')->get();
+		$registros = RetencionIvaDetalle::where('estatus','S')->where('rif_agente',session('empresaRif'))->get();
         $proveedores = Proveedor::all();
 		$iva = Parametro::buscarVariable('poriva');
-        return view('retencionIva.registroDocumentos',['proveedores'=>$proveedores,'registros'=>$registros,'iva'=>$iva]);
+        return view('retencionIva.registroDocumentos',['proveedores'=>$proveedores,'registros'=>$registros,'iva'=>$iva,'empresas'=>$herramientas->listarEmpresas()]);
     }
 
     public function guardarFacturaRetencionIva(Request $request){
@@ -118,7 +120,7 @@ class RetencionIvaController extends Controller
 						'tipo_docu'=>'FA',
 						'serie'=>'',
 						'documento'=>$registro->documento,
-						'estatus'=>'N',
+						'estatus'=>'S',
 						'control_fact'=>$registro->control_fact,
 						'tipo_trans'=>'no aplica',
 						'fact_afectada'=>'NO',
@@ -178,7 +180,7 @@ class RetencionIvaController extends Controller
 			'tipo_docu'=>$request->tipo_docu,
 			'serie'=>$request->serie,
 			'documento'=>$request->nfactura,
-			'estatus'=>'N',
+			'estatus'=>'S',
 			'control_fact'=>$request->control_fact,
 			'tipo_trans'=>$request->tipo_trans,
 			'fact_afectada'=>$request->fact_afectada,
@@ -245,14 +247,88 @@ class RetencionIvaController extends Controller
 
 	public function generarRetencionIva(Request $request){
 		$idFacturasPorRetener = $request->facturasPorRetener;
+		$proveedorRif ='';
+		$proveedorNombre ='';
+		$valor =0;
 		//buscamos todas las facturas seleccionadas
 		$datosFacturas = RetencionIvaDetalle::whereIn('keycodigo',$idFacturasPorRetener)->get();
-		 
-		dd(str_pad('12', 8, "0", STR_PAD_LEFT));
-		foreach($idFacturasPorRetener as $idFactura){
-			
+		//recorremos los datos de las facturas para optener los datos del porveedor
+		foreach($datosFacturas as $datos){
+			$proveedorRif = $datos->rif_retenido;
+			$proveedorNombre = $datos->nom_retenido;
 		}
+		$variable = 'contador_reten_iva_'.session('empresaRif');
+		$valor = Parametro::buscarVariable($variable);		
+		$contador=str_pad($valor, 8, "0", STR_PAD_LEFT);
 		
+		//BUSCAMOS EL ULTIMO COMPROBANTE DE RETENCION
+		$ultimoComprobante = DB::select("SELECT comprobante FROM retenciones WHERE rif_agente=:empresaRif ORDER BY keycodigo DESC LIMIT 1",['empresaRif'=>session('empresaRif')]);
+		return view('retencionIva.registroRetencion',['datosFacturas'=>$datosFacturas,'contador'=>$contador,'rif_agente'=>$proveedorRif,'nom_agente'=>$proveedorNombre,'ultimoComprobante'=>$ultimoComprobante]);
+		
+	}
+
+	public function guardarComprobanteRetencionIva(Request $request){
+		//una vez ya seleccionada la factura nos aparece un formulario donde seleccionamos la fecha la transferencia y guardamos eso datos en este metodo 
+		//esto genera guarda el numero del comprobanate de retencion y actualiza los estatus de los registros
+		$fecha = $request->fecha;
+		$anioMes = $fecha = date('Ym', strtotime($fecha));
+		$comprobante = $anioMes.$request->comprobante;
+		$rif_retenido='';
+		$nom_retenido='';
+		$sumaIvaRetenido = 0;
+		$datosFacturas = RetencionIvaDetalle::whereIn('keycodigo',$request->facturas_id)->get();//buscamos los datos de las facturas
+		foreach($datosFacturas as $datoFactura){
+			$rif_retenido = $datoFactura->rif_retenido;
+			$nom_retenido = $datoFactura->nom_retenido;
+			$sumaIvaRetenido =+ floatval($datoFactura->iva_retenido);
+			RetencionIvaDetalle::where('keycodigo',$datoFactura->keycodigo)->update(['comprobante'=>$comprobante,'estatus'=>'C']);
+		}
+		$retencionIva = new RetencionIva();
+		$retencionIva->periodo = $anioMes;
+		$retencionIva->comprobante = $comprobante;
+		$retencionIva->fecha = $fecha;
+		$retencionIva->rif_agente = session('empresaRif');
+		$retencionIva->nom_agente = session('empresaNombre');
+		$retencionIva->rif_retenido = $rif_retenido;
+		$retencionIva->nom_retenido = $nom_retenido;
+		$retencionIva->cheque = $request->cheque;
+		$retencionIva->total = $sumaIvaRetenido;
+		$retencionIva->estatus='N';
+		$retencionIva->cod_usua = Auth::user()->id;
+		$retencionIva->usuario = Auth::user()->name;
+		$retencionIva->save();
+		$variable = 'contador_reten_iva_'.session('empresaRif');
+		$valor = Parametro::buscarVariable($variable);
+		Parametro::actualizarVariable($variable,$valor+1);
+		return self::mostrarComprobanteRetencionIva($comprobante);
+	}
+
+	public function mostrarComprobanteRetencionIva($comprobante){
+		$data = [
+            'title' => 'Ejemplo de PDF',
+            'content' => 'Este es un ejemplo de contenido para el PDF.'
+        ];
+		$retencionIva = RetencionIva::where('comprobante',$comprobante)->first();
+		$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
+		$pdf = new Dompdf();
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+		$pdf->setPaper('letter', 'landscape'); // Establecer la orientación a horizontal
+        $pdf->setOptions($options);
+        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'data'=>$data])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
+
+        $pdf->loadHtml($html);
+        $pdf->render();
+
+        return $pdf->stream('documento.pdf');
+			
+
+	}
+
+	public function listarRetencionesIva(){
+		$retenciones = DB::select( "select * from retenciones_dat where estatus='C'");
+		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones]);
 	}
 
 

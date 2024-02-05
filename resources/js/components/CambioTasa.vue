@@ -95,7 +95,7 @@ window.JSZip = jszip
                 this.$nextTick(()=>{
                     $('#cotizaciones').DataTable({
                         dom: 'Bfrtip',
-                        ordering:  false,
+                        ordering: false,
                         buttons: [
                             {
                                 "extend":"copyHtml5",

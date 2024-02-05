@@ -7,7 +7,10 @@
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
         "prod": "npm run production",
-        "production": "mix --production"
+        "production": "mix --production",
+        "app-build": "vue-cli-service build --no-clean ",
+        "script-build": "minify public/js/thing.js --out-file public/js/thing.min.js",
+        "build": "npm run script-build && npm run app-build"
     },
     "devDependencies": {
         "@popperjs/core": "^2.10.2",

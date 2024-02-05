@@ -6,10 +6,36 @@
 @endsection
 @section('content')
 	<div class="container-fluid">
-		<h4>Retencion IVA {{session('empresaNombre')}} {{session('empresaRif')}}</h4>
+		<h4>Retencion IVA  <a href="#" data-toggle="modal" data-target="#modalCambioSucursal" class="btn btn-outline-primary my-2">Seleccione sucursal ->{{session('empresaRif')}} {{session('empresaNombre') ?? 'No hay sucursal seleccionada'}}</a></h4>
 		<hr>
 		
-			
+		<!-- Modal sucursal -->
+		<div class="modal fade" id="modalCambioSucursal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Sucursales</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				</div>
+				<div class="modal-body">
+				@if(isset($empresas))
+					Seleccione la sucursal
+					@foreach($empresas as $empresa)
+						<!-- <option value="{{--$empresa->rif--}}|{{--$empresa->nombre--}}|{{--$empresa->basedata--}}">{{--$empresa->rif--}} {{--$empresa->nombre--}}</option> -->
+						<a href="{{route('seleccionSucursal',$empresa->rif)}}" class="dropdown-item dropdown-footer">{{$empresa->rif}} {{$empresa->nombre}}</a>
+						<div class="dropdown-divider"></div>
+					@endforeach
+				@endif
+				</div>
+				<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>				        		        
+				
+				</div>
+			</div>
+			</div>
+		</div>	<!--fin modal-->	
 				
 			
 		<div class="mb-3">				
@@ -46,7 +72,7 @@
 							</div>						
 						
 						</div>
-						<div id="facturaManual1" class="ocultoFacturaManual">
+						<div id="facturaManual1" class="ocultoFacturaManual ">
 							<form name="factura_manual" id="factura_manual" action="#" method="post">
 								<div class="row border">
 								
@@ -113,7 +139,7 @@
 					</div>	    				
 				</div>
 				
-				<div id="info1" class="row well oculto">
+				<div id="info1" class="row well oculto d-none">
 					<div class="col">
 						Observación
 						<input type="text" name="observacion" id="observacion" placeholder='Observacion adicional' class='form-control'>
@@ -352,7 +378,14 @@
 					//oculto
 					$(nodo).hide();
 					$('#factura_import_manual').prop('checked', false);
-					
+					$('#proveedorRif').removeAttr('required');
+					$('#proveedorRif').removeAttr('required');
+					$('#fecha_docu').removeAttr('required');
+					$('#control_fact').removeAttr('required');
+					$('#tipo_trans').removeAttr('required');					
+					$('#comprasmasiva').removeAttr('required');
+					$('#porc_alic').removeAttr('required');
+					$('#porc_reten').removeAttr('required');
 
 					return false;
 				}else{

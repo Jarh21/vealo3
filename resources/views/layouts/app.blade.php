@@ -11,7 +11,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{session('nombre_general_empresa')}}</title>    <!-- Scripts -->
+    <title>Vealo 3.1</title>    <!-- Scripts -->
 
 
 
@@ -70,7 +70,7 @@
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
                      
-                    <span class="brand-text font-weight-light h4">{{ config('app.name', 'Laravel') }}.9</span>
+                    <span class="brand-text font-weight-light h4">Vealo 3.1 SAN-FDO</span>
                 </a>
 
                 <!-- Sidebar -->
@@ -155,7 +155,7 @@
                                         <a href="{{route('listadoFacturasCalculadas')}}"
                                             class="{{ Request::path() === 'cuentasporpagar/facturas-calculadas' ? 'nav-link active' : 'nav-link' }}">
                                             <i class="fa fa-calculator nav-icon text-warning"></i>
-                                            Facturas Calculadas
+                                            Relacion Pago Facturas
                                         </a>
                                     </li>
                                                                 
@@ -434,8 +434,8 @@
                                     @endcan
                                     @can('comisionPorVentas')
                                     <li class="nav-item">
-                                        <a href="{{--route('retencion.iva.retener')--}}"
-                                        class="{{ Request::path() === 'retencion-iva/comision-ventas' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-hand-holding-usd nav-icon mr-2"></i>Retención IVA</a>
+                                        <a href="{{route('retencion.iva.listar')}}"
+                                        class="{{ Request::path() === 'retencion-iva/listar-retencion' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-hand-holding-usd nav-icon mr-2"></i>Retención IVA</a>
                                     </li>
                                    
                                     @endcan                                        
