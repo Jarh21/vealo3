@@ -2073,6 +2073,7 @@ class CuentasPorPagarController extends Controller
 	    		$facturas = $facturasCalculadas->listarFacturasPagoCalculado($fechaPago->fecha_real_pago,$fechaPago->proveedor_rif);
 	    		$listadoFacturasPorPagar=array();
 	    		foreach ($facturas as $facturaPorPagar){
+					$montoOrigenFactura=0;
 	    			//buscamos en cuentas por pagars el total a cancelar
     				$totalCancelar = CuentasPorPagar::debitosMenosCreditoSoloDeuda($facturaPorPagar->id);
 					$notasDebitoAumentoTasa = CuentasPorPagar::sumaDebitosPorAumentoTasa($facturaPorPagar->id);
