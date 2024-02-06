@@ -959,7 +959,7 @@ class CuentasPorPagarController extends Controller
 			}
 			
     		//buscamos y restamos los debitos menos los creditos
-    		$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($datosFactura->id);
+    		$verificarSiSeCanceloFactura = CuentasPorPagar::debitosMenosCredito($datosFactura->id);			
     		$restaTotal = $verificarSiSeCanceloFactura->resto;
     		
     		

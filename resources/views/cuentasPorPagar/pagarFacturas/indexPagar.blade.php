@@ -264,9 +264,9 @@
 							
 						@endforeach
 
-						<?php $totalBs = $cuenta['restaTotal'];  ?>
+						<?php  $totalBs = $cuenta['restaTotal'];  ?>
 						<?php
-					/*		if($monedaBase=='nacional'){
+							if($monedaBase=='nacional'){ //esta parte hace el calculo de los montos a cancelas de las facturas en divisas cuando la moneda base es bolivares
 								if($totalBs >0.00){
 									$totalDivisa = ($totalBs/$cuenta['tasa']);
 									//$totalDivisa = 0;//valor falso
@@ -274,14 +274,14 @@
 									$totalDivisa = 0;
 								}
 							} 
-							if($monedaBase=='extranjera'){
+							if($monedaBase=='extranjera'){ // esta comentado porque si la moneda base es divisas los montos quedan en 0 no tocar a menos que entiendas que hace este codigo
 								if($totalBs >0.00){
 									$totalDivisa = ($totalBs*$cuenta['tasa']);
 									//$totalDivisa = 0;//valor falso
 								}else{
 									$totalDivisa = 0;
 								}
-							} 		*/				
+							} 					
 
 						?>
 						<?php $totalDivisaFormato = number_format($totalDivisa,3) ?>
