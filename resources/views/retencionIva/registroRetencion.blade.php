@@ -26,7 +26,7 @@
                         <label for="">Nº Comprobante</label>
                         <input type="text" class='form-control' name='comprobante' value='{{$contador}}' readonly>
                         <label for="">Nº Egreso/Cheque</label>
-                        <input type="text" class='form-control' name='cheque'>
+                        <input type="text" class='form-control' name='cheque' required>
                     </div>
                     <div class="col">
                         <div class="card">
@@ -74,14 +74,15 @@
                             <td>{{$datoFactura->iva_retenido}}</td>
                             <input type="hidden" name="facturas_id[]" value="{{$datoFactura->keycodigo}}">
                         </tr>
-                        <?php $suma =+ floatval($datoFactura->iva_retenido);?>
+                        <?php $suma = $suma + floatval($datoFactura->iva_retenido);?>
+                        
                         @endforeach
                         
                     </tbody>
                     <thead>
                         <tr>
-                            <td colspan='9'>Total IVA Retenido:</td>
-                            <td>{{$suma}}</td>
+                            <td colspan='9'><h4>Total IVA Retenido:</h4></td>
+                            <td><h4>{{$suma}}</h4></td>
                         </tr>
                     </thead>
                 </table>

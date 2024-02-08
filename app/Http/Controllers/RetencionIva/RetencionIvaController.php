@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 use App\Models\Proveedor;
 use App\Models\RetencionIvaDetalle;
 use App\Models\RetencionIva;
-use App \Models\Parametro;
+use App\Models\Parametro;
+use App\Models\Empresa;
 use App\Http\Controllers\Herramientas\HerramientasController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -246,24 +247,39 @@ class RetencionIvaController extends Controller
 	}
 
 	public function generarRetencionIva(Request $request){
+		//este metodo toma las facturas seleccionadas y genera la retencion de iva
 		$idFacturasPorRetener = $request->facturasPorRetener;
 		$proveedorRif ='';
 		$proveedorNombre ='';
-		$valor =0;
+		$rifProveedorComparar=array();
+		$valor =0;		
+
 		//buscamos todas las facturas seleccionadas
 		$datosFacturas = RetencionIvaDetalle::whereIn('keycodigo',$idFacturasPorRetener)->get();
 		//recorremos los datos de las facturas para optener los datos del porveedor
 		foreach($datosFacturas as $datos){
 			$proveedorRif = $datos->rif_retenido;
 			$proveedorNombre = $datos->nom_retenido;
+			$rifProveedorComparar[] = $proveedorRif;
 		}
-		$variable = 'contador_reten_iva_'.session('empresaRif');
-		$valor = Parametro::buscarVariable($variable);		
-		$contador=str_pad($valor, 8, "0", STR_PAD_LEFT);
-		
-		//BUSCAMOS EL ULTIMO COMPROBANTE DE RETENCION
-		$ultimoComprobante = DB::select("SELECT comprobante FROM retenciones WHERE rif_agente=:empresaRif ORDER BY keycodigo DESC LIMIT 1",['empresaRif'=>session('empresaRif')]);
-		return view('retencionIva.registroRetencion',['datosFacturas'=>$datosFacturas,'contador'=>$contador,'rif_agente'=>$proveedorRif,'nom_agente'=>$proveedorNombre,'ultimoComprobante'=>$ultimoComprobante]);
+
+		//verificamos que las facturas seleccionadas pertenezcan al mismo vendedo
+		$verificarProveedores = array_unique($rifProveedorComparar);
+		if(count($verificarProveedores)== 1){
+			$variable = 'contador_reten_iva_'.session('empresaRif');
+			$valor = Parametro::buscarVariable($variable);		
+			$contador=str_pad($valor, 8, "0", STR_PAD_LEFT);
+			
+			//BUSCAMOS EL ULTIMO COMPROBANTE DE RETENCION
+			$ultimoComprobante = DB::select("SELECT comprobante FROM retenciones WHERE rif_agente=:empresaRif ORDER BY keycodigo DESC LIMIT 1",['empresaRif'=>session('empresaRif')]);
+			return view('retencionIva.registroRetencion',['datosFacturas'=>$datosFacturas,'contador'=>$contador,'rif_agente'=>$proveedorRif,'nom_agente'=>$proveedorNombre,'ultimoComprobante'=>$ultimoComprobante]);
+			
+		}else{
+			\Session::flash('message', 'La retencion no procede porque las facturas seleccionadas son de distintos proveedores, estas deben ser del mismo proveedor para continuar');
+			\Session::flash('alert','alert-warning');
+			return redirect()->route('retencion.iva.index');
+		}
+
 		
 	}
 
@@ -280,7 +296,7 @@ class RetencionIvaController extends Controller
 		foreach($datosFacturas as $datoFactura){
 			$rif_retenido = $datoFactura->rif_retenido;
 			$nom_retenido = $datoFactura->nom_retenido;
-			$sumaIvaRetenido =+ floatval($datoFactura->iva_retenido);
+			$sumaIvaRetenido = $sumaIvaRetenido + floatval($datoFactura->iva_retenido);
 			RetencionIvaDetalle::where('keycodigo',$datoFactura->keycodigo)->update(['comprobante'=>$comprobante,'estatus'=>'C']);
 		}
 		$retencionIva = new RetencionIva();
@@ -304,19 +320,18 @@ class RetencionIvaController extends Controller
 	}
 
 	public function mostrarComprobanteRetencionIva($comprobante){
-		$data = [
-            'title' => 'Ejemplo de PDF',
-            'content' => 'Este es un ejemplo de contenido para el PDF.'
-        ];
+		//Generamos el comprobante de retencion en PDF
+		
 		$retencionIva = RetencionIva::where('comprobante',$comprobante)->first();
 		$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
+		$datosEmpresa = Empresa::select('direccion','logo')->where('rif',$retencionIva->rif_agente)->first();
 		$pdf = new Dompdf();
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
 		$pdf->setPaper('letter', 'landscape'); // Establecer la orientación a horizontal
         $pdf->setOptions($options);
-        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'data'=>$data])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
+        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
 
         $pdf->loadHtml($html);
         $pdf->render();

@@ -115,7 +115,7 @@
 	function eliminarLista(lista){
 		let eliminar = confirm("Desea eliminar la lista "+lista);
 		if(eliminar){
-			window.location="/vealo/public/informes/eliminar-lista-habladores/"+lista;
+			window.location="eliminar-lista-habladores/"+lista;
 		}
 	}
 </script>
