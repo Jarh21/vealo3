@@ -308,14 +308,15 @@
                                             % Retencion
                                         </a>
                                     </li>
+                                    @endcan
+                                    @can('contribuyente.index')
                                     <li class="nav-item">
                                         <a href="{{route('contribuyente.index')}}"
                                             class="{{ Request::path() === 'regisretenciones/contribuyentes' ? 'nav-link active' : 'nav-link' }}">
                                             <i class="fas fa-donate"></i>
                                             Contribuyentes
                                         </a>
-                                    </li>
-                                            
+                                    </li>                                         
                                         
                                     @endcan
                                 </ul>
