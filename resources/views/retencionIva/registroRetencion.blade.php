@@ -5,7 +5,7 @@
 @endsection
 @section('content')
     <h4>Retencion IVA Registro de Retención <a href="{{route('retencion.iva.index')}}" class='btn btn-warning btn-sm float-right'>< Regresar</a></h4><hr>
-    <form action="{{route('retencion.iva.guardar')}}" method="post">
+    <form action="{{route('retencion.iva.guardar')}}" method="post" name='registroRetencion' id='registroRetencion'>
         @csrf
         <div class="card">
             <div class="card-body">
@@ -38,6 +38,7 @@
                                 {{$ultimoComprobante[0]->comprobante ?? '0'}}
                             </div>
                         </div>
+                        <input type="checkbox" name="firma_digital" id="firma_digital"><label for="firma_digital">Firma Digital</label>
                     </div>
                 </div>           
                 
@@ -86,9 +87,31 @@
                         </tr>
                     </thead>
                 </table>
-                <button type="submit" class="btn btn-primary float-right">Guardar Comprobante</button>
+                <button type="submit" id='guardarBtn' class="btn btn-primary float-right">Guardar Comprobante</button>
             </div>
 
         </div>
     </form>
+@endsection
+@section('js')
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#registroRetencion").submit(function(){
+            var formValido = true;
+        
+            // Verificar si los campos están llenos
+            $(this).find('input[type="text"]').each(function(){
+                if($(this).val() === ''){
+                    formValido = false;
+                    return false; // Salir del bucle each si se encuentra un campo vacío
+                }
+            });
+            // Si los campos están llenos, deshabilitar el botón de submit
+            if(formValido){
+                $("#guardarBtn").prop('disabled', true);
+            }
+        });
+
+    });
+</script>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\RetencionIva;
 
 use App\Http\Controllers\Controller;
+use DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
@@ -287,7 +288,7 @@ class RetencionIvaController extends Controller
 		//una vez ya seleccionada la factura nos aparece un formulario donde seleccionamos la fecha la transferencia y guardamos eso datos en este metodo 
 		//esto genera guarda el numero del comprobanate de retencion y actualiza los estatus de los registros
 		$fecha = $request->fecha;
-		$anioMes = $fecha = date('Ym', strtotime($fecha));
+		$anioMes = date('Ym', strtotime($fecha));
 		$comprobante = $anioMes.$request->comprobante;
 		$rif_retenido='';
 		$nom_retenido='';
@@ -325,13 +326,30 @@ class RetencionIvaController extends Controller
 		$retencionIva = RetencionIva::where('comprobante',$comprobante)->first();
 		$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
 		$datosEmpresa = Empresa::select('direccion','logo')->where('rif',$retencionIva->rif_agente)->first();
+		$datosModificados=array();
+		
+		//modificamos datos necesarios para el formato de retencion de iva 
+		
+		$anio = substr($retencionIva->periodo, 0, 4);
+		$mes = substr($retencionIva->periodo,4,2);
+		
+
+		//nombre del mes
+		setlocale(LC_TIME, 'es-ES');		
+		$dateObj   = DateTime::createFromFormat('!m', $mes);
+		$monthName = strftime('%B', $dateObj->getTimestamp());
+		
+
+		$datosModificados['anio']=$anio;
+		$datosModificados['mes']=ucfirst($monthName);
+
 		$pdf = new Dompdf();
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-		$pdf->setPaper('letter', 'landscape'); // Establecer la orientación a horizontal
+		$pdf->setPaper('legal','landscape'); // Establecer la orientación a horizontal
         $pdf->setOptions($options);
-        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
+        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa,'datosModificados'=>$datosModificados])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
 
         $pdf->loadHtml($html);
         $pdf->render();

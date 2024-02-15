@@ -28,7 +28,16 @@ class UserController extends Controller
 
         $user = new User();
         $user->name = $request->name;
-        $user->email = $request->email;
+        //verificamos que el correo no exista para poder guardarlo
+        
+        $buscarEmail = User::where('email',$request->email)->exists();     
+        if($buscarEmail == false){
+            $user->email = $request->email;
+        }else{
+            //si existe el correo volvemos al formulario
+            return redirect()->route('admin.user.register')->with('info','El correo ingresado ya se encuentra registrado');
+        }
+       
         $user->password = Hash::make($request->password);
         $user->save();
         //si selecciono un rol se guarda
@@ -67,8 +76,16 @@ class UserController extends Controller
 
            $user->password = Hash::make($request->password); 
            
-           $user->update();
+           
         }
+        //verificamos que el correo no exista para poder actualizarlo
+        $user->name = $request->name;
+        $buscarEmail = User::where('email',$request->email)->exists();     
+        if($buscarEmail == false){
+            $user->email = $request->email;
+        }
+        
+        $user->update();
         //asigna los roles con la erramienta de roles y permisos instalada laravel permision      
         $user->roles()->sync($request->roles);
 
@@ -79,7 +96,7 @@ class UserController extends Controller
         if(!empty($empresas)){
             foreach($empresas as $empresa){
                 $empresaAcceso = new UsuariosEmpresaAcceso();
-                $empresaAcceso->empresa_rif = $empresa;
+                $empresaAcceso->empresa_rif = $empresa;                
                 $empresaAcceso->user_id = $id;
                 $empresaAcceso->save();
             }   
