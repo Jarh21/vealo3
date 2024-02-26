@@ -33,6 +33,7 @@ Vue.component('cuadre-prestamos-efectivo',require('./components/cuadres/CuadresP
 Vue.component('visualizador-precios',require('./components/asistenteCompras/AsistenteVisualizadorPrecios.vue').default);
 Vue.component('cambio-tasa',require('./components/CambioTasa.vue').default);
 Vue.component('listar-asesor-por-fecha',require('./components/ListarAsesoresPorFecha.vue').default);
+Vue.component('detalle-retencion-iva',require('./components/retencionIva/DetalleRetencionIva.vue').default);
 
 
 /**

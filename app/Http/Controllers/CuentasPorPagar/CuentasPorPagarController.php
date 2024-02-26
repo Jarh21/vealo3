@@ -258,11 +258,11 @@ class CuentasPorPagarController extends Controller
     	*/
     	$herramientas  = new HerramientasController();
     	
-		$facturas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion, cuentas_por_pagars.id as idcxp, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, facturas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE cuentas_por_pagars.concepto = 'CAN' AND cuentas_por_pagars.empresa_rif =:empresa AND facturas_por_pagars.id = cuentas_por_pagars.factura_id order by id desc limit 1000",['empresa'=>session('empresaRif')]);
+		//$facturas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion, cuentas_por_pagars.id as idcxp, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, facturas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE cuentas_por_pagars.concepto = 'CAN' AND cuentas_por_pagars.empresa_rif =:empresa AND facturas_por_pagars.id = cuentas_por_pagars.factura_id order by id desc limit 100",['empresa'=>session('empresaRif')]);
 		
     	return view('cuentasPorPagar.facturasPagadas',[
     		'empresas'=>$herramientas->listarEmpresas(),
-    		'cuentas'=>$facturas_por_pagar,
+    		
     		'empresaRif'=>session('empresaRif'),
     		'proveedores'=>Proveedor::all(),
     	]);
@@ -271,6 +271,7 @@ class CuentasPorPagarController extends Controller
     public function buscarCuentasPagadas(Request $request){
     	// metodo que filtra las facturas guardadas en el sistema de cuentas por pagar 
     	$herramientas = new HerramientasController();
+		$proveedor = $request->proveedor;
     	$nFactura = $request->n_factura;
     	$fechaDesde 	  = $request->get('fecha_desde');
     	$fechaHasta	      = $request->get('fecha_hasta');    	
@@ -279,23 +280,31 @@ class CuentasPorPagarController extends Controller
     	$empresaRif = $empresa[0];
     	$empresaNombre = $empresa[1];
 
-		if($fechaDesde <>'' and $fechaHasta <>'' and $nFactura==''){
-			$cuentas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion,cuentas_por_pagars.id, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, facturas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE cuentas_por_pagars.concepto = 'CAN' AND cuentas_por_pagars.empresa_rif =:empresa AND cuentas_por_pagars.fecha_pago >=:fechaDesde AND cuentas_por_pagars.fecha_pago <=:fechaHasta AND facturas_por_pagars.id = cuentas_por_pagars.factura_id",['empresa'=>$empresaRif,'fechaDesde'=>$fechaDesde,'fechaHasta'=>$fechaHasta]);
+		$condicion = array();
+		$condicion[]="cuentas_por_pagars.concepto = 'CAN'";
+		$condicion[]="cuentas_por_pagars.empresa_rif ='".$empresaRif."'";
+		$condicion[]="facturas_por_pagars.id = cuentas_por_pagars.factura_id";
+		if(!empty($nFactura)){ 
+			$condicion[]= "facturas_por_pagars.documento='".$nFactura."'";
+			$condicion[]= "cuentas_por_pagars.documento='".$nFactura."'";
 		}
-		if($fechaDesde =='' and $fechaHasta =='' and $nFactura<>''){
-			$cuentas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion,cuentas_por_pagars.id, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, cuentas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE cuentas_por_pagars.concepto = 'CAN' AND cuentas_por_pagars.empresa_rif =:empresa AND facturas_por_pagars.documento=:documento AND cuentas_por_pagars.documento=:documento2 AND facturas_por_pagars.id = cuentas_por_pagars.factura_id",['empresa'=>$empresaRif,'documento'=>$nFactura,'documento2'=>$nFactura]);
-		}
-		if($fechaDesde <>'' and $fechaHasta <>'' and $nFactura<>''){
-			$cuentas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion,cuentas_por_pagars.id, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, facturas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE cuentas_por_pagars.concepto = 'CAN' AND cuentas_por_pagars.empresa_rif =:empresa AND cuentas_por_pagars.fecha_pago >=:fechaDesde AND cuentas_por_pagars.fecha_pago <=:fechaHasta AND facturas_por_pagars.documento=:documento AND cuentas_por_pagars.documento=:documento2 AND facturas_por_pagars.id = cuentas_por_pagars.factura_id",['empresa'=>$empresaRif,'fechaDesde'=>$fechaDesde,'fechaHasta'=>$fechaHasta,'documento'=>$nFactura,'documento2'=>$nFactura]);
-		}
+		if(!empty($fechaDesde)){ $condicion[]="cuentas_por_pagars.fecha_pago >='".$fechaDesde."'"; }
+		if(!empty($fechaHasta)){ $condicion[]="cuentas_por_pagars.fecha_pago <='".$fechaHasta."'"; }
+		if(!empty($proveedor)){ $condicion[]="facturas_por_pagars.proveedor_nombre like '%".$proveedor."%'";}
+		$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
+
+		
+		$cuentas_por_pagar = DB::select("select cuentas_por_pagars.concepto_descripcion,cuentas_por_pagars.id, facturas_por_pagars.id, cuentas_por_pagars.codigo_relacion_pago,facturas_por_pagars.modo_pago, facturas_por_pagars.empresa_rif, facturas_por_pagars.proveedor_nombre, facturas_por_pagars.proveedor_rif, facturas_por_pagars.documento, cuentas_por_pagars.creditos, cuentas_por_pagars.fecha_pago as fecha_real_pago FROM cuentas_por_pagars, facturas_por_pagars WHERE ". $whereClause." order by facturas_por_pagars.id desc ");
+		$empresaDatos = Empresa::select('nombre','rif')->where('rif',$empresaRif)->first();//datos de la empresa seleccionada para la vista
     	
     	return view('cuentasPorPagar.facturasPagadas',[
     		'cuentas'=>$cuentas_por_pagar,
     		'empresas'=>$herramientas->listarEmpresas(),
     		'datosEmpresa'=>$empresa,
     		'fechaDesde' =>$fechaDesde,
-    		'fechaHasta' =>$fechaHasta,
-    		'empresaRif' =>$empresaRif,
+    		'fechaHasta' =>$fechaHasta,    		
+			'empresaDatos' =>$empresaDatos,
+			'empresaRif'=>$empresaRif,
 			'nFactura' =>$nFactura    		
     	]);
     	   	

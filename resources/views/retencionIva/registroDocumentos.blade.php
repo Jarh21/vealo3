@@ -182,6 +182,7 @@
 					<tr>    				
 						<th>Nº</th>    				
 						<th>Proveedor</th>
+						<th>Tipo <br>Docu</th>
 						<th>Nº Factura</th>
 						<th>Base Imponible</th>
 						<th>Impuesto Iva</th>    					
@@ -196,6 +197,7 @@
 						<tr id="tr{{$registro->keycodigo}}">
 							<td><input type="checkbox" id="check{{$registro->keycodigo}}" name="facturasPorRetener[]" onchange="isCheckBoxSeleccionado({{$registro->keycodigo}})" class="CheckedAK" value="{{$registro->keycodigo}}">{{$registro->keycodigo}}</td>
 							<td>{{$registro->nom_retenido}} <span class="badge badge-secondary">{{$registro->porc_reten ?? '0'}}%</span> </td>
+							<td>{{$registro->tipo_docu}}</td>
 							<td>{{$registro->documento}}</td>
 							<td>{{$registro->base_impon}}</td>
 							<td>{{$registro->iva}}</td>
@@ -269,6 +271,13 @@
 			if(document.getElementById('porc_alic').value == ''){
 				alert("Debe ingresar el valor del IVA, alicuota, no de be ser vacío");
 				document.getElementById('porc_alic').focus();
+				return;
+			}
+			
+			/*validamos que iva alicuota no este vacio*/
+			if(document.getElementById('sincredito').value == ''){
+				alert("Debe ingresar el valor del monto exento de lo contrario colocar 0");
+				document.getElementById('sincredito').focus();
 				return;
 			}
 			/*validamos que le monto porcentaje re retencion 100 o 75 no este vacio*/

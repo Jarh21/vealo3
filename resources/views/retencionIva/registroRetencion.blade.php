@@ -26,7 +26,7 @@
                         <label for="">Nº Comprobante</label>
                         <input type="text" class='form-control' name='comprobante' value='{{$contador}}' readonly>
                         <label for="">Nº Egreso/Cheque</label>
-                        <input type="text" class='form-control' name='cheque' required>
+                        <input type="text" class='form-control' name='cheque' >
                     </div>
                     <div class="col">
                         <div class="card">
@@ -38,7 +38,7 @@
                                 {{$ultimoComprobante[0]->comprobante ?? '0'}}
                             </div>
                         </div>
-                        <input type="checkbox" name="firma_digital" id="firma_digital"><label for="firma_digital">Firma Digital</label>
+                        <input type="checkbox" name="firma_digital" id="firma_digital" value='firma'><label for="firma_digital">Firma Digital</label>
                     </div>
                 </div>           
                 

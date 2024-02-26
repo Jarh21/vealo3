@@ -21,6 +21,7 @@ class InformesAdicionalesController extends Controller
         $empresa = Empresa::where('rif','=',$rifEmpresa)->first();
         session(['empresaNombre'=>$empresa->nombre,'empresaRif'=>$empresa->rif,'codTipoMoneda'=>3,'modoPago'=>'dolares','basedata'=>$empresa->basedata]);
         return back()->withInput();
+        //return redirect()->back();
     }
 
     public function comisionPorVentas($fechaini='',$fechafin=''){

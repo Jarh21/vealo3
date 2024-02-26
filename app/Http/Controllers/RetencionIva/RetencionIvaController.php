@@ -317,15 +317,15 @@ class RetencionIvaController extends Controller
 		$variable = 'contador_reten_iva_'.session('empresaRif');
 		$valor = Parametro::buscarVariable($variable);
 		Parametro::actualizarVariable($variable,$valor+1);
-		return self::mostrarComprobanteRetencionIva($comprobante);
+		return self::mostrarComprobanteRetencionIva($comprobante,$request->firma_digital);
 	}
 
-	public function mostrarComprobanteRetencionIva($comprobante){
+	public function mostrarComprobanteRetencionIva($comprobante,$firma=''){
 		//Generamos el comprobante de retencion en PDF
 		
 		$retencionIva = RetencionIva::where('comprobante',$comprobante)->first();
 		$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
-		$datosEmpresa = Empresa::select('direccion','logo')->where('rif',$retencionIva->rif_agente)->first();
+		$datosEmpresa = Empresa::select('direccion','logo','firma')->where('rif',$retencionIva->rif_agente)->first();
 		$datosModificados=array();
 		
 		//modificamos datos necesarios para el formato de retencion de iva 
@@ -349,19 +349,63 @@ class RetencionIvaController extends Controller
         $options->set('isRemoteEnabled', true);
 		$pdf->setPaper('legal','landscape'); // Establecer la orientación a horizontal
         $pdf->setOptions($options);
-        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa,'datosModificados'=>$datosModificados])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
+        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa,'datosModificados'=>$datosModificados,'firma'=>$firma])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
 
         $pdf->loadHtml($html);
         $pdf->render();
 
-        return $pdf->stream('documento.pdf');
+        return $pdf->stream($retencionIva->nom_agente.'-'.$retencionIva->nom_retenido.'-'.$retencionIva->comprobante.'.pdf');
 			
 
 	}
 
 	public function listarRetencionesIva(){
-		$retenciones = DB::select( "select * from retenciones_dat where estatus='C'");
-		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones]);
+		$herramientas = new HerramientasController();
+		$retenciones = DB::select( "select * from retenciones_dat where estatus='C' and rif_agente=:rifAgente order by keycodigo desc limit 100",['rifAgente'=>session('empresaRif')]);
+		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones,'empresas'=>$herramientas->listarEmpresas()]);
+	}
+
+	public function buscarRetencionIva(Request $request){
+		$comprobante = $request->comprobante;
+		$proveedor = $request->proveedor;
+		$fechaDesde = $request->fecha_desde;
+		$fechaHasta = $request->fecha_hasta;
+		$documento = $request->documento;
+
+		$condicion = array();
+		$condicion[]="estatus='C'";
+		$condicion[]="rif_agente='".session('empresaRif')."'";
+		if(!empty($comprobante)){$condicion[]="comprobante =".$comprobante;}
+		if(!empty($proveedor)){ $condicion[]="nom_retenido like '%".$proveedor."%'";}
+		if(!empty($fechaDesde)){ $condicion[]=" fecha_docu >='".$fechaDesde."'"; }
+		if(!empty($fechaHasta)){ $condicion[]=" fecha_docu <='".$fechaHasta."'";}
+		if(!empty($documento)){ $condicion[] = " documento in(".$documento.")";}
+		$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
+
+		$herramientas = new HerramientasController();
+		$retenciones = DB::select( "select * from retenciones_dat where  ". $whereClause." order by keycodigo desc ");
+		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones,'empresas'=>$herramientas->listarEmpresas()]);
+	}
+
+	public function seleccionSucursal($rifEmpresa,$vista=''){
+		//este solo aplica para el listado de las retenciones de iva ya registradas
+		//debido a que si le dan opcion buscar
+        $empresa = Empresa::where('rif','=',$rifEmpresa)->first();		
+        session(['empresaNombre'=>$empresa->nombre,'empresaRif'=>$empresa->rif,'codTipoMoneda'=>3,'modoPago'=>'dolares','basedata'=>$empresa->basedata]);
+        return redirect()->route('retencion.iva.listar');        
+    }
+
+	public function editarRetencionIva($comprobante){
+		//abre la vista para editar la retencion y se le pasan los parametros 
+		$retencionIva = RetencionIva::where('comprobante',$comprobante)->first();
+		//$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
+		$proveedores = Proveedor::all();//los proveedores para poder editarlos
+		return view('retencionIva.editarRetencion',['retencionIva'=>$retencionIva,'proveedores'=>$proveedores]);
+	}
+
+	public function detallesRetencionIva($comprobante){
+		return RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
+
 	}
 
 

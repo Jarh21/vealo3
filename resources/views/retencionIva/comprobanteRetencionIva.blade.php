@@ -124,19 +124,19 @@
       @foreach($datosFacturas as $datosFactura)
       <tr align="center">
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$contador}}</span></td>
-        <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->fecha_docu}}</span></td>
-        <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->serie ?? ''}}{{$datosFactura->documento}}</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo2">{{date("d-m-Y", strtotime($datosFactura->fecha_docu))}}</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'FA'){{$datosFactura->serie ?? ''}}{{$datosFactura->documento}}@endif</span></td>
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->control_fact}}</span></td>
-        <td bgcolor="#FFFFFF"><span class="Estilo2">debito </span></td> <!-- nota debito -->
-        <td bgcolor="#FFFFFF"><span class="Estilo2">credito </span></td> <!-- nota credito -->
+        <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'ND'){{$datosFactura->documento}}@endif </span></td> <!-- nota debito -->
+        <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'NC'){{$datosFactura->documento}}@endif </span></td> <!-- nota credito -->
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->tipo_trans}}</span></td>
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->fact_afectada}}</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->comprasmasiva}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->sincredito}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->base_impon}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->comprasmasiva,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->sincredito,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->base_impon,2,',','.')}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->porc_alic}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->iva}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->iva_retenido}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->iva,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->iva_retenido,2,',','.')}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->porc_reten}}&nbsp;</span></td>
       </tr>   
       <?php 
@@ -150,12 +150,12 @@
       @endforeach
 	<tr align="center" bgcolor="#FFFFFF">
         <td colspan="8" align="right"><span class="Estilo1">T O T A L E S&nbsp;&nbsp;&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{$totalCompras}}&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{$totalSinCredito}}&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{$totalBase}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalCompras,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalSinCredito,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalBase,2,',','.')}}&nbsp;</span></td>
         <td>&nbsp;</td>
-        <td align="right"><span class="Estilo1">&nbsp;{{$totalIva}}&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{$totalIvaRetener}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalIva,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalIvaRetener,2,',','.')}}&nbsp;</span></td>
         <td>&nbsp;</td>
       </tr>
     </table></td>
@@ -168,7 +168,14 @@
         <table width="900" border="0" cellspacing="0" cellpadding="0">
       <tr>
         <td width="450" height="50" valign="bottom" class="Estilo2">RECIBIDO POR: ____________________________ </td>
-        <td width="450" height="50" valign="bottom"><span class="Estilo2">AGENTE DE RETENCION: ____________________________ </span></td>
+
+        <td width="450" height="50" valign="bottom">
+        @if(!empty($firma))
+        <img id='imagenFirma' src="{{asset($datosEmpresa->firma)}}">
+        @else
+          <span class="Estilo2">AGENTE DE RETENCION: ____________________________ </span>
+        @endif  
+        </td>
       </tr>
       <tr valign="bottom">
         <td height="40"><span class="Estilo2">FECHA DE ENTREGA: __________________________ </span></td>
@@ -187,3 +194,8 @@
 
 
 </table>
+
+<script type="text/javascript">
+
+
+</script>

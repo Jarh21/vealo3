@@ -2,8 +2,8 @@
 
 @section('content')
 	<div class="container-fluid">
-		<h3>Cuentas Pagadas de {{session('empresaNombre')}} {{session('empresaRif')}}</h3><hr>
-		<div class="@if(session('modoPago')<>'bolivares')bg-success @else bg-primary @endif border border-5">
+		<h3>Cuentas Pagadas <span class='d-print-none'>de {{session('empresaNombre')}} {{session('empresaRif')}}<span></h3><hr>
+		<div class="d-print-none @if(session('modoPago')<>'bolivares')bg-success @else bg-primary @endif border border-5">
 			<h4>Pagos en {{session('modoPago')}}</h4>
 		</div>    	
 		<!-- <ul class="nav nav-tabs">
@@ -18,9 +18,8 @@
 		
 		<form action="{{route('cuentaspagadas.buscar')}}" method="POST">
 			@csrf
-			<div class="">
-				  		   	
-			<div class="form-group ">
+							  		   	
+			<div class="form-group d-print-none">
 				<div>
 					<p>Busqueda segun empresa, fechas, proveedor o numero de factura</p>
 				</div>
@@ -47,28 +46,39 @@
 						<input type="date" name="fecha_hasta" class="form-control" @if(isset($fechaHasta)) value="{{$fechaHasta}}" @endif >
 						
 					</div>
+				</div>
+				<div class="row">	
 					<div class="col">
 						<label>Nro Factura</label>
 						<input type="text" name="n_factura" class="form-control" @if(isset($nFactura)) value="{{$nFactura}}" @endif >
 						
+					</div>
+					<div class="col">
+					<label for="">Nombre Proveedor</label>
+						<input type="text" name="proveedor" class="form-control">
 					</div>
 					<div class="d-flex">
 						<button type="submit" class="btn btn-secondary mt-auto p-2">
 							<i class="fa fa-search" aria-hidden="true"></i>
 							Buscar
 						</button>
+						@if(isset($cuentas))
+						<button type="button" class="btn btn-success mt-auto p-2" onclick="javascript:window.print()">
+							<i class="fa fa-print" aria-hidden="true"></i>Imprimir
+						</button>
+						@endif
 					</div>
 	    		</div>
 			</div>
-			</div>			
+						
     	</form>    	
-    		
-    	<table id="articulos" class="table table-bordered" data-page-length='100'>
+    	 <h4>{{$empresaDatos->rif ?? 'Seleccione algunos filtros y haga click en buscar para mostrar resultados'}}	{{$empresaDatos->nombre ?? ''}}</h4>
+    	<table id="articulos" class="" border=1 data-page-length='100'>
     		<thead>
     			<tr>    				
     				<th>Nº</th>
-    				<th>Empresa</th>
-					<th>Tipo Moneda</td>
+    				
+					<th>Metodo<br>de Pago</td>
     				<th>Proveedor</th>
     				<th>Nº Factura</th>
     				<th>Pagos</th>	
@@ -87,12 +97,12 @@
 	    				
 	    					{{$n++}}
 	    				</td>	    				
-	    				<td>{{$cuenta->empresa_rif}}</td>
+	    				
 						<td>
 							@if($cuenta->modo_pago == 'bolivares')
-							<span class="right badge badge-primary">{{$cuenta->modo_pago}}</stpan>
+							<span class="text-black">{{$cuenta->modo_pago}}</stpan>
 							@else
-							<span class="right badge badge-success">{{$cuenta->modo_pago}}</stpan>
+							<span class="text-success">{{$cuenta->modo_pago}}</stpan>
 							@endif
 						</td>
 	    				<td>
@@ -106,7 +116,7 @@
 	    				<td>{{$cuenta->fecha_real_pago}}</td>
 	    				<td class="d-print-none">
 						@can('relacionPagoFacturasIndex')
-	    					<a href="{{route('verVistaPagarFacturas',$cuenta->codigo_relacion_pago)}}" class="btn-success btn-sm" title="Pago en proceso haga click para terminar">Ver</a>
+	    					<a href="{{route('verVistaPagarFacturas',$cuenta->codigo_relacion_pago)}}" class="text-decorative-none" title="Pago en proceso haga click para terminar">Ver</a>
 						@endcan	
 	    				</td>
 	    			</tr>
@@ -115,14 +125,14 @@
 	    			</tbody>
 					<tfoot>
 						<tr>
-							<th colspan="6" style="text-align:right">Total </th>
+							<th colspan="5" style="text-align:right">Total </th>
 							<th colspan="2"></th>
 						</tr>
 					</tfoot>    		
     		@endif	
     	</table><hr>    		
     	    		
-    		<div>{{--$cuentas->links()--}}</div>    		
+    		  		
 	</div>	
 	
 @endsection
@@ -148,11 +158,11 @@
             { "orderable": false, "targets": 0 }
         ],
 		"order": [
-            [ 6, "desc" ]
+            [ 5, "desc" ]
         ],
 	    select: true,
-	    searching: true,
-	    paging: true,
+	    searching: false,
+	    paging: false,
 		"footerCallback": function ( row, data, start, end, display ) {
 	            var api = this.api(), data;
 	 
@@ -166,7 +176,7 @@
 	        
 	            // Total over this page
 	            pageTotal = api
-	                .column( 5, { page: 'current'} )
+	                .column( 4, { page: 'current'} )
 	                .data()
 	                .reduce( function (a, b) {
 	                    return intVal(a) + intVal(b);

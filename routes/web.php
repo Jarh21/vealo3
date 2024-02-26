@@ -354,7 +354,11 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/retencion-iva/generar-retencion',[RetencionIvaController::class,'generarRetencionIva'])->name('retencion.iva.generar');
     Route::post('/retencion-iva/guardar-retencion',[RetencionIvaController::class,'guardarComprobanteRetencionIva'])->name('retencion.iva.guardar');
     Route::get('/retencion-iva/listar-retencion',[RetencionIvaController::class,'listarRetencionesIva'])->name('retencion.iva.listar');
-    Route::get('/retencion-iva/generar-comprobante/{comprobanteRetencion}',[RetencionIvaController::class,'mostrarComprobanteRetencionIva'])->name('retencion.iva.generar_comprobante');
+    Route::get('/retencion-iva/generar-comprobante/{comprobanteRetencion}/{firma?}',[RetencionIvaController::class,'mostrarComprobanteRetencionIva'])->name('retencion.iva.generar_comprobante');
+    Route::post('/retencion-iva/buscar-retencion',[RetencionIvaController::class,'buscarRetencionIva'])->name('retencion.iva.buscar_retencion');
+    Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
+    Route::get('/retencion-iva/editar-retencion/{comprobante}',[RetencionIvaController::class,'editarRetencionIva'])->name('retencion.iva.editar_retencion');
+    Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}',[RetencionIvaController::class,'detallesRetencionIva']);
 
 
 });

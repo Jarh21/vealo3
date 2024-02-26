@@ -95,7 +95,7 @@ import 'datatables.net-buttons-bs4';
 import 'datatables.net-buttons/js/buttons.colVis.mjs';
 import 'datatables.net-buttons/js/buttons.html5.mjs';
 import 'datatables.net-buttons/js/buttons.print.mjs';
-import RegistroPorFarmacia from './RegistroPorFarmacia.vue';
+/* import RegistroPorFarmacia from './RegistroPorFarmacia.vue'; */
 window.JSZip = jszip
 
     export default{
@@ -206,7 +206,7 @@ window.JSZip = jszip
 
             cerrarModalEditar(){
                 $('#editarPedido').modal('hide')
-            }
+            },
         }
     }
 </script>
