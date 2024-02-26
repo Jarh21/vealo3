@@ -285,8 +285,8 @@ class CuentasPorPagarController extends Controller
 		$condicion[]="cuentas_por_pagars.empresa_rif ='".$empresaRif."'";
 		$condicion[]="facturas_por_pagars.id = cuentas_por_pagars.factura_id";
 		if(!empty($nFactura)){ 
-			$condicion[]= "facturas_por_pagars.documento='".$nFactura."'";
-			$condicion[]= "cuentas_por_pagars.documento='".$nFactura."'";
+			$condicion[]= "facturas_por_pagars.documento in(".$nFactura.")";
+			$condicion[]= "cuentas_por_pagars.documento in(".$nFactura.")";
 		}
 		if(!empty($fechaDesde)){ $condicion[]="cuentas_por_pagars.fecha_pago >='".$fechaDesde."'"; }
 		if(!empty($fechaHasta)){ $condicion[]="cuentas_por_pagars.fecha_pago <='".$fechaHasta."'"; }

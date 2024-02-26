@@ -50,7 +50,7 @@
 				<div class="row">	
 					<div class="col">
 						<label>Nro Factura</label>
-						<input type="text" name="n_factura" class="form-control" @if(isset($nFactura)) value="{{$nFactura}}" @endif >
+						<input type="text" name="n_factura" placeholder="Ej. 001520,001522" class="form-control" @if(isset($nFactura)) value="{{$nFactura}}" @endif >
 						
 					</div>
 					<div class="col">
