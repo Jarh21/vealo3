@@ -358,8 +358,9 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/retencion-iva/buscar-retencion',[RetencionIvaController::class,'buscarRetencionIva'])->name('retencion.iva.buscar_retencion');
     Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
     Route::get('/retencion-iva/editar-retencion/{comprobante}',[RetencionIvaController::class,'editarRetencionIva'])->name('retencion.iva.editar_retencion');
+    Route::post('/retencion-iva/update-retencion',[RetencionIvaController::class,'actualizarRetencionIva'])->name('retencion.iva.update_retencion');
     Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}',[RetencionIvaController::class,'detallesRetencionIva']);
-
+    Route::post('/retencion-iva/editar-retencion/update-detalle-retencion',[RetencionIvaController::class,'updateDetalleRetencionIva']);
 
 });
 //se sacaron del middleware Auth para que no requiere de inicio de sesion al momento de buscar informacion

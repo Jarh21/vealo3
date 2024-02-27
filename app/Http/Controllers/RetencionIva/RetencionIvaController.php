@@ -403,10 +403,56 @@ class RetencionIvaController extends Controller
 		return view('retencionIva.editarRetencion',['retencionIva'=>$retencionIva,'proveedores'=>$proveedores]);
 	}
 
+	public function actualizarRetencionIva(Request $request){
+		
+		$proveedoRequest = explode('|',$request->proveedorRif);
+		$proveedorRif = $proveedoRequest[0];
+		
+		$retencionIva = RetencionIva::where('comprobante',$request->comprobante)->first();
+		
+		//verificamos que se ha modificado el dato del proveedor para modificarlo tambien el los detallados de las facturas.
+		if($retencionIva->rif_retenido <> $proveedorRif){
+			$proveedor= Proveedor::where('rif',$proveedorRif)->first();
+			$retencionIva->rif_retenido = $proveedor->rif;
+			$retencionIva->nom_retenido = $proveedor->nombre;
+			//actualizamos en detalle de la retencion
+			RetencionIvaDetalle::where('comprobante',$request->comprobante)->update(['rif_retenido'=>$proveedor->rif,'nom_retenido'=>$proveedor->nombre]);
+		}
+		
+		$retencionIva->fecha = $request->fecha;
+		$retencionIva->cheque = $request->cheque;
+
+		$retencionIva->update();
+		return redirect()->route('retencion.iva.listar');
+	}
+
+	
+
 	public function detallesRetencionIva($comprobante){
 		return RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
 
 	}
 
+	public function updateDetalleRetencionIva(Request $request){
+		//buscamos la factura a modificar
+		RetencionIvaDetalle::where('keycodigo',$request->keycodigo)->update([
+			'fecha_docu'=>$request->fecha_docu,			
+			'serie'=>$request->serie,
+			'documento'=>$request->nfactura,			
+			'control_fact'=>$request->control_fact,
+			'tipo_trans'=>$request->tipo_trans,
+			'fact_afectada'=>$request->fact_afectada,
+			'comprasmasiva'=>$request->comprasmasiva,
+			'sincredito'=>$request->sincredito,
+			'base_impon'=>$request->base_impon,
+			'porc_alic'=>$request->porc_alic,
+			'iva'=>$request->iva,
+			'iva_retenido'=>$request->iva_retenido,
+			'porc_reten'=>$request->porc_reten]
+			); 
+		
+			
+		
+	}
 
 }

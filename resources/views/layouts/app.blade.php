@@ -11,7 +11,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Vealo 3.1.7</title>    <!-- Scripts -->
+    <title>Vealo 3.1.8</title>    <!-- Scripts -->
 
 
 
@@ -70,7 +70,7 @@
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
                      
-                    <span class="brand-text font-weight-light h4">Vealo 3.1.7 SAN-FDO</span>
+                    <span class="brand-text font-weight-light h4">Vealo 3.1.8 SAN-FDO</span>
                 </a>
 
                 <!-- Sidebar -->

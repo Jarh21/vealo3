@@ -9,5 +9,6 @@ class RetencionIva extends Model
 {
     use HasFactory;
     protected $table="retenciones";
+    protected $primaryKey = 'keycodigo';
 
 }
