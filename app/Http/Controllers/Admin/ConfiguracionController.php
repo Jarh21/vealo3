@@ -316,4 +316,24 @@ class ConfiguracionController extends Controller
         return redirect("/cuentasporpagar/facturasPorPagar");
                
     }
+
+    public function indexConfiguracionRetencionIva(){
+        $porceRetencionIva = self::consultarPorcentajeRetencionIva();
+        
+        return view('admin.configuraciones.confRetencionIva',['porceRetencionIva'=>$porceRetencionIva]);
+    }
+
+    public function guardarPorcentajeRetencionIva(Request $request){
+        DB::insert("INSERT INTO porcentaje_retencion_iva (porcentaje) VALUES (?)",[$request->porcentaje]);
+        return redirect()->route('indexConfiguracionRetencionIva');
+    }
+
+    public function eliminarPorcentajeRetencionIva($id){
+        DB::delete("delete from porcentaje_retencion_iva where id=?",[$id]);
+        return redirect()->route('indexConfiguracionRetencionIva');
+    }
+
+    public function consultarPorcentajeRetencionIva(){
+        return  DB::select("select id,porcentaje from porcentaje_retencion_iva");
+    }
 }

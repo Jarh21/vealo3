@@ -45,6 +45,9 @@
                                     <input type="text" v-model="objFactura.porc_alic" ref="porc_alic" class="form-control" value="">
                                     <label for="">% Retencion</label>
                                     <input type="text" v-model="objFactura.porc_reten" ref="porc_reten" class="form-control">
+                                    <select class="form-control" >
+                                        <option v-for="(porcentaje, i) in porcentajes" :key="i">{{porcentaje.porcentaje}}</option>
+                                    </select>
 
                                 </div>
                                 <div class="col">
@@ -103,10 +106,16 @@
             </tbody>
             
         </table>
+        <div class="row">
+            <div class="col">
+                <h4 class="">Total Retenido : {{total_retenido}}</h4> 
+            </div>
+        </div>
     </div>
   </template>
   
   <script>
+
   export default {
     props: {
         comprobante: {
@@ -116,11 +125,14 @@
     },
     mounted(){
             
-            this.listarFacturas();          
+            this.listarFacturas();
+            this.consultarRetencion();
+            this.consultarPorcentajeRetencionIva();          
         },
     data(){
         return{
             facturas:[],
+            porcentajes:[],
             objFactura:{
                 keycodigo:'',
                 comprobante:'',
@@ -138,6 +150,7 @@
                 iva_retenido:'',
                 fact_afectada:'',
             },
+            total_retenido :0,
         }
     },
     methods:{
@@ -147,6 +160,16 @@
             this.facturas = resultado.data 
             
             
+        },
+        async consultarRetencion(){
+            let comprobante = this.comprobante;
+            let resultado = await axios.get("consultar-retencion/"+comprobante);
+            this.total_retenido = resultado.data.total;
+        },
+        async consultarPorcentajeRetencionIva(){
+            let resultado = await axios.get('../../admin/configuracion/lista-porce-retencionIva')
+            
+            this.porcentajes = resultado.data;
         },
         tabla(){ //asi se llama datatabes en vue
             this.$nextTick(()=>{
@@ -191,7 +214,9 @@
             $('#editarPedido').modal('show')
         },
         cerrarModalEditar(){
-            $('#editarPedido').modal('hide')
+            $('#editarPedido').modal('hide');
+            this.listarFacturas();
+            this.consultarRetencion();
         },
         calcularMontos(){
             /*validamos que le monto total no este vacio*/

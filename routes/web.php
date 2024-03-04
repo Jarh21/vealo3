@@ -114,6 +114,10 @@ Route::middleware(['auth'])->group(function(){
     Route::post('admin/configuracion/general',[ConfiguracionController::class,'guardarConfiguracionGeneral'])->name('guardarConfiguracionGeneral');
     Route::get('admin/configuracion/cuentasPorPagar-sincronizar-server',[ConfiguracionController::class,'sincorinzarServidoresTraerUltimosRegistros'])->name('sincorinzarServidores');
     Route::get('admin/configuracion/cuentasPorPagar-sincronizar-todo-server',[ConfiguracionController::class,'sincorinzarServidoresTraerTodosLosRegistros'])->name('sincorinzarServidoresTodo');
+    Route::get('admin/configuracion/retencionIva',[ConfiguracionController::class,'indexConfiguracionRetencionIva'])->name('indexConfiguracionRetencionIva');
+    Route::get('admin/configuracion/lista-porce-retencionIva',[ConfiguracionController::class,'consultarPorcentajeRetencionIva'])->name('consultarPorcentajeRetencionIva');
+    Route::post('admin/configuracion/guardar-porce-retencionIva',[ConfiguracionController::class,'guardarPorcentajeRetencionIva'])->name('guardarPorcentajeRetencionIva');
+    Route::get('admin/configuracion/eliminar-porce-retencioniva/{id}',[ConfiguracionController::class,'eliminarPorcentajeRetencionIva'])->name('eliminarPorcentajeRetencionIva');
 
     //bancos
     Route::get('/bancos',[BancoController::class,'index'])->name('banco.index');
@@ -359,8 +363,10 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
     Route::get('/retencion-iva/editar-retencion/{comprobante}',[RetencionIvaController::class,'editarRetencionIva'])->name('retencion.iva.editar_retencion');
     Route::post('/retencion-iva/update-retencion',[RetencionIvaController::class,'actualizarRetencionIva'])->name('retencion.iva.update_retencion');
-    Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}',[RetencionIvaController::class,'detallesRetencionIva']);
+    Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}',[RetencionIvaController::class,'consultarDetallesRetencionIva']);
     Route::post('/retencion-iva/editar-retencion/update-detalle-retencion',[RetencionIvaController::class,'updateDetalleRetencionIva']);
+    Route::get('/retencion-iva/editar-retencion/consultar-retencion/{comprobante}',[RetencionIvaController::class,'consultarRetencionIva']);
+    
 
 });
 //se sacaron del middleware Auth para que no requiere de inicio de sesion al momento de buscar informacion

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Proveedor;
+use Illuminate\Support\Facades\DB;
 class ProveedorController extends Controller
 {
     public function listarProveedor(){
@@ -36,7 +37,8 @@ class ProveedorController extends Controller
         if($permisos==false){
             return redirect('/proveedor');
         }*/
-    	return view($origen);
+        $porceRetencionIva = DB::select("select id,porcentaje from porcentaje_retencion_iva");
+    	return view($origen,['porceRetencionIva'=>$porceRetencionIva]);
     }
 
     public function save(Request $request,$origen='admin.proveedor.index'){
@@ -68,14 +70,14 @@ class ProveedorController extends Controller
 
         $cadenaRif[]="";
     	$proveedor= Proveedor::where('rif',$rif)->get();
-
+        
         if(empty($proveedor[0])){
             return self::create();
 
         }else{
-            
-          $cadenaRif = explode('-',$proveedor[0]->rif);
-        return view($origen,['proveedor'=>$proveedor[0],'cadenaRif'=>$cadenaRif,'origen'=>$origen]);  
+            $porceRetencionIva = DB::select("select id,porcentaje from porcentaje_retencion_iva");             
+            $cadenaRif = explode('-',$proveedor[0]->rif);
+        return view($origen,['proveedor'=>$proveedor[0],'cadenaRif'=>$cadenaRif,'origen'=>$origen,'porceRetencionIva'=>$porceRetencionIva]);  
         }
         
     }

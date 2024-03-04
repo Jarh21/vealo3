@@ -70,7 +70,7 @@ class EmpleadoDeclaranteController extends Controller
             return $xmlController->xmlCrearGet($fechaIniFin,$encabezadoXml->rif_empresa);
         }else{
         
-            return redirect('/declarantes');
+            return redirect()->route('declarantes.index');
         }     
 
     }

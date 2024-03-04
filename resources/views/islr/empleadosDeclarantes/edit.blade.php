@@ -38,7 +38,7 @@
 						</div>
 						<div class="form-group">
 							<label>Sueldo a declarar</label>
-							<span class="text-danger">*</span><input type="text" name="sueldo" id="creditos" required class="form-control" value="{{number_format($declarante->sueldo_base,2,',','.')}}">
+							<span class="text-danger">*</span><input type="text" name="sueldo" id="creditos" required class="form-control" value="{{number_format($declarante->sueldo_base,2,',','.')}}"><span>usar (.)en separador de miles y (,) para decimales Ej: 15.500,90</span>
 						</div>
 						<div class="form-group">
 							<label>Fecha de Ingreso</label>

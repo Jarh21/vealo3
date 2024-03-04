@@ -13,6 +13,7 @@ use App\Models\RetencionIva;
 use App\Models\Parametro;
 use App\Models\Empresa;
 use App\Http\Controllers\Herramientas\HerramientasController;
+/* use App\Http\Controllers\Admin\ConfiguracionController; */
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 class RetencionIvaController extends Controller
@@ -397,8 +398,8 @@ class RetencionIvaController extends Controller
 
 	public function editarRetencionIva($comprobante){
 		//abre la vista para editar la retencion y se le pasan los parametros 
-		$retencionIva = RetencionIva::where('comprobante',$comprobante)->first();
-		//$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
+		$retencionIva = self::consultarRetencionIva($comprobante);
+		
 		$proveedores = Proveedor::all();//los proveedores para poder editarlos
 		return view('retencionIva.editarRetencion',['retencionIva'=>$retencionIva,'proveedores'=>$proveedores]);
 	}
@@ -426,16 +427,18 @@ class RetencionIvaController extends Controller
 		return redirect()->route('retencion.iva.listar');
 	}
 
-	
+	public function consultarRetencionIva($comprobante){
+		return RetencionIva::where('comprobante',$comprobante)->first();
+	}
 
-	public function detallesRetencionIva($comprobante){
+	public function consultarDetallesRetencionIva($comprobante){
 		return RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
 
 	}
 
 	public function updateDetalleRetencionIva(Request $request){
 		//buscamos la factura a modificar
-		RetencionIvaDetalle::where('keycodigo',$request->keycodigo)->update([
+		$retencionDetalle = RetencionIvaDetalle::where('keycodigo',$request->keycodigo)->update([
 			'fecha_docu'=>$request->fecha_docu,			
 			'serie'=>$request->serie,
 			'documento'=>$request->nfactura,			
@@ -449,10 +452,17 @@ class RetencionIvaController extends Controller
 			'iva'=>$request->iva,
 			'iva_retenido'=>$request->iva_retenido,
 			'porc_reten'=>$request->porc_reten]
-			); 
-		
+			);
+			 
+		self::actualizarTotalRetener($request->comprobante);
 			
 		
 	}
+
+	public function actualizarTotalRetener($comprobante){
+		DB::update("UPDATE retenciones r JOIN retenciones_dat r_dat ON r.comprobante = r_dat.comprobante SET r.total = (SELECT SUM(iva_retenido) FROM retenciones_dat WHERE comprobante = ?)WHERE r.comprobante=? ",[$comprobante,$comprobante]);
+	}
+
+	
 
 }

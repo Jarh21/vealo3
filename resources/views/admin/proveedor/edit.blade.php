@@ -65,7 +65,13 @@
 		  </div>
 		  <div class="form-group">
 		    <label for="direccion">Porcentaje de retención IVA</label>
-		    <input type="text" class="form-control" name="porcentaje_retener" placeholder="100,75 ..." value="{{$proveedor->porcentaje_retener}}">
+		    <!-- <input type="text" class="form-control" name="porcentaje_retener" placeholder="100,75 ..." value="{{--$proveedor->porcentaje_retener--}}"> -->
+			<select name="porcentaje_retener" class="form-control">
+				<option value="">-- Seleccione --</option>
+				@foreach($porceRetencionIva as $porce)
+					<option value="{{$porce->porcentaje}}" @if($porce->porcentaje == $proveedor->porcentaje_retener) selected @endif>{{$porce->porcentaje}}</option>
+				@endforeach	
+			</select>
 		  </div>
 		  <div class="form-group">
 		    <label for="direccion">Porcentaje de retención ISLR</label>

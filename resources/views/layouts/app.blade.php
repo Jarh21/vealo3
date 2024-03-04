@@ -495,9 +495,9 @@
                                     <li class="nav-item"><a class="{{ Request::path() === 'admin/empresas' ? 'nav-link active' : 'nav-link' }}" href="{{route('admin.empresas.index')}}">Empresas</a></li>
                                     <li class="nav-item"><a class="{{ Request::path() === 'bancos' ? 'nav-link active' : 'nav-link' }}" href="{{route('banco.index')}}">Entidades Bancarias</a></li>
                                     <li class="nav-item"><a class="{{ Request::path() === 'proveedor' ? 'nav-link active' : 'nav-link' }}" href="{{ url('proveedor')}}">Proveedores</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    
+                                    <li><hr class="dropdown-divider"></li>                                    
                                     <li  class="nav-item"><a class="{{ Request::path() === 'admin/configuracion/cuentasPorPagar' ? 'nav-link active' : 'nav-link' }}" href="{{route('indexConfiguracionCuentasPorPagar')}}">Configuracion Cuentas <br> por pagar</a></li>
+                                    <li><a  class="{{ Request::path() === 'admin/configuracion/retencionIva' ? 'nav-link active' : 'nav-link' }}" href="{{route('indexConfiguracionRetencionIva')}}">Configurar Retencion IVA</a></li>
                                 </ul>
                             </div> <!-- fin capa configuracion  -->
                             @endcan 
