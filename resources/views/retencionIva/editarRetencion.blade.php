@@ -52,6 +52,5 @@
 				placeholder: 'Seleccione el proveedor',    	
 				/* maximumSelectionLength:1, */
 			});
-            window.baseUrl = '{{ url('/') }}';
     </script>
 @endsection

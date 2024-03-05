@@ -89,7 +89,7 @@ class EmpleadoDeclaranteController extends Controller
         $declarantes->sueldo_base = $monto;
         $declarantes->fecha = $request->get('fecha');
     	$declarantes->save();
-    	return redirect('/declarantes');
+    	return redirect()->route('declarantes.index');
     }
 
 
@@ -105,7 +105,7 @@ class EmpleadoDeclaranteController extends Controller
             //creamos el nuevo xml con los nuevos cambios
             return $xmlController->xmlCrearGet($fechaIniFin,$empresaRif);
         }else{
-    	   return redirect('/declarantes');
+            return redirect()->route('declarantes.index');
         }
     }
 }
