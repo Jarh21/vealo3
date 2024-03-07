@@ -34,6 +34,7 @@ Vue.component('visualizador-precios',require('./components/asistenteCompras/Asis
 Vue.component('cambio-tasa',require('./components/CambioTasa.vue').default);
 Vue.component('listar-asesor-por-fecha',require('./components/ListarAsesoresPorFecha.vue').default);
 Vue.component('detalle-retencion-iva',require('./components/retencionIva/DetalleRetencionIva.vue').default);
+Vue.component('editar-factura-iva',require('./components/retencionIva/EditarFacturaIva.vue').default);
 
 
 /**

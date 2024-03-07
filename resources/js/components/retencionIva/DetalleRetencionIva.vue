@@ -43,10 +43,10 @@
                                     <input type="text" v-model="objFactura.sincredito" ref="sincredito" class="form-control">
                                     <label for="">% Alicuota</label>
                                     <input type="text" v-model="objFactura.porc_alic" ref="porc_alic" class="form-control" value="">
-                                    <label for="">% Retencion</label>
-                                    <input type="text" v-model="objFactura.porc_reten" ref="porc_reten" class="form-control">
-                                    <select class="form-control" >
-                                        <option v-for="(porcentaje, i) in porcentajes" :key="i">{{porcentaje.porcentaje}}</option>
+                                    <label for="">% Retencion</label>  {{ objFactura.porc_reten }}                                  
+                                    <select class="form-control" v-model="objFactura.porc_reten">
+                                        <option value="">-- selecciones % --</option>
+                                        <option v-for="(porcentaje, i) in porcentajes" :key="i" :value= "porcentaje.porcentaje" :selected ="objFactura.porc_reten === porcentaje.porcentaje">{{porcentaje.porcentaje}}</option>
                                     </select>
 
                                 </div>
@@ -150,15 +150,27 @@
                 iva_retenido:'',
                 fact_afectada:'',
             },
+            datosProveedor:0,
             total_retenido :0,
+            
         }
     },
     methods:{
         async listarFacturas(){
             let nuemro = this.comprobante;
             let resultado = await axios.get("./listar-detalle-retencion/"+nuemro);
-            this.facturas = resultado.data 
+            this.facturas = resultado.data
             
+            
+            for (const valores of this.facturas) {
+                await this.buscarProveedor(valores.rif_retenido);
+                if(valores.porc_reten == this.datosProveedor){
+                    console.log("no hay cambio en los porcentajes de retencion del proveedor con las facturas");
+                }else{
+                    alert("¡¡¡Error el porcentaje de retencion del proveedor es distinto al de las facturas, modifiquelos y recalcule los montos en editar!!!")
+                }
+                
+            }
             
         },
         async consultarRetencion(){
@@ -171,6 +183,13 @@
             
             this.porcentajes = resultado.data;
         },
+        async buscarProveedor(rif){
+            this.datosProveedor =0;
+            let resultado = await axios.get('../../proveedor/buscar/'+rif)
+            this.datosProveedor = resultado.data.porcentaje_retener;
+            
+        },
+
         tabla(){ //asi se llama datatabes en vue
             this.$nextTick(()=>{
                 $('#facturas').DataTable({
@@ -195,6 +214,7 @@
             this.objFactura.iva='';
             this.objFactura.iva_retenido='';
             this.objFactura.fact_afectada='';
+            this.porce_proveedor='';
 
             this.objFactura.keycodigo= datos.keycodigo;
             this.objFactura.comprobante=datos.comprobante;
@@ -211,6 +231,7 @@
             this.objFactura.base_impon=datos.base_impon;
             this.objFactura.iva=datos.iva;
             this.objFactura.iva_retenido=datos.iva_retenido;
+            this.porce_proveedor = datos.porc_reten;
             $('#editarPedido').modal('show')
         },
         cerrarModalEditar(){

@@ -202,7 +202,7 @@ class HerramientasController extends Controller
 			}else{
 				for($i=0;$i<=$ndias;){
 					$fecha_actual = date('Y-m-d', strtotime($fecha . ' +'.$i.' day'));
-					DB::insert("INSERT INTO tipo_moneda_historial_tasa (codtipomoneda,nueva_tasa_de_cambio_en_moneda_nacional,fecha) VALUES	(?,?,?)",[3,$tasa,$fecha_actual]);
+					DB::insert("INSERT INTO tipo_moneda_historial_tasa (codtipomoneda,nueva_tasa_de_cambio_en_moneda_nacional,fecha,registrado) VALUES	(?,?,?,?)",[3,$tasa,$fecha_actual,date("Y-m-d H:i:s")]);
 					$i++;
 				}
 				

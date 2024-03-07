@@ -28,6 +28,30 @@ class RetencionIvaController extends Controller
         return view('retencionIva.registroDocumentos',['proveedores'=>$proveedores,'registros'=>$registros,'iva'=>$iva,'empresas'=>$herramientas->listarEmpresas()]);
     }
 
+	public function buscarFactura($keycodigo){
+		return RetencionIvaDetalle::find($keycodigo);
+	}
+
+	public function editarFactura($keycodigo){
+		$iva = Parametro::buscarVariable('poriva');
+		$documento = self::buscarFactura($keycodigo);
+		$proveedores = Proveedor::all();//los proveedores para poder editarlos
+		return view("retencionIva.editarDocumentoIva",['documento'=>$documento,'proveedores'=>$proveedores,'iva'=>$iva]);
+	}
+
+	public function updateFactura(Request $request){
+		
+	
+		//esto es para cerrar la ventana popup y recargar la pagina principal
+	?>
+		<script>
+			window.opener.location.reload()
+			window.close();
+		  </script>
+	<?php	
+		
+	}
+
     public function guardarFacturaRetencionIva(Request $request){
 		
 		if($request->factura_import_manual=='on'){

@@ -32,7 +32,7 @@
                 @can('agregar.tasadivisa.afactura')
                 <div class="col">
                     <label for="">Valor Tasa Factura</label>
-                   <input type="text" name="valor_tasa" value="{{$factura->moneda_secundaria}}" class="form-control" placeholder="Valor de la Tasa">
+                   <input type="text" name="valor_tasa" value="{{$factura->moneda_secundaria}}" class="form-control" placeholder="Valor de la Tasa" required>
                 </div>
                 @endcan
              </div>             

@@ -72,7 +72,7 @@
 							</div>						
 						
 						</div>
-						<div id="facturaManual1" class="ocultoFacturaManual ">
+						<div id="facturaManual1" class="ocultoFacturaManual " style="display: none">
 							<form name="factura_manual" id="factura_manual" action="#" method="post">
 								<div class="row border">
 								
@@ -177,7 +177,8 @@
 				<h4><i class="fa fa-exclamation-triangle"></i>{{$mensaje['texto']}}</h4>
 			</div>
 			@endif	
-			<table id="articulos" class="table table-bordered" data-page-length='25'>
+			<!-- <table id="articulos" class="table table-bordered" data-page-length='25'> -->
+			<table id="" class="table table-bordered" data-page-length='25'>
 				<thead>
 					<tr>    				
 						<th>Nº</th>    				
@@ -201,9 +202,15 @@
 							<td>{{$registro->documento}}</td>
 							<td>{{$registro->base_impon}}</td>
 							<td>{{$registro->iva}}</td>
-							<td>{{$registro->iva_retenido}}</td>
-							<td><button type='button' id='eliminarBtn{{$registro->keycodigo}}' class='btn btn-danger btn-sm' onclick="eliminar('{{$registro->keycodigo}}')">Eliminar</button></td>
+							<td>{{$registro->iva_retenido}}</td> 
+							<td>
+							<a href="{{route('retencion.iva.editarDocumento',$registro->keycodigo)}}" target="popup" onClick="window.open(this.href, this.target, 'width=850,height=650,left=100,top=50');   return false;" class="btn btn-secondary btn-sm">Editar</a>
+
+								<button type='button' id='eliminarBtn{{$registro->keycodigo}}' class='btn btn-danger btn-sm' onclick="eliminar('{{$registro->keycodigo}}')">Eliminar</button>
+							</td>
+							
 						</tr>
+						
 						@endforeach
 					@endif
 				</tbody>		 

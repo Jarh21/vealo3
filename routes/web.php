@@ -186,6 +186,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/proveedor/ver/{id}/{origen?}',[ProveedorController::class,'ver'])->name('proveedor.ver');
     Route::get('/proveedor/edit/{id}/{origen?}',[ProveedorController::class,'edit'])->name('proveedor.edit');
     Route::PUT('/proveedor/update/{id}/{origen?}',[ProveedorController::class,'update'])->name('proveedor.update');
+    Route::get('/proveedor/buscar/{rif}',[ProveedorController::class,'buscar'])->name('proveedor.buscar');
     /*fin rutas de proveedores */
 
     /*Registro de las retenciones ISLR*/
@@ -354,6 +355,8 @@ Route::middleware(['auth'])->group(function(){
     /***********************RETENCION DE IVA  ************/
     Route::get('/retencion-iva/index',[RetencionIvaController::class,'index'])->name('retencion.iva.index');
     Route::post('/retencion-iva/buscar-documento',[RetencionIvaController::class,'guardarFacturaRetencionIva'])->name('retencion.iva.buscarFacturasSiace');
+    Route::get('/retencion-iva/editar-documento/{keycodigo}',[RetencionIvaController::class,'editarFactura'])->name('retencion.iva.editarDocumento');
+    Route::post('/retencion-iva/update-documento',[RetencionIvaController::class,'updateFactura'])->name('retencion.iva.updateDocumento');
     Route::get('/retencion-iva/eliminar-factura/{id}',[RetencionIvaController::class,'eliminarFactura'])->name('retencion.iva.eliminarFactura');
     Route::post('/retencion-iva/generar-retencion',[RetencionIvaController::class,'generarRetencionIva'])->name('retencion.iva.generar');
     Route::post('/retencion-iva/guardar-retencion',[RetencionIvaController::class,'guardarComprobanteRetencionIva'])->name('retencion.iva.guardar');
@@ -366,6 +369,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}',[RetencionIvaController::class,'consultarDetallesRetencionIva']);
     Route::post('/retencion-iva/editar-retencion/update-detalle-retencion',[RetencionIvaController::class,'updateDetalleRetencionIva']);
     Route::get('/retencion-iva/editar-retencion/consultar-retencion/{comprobante}',[RetencionIvaController::class,'consultarRetencionIva']);
+    Route::get('/retencion-iva/buscar-factura/{keycodigo}',[RetencionIvaController::class,'buscarFactura']);
     
 
 });

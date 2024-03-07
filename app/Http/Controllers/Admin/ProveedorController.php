@@ -131,4 +131,8 @@ class ProveedorController extends Controller
     public function actualizarUltimoPorcentajeRetencionIslr($id,$porcentaje){
         Proveedor::where('id','=',$id)->update(['ultimo_porcentaje_retener_islr'=>$porcentaje]);
     }
+
+    public function buscar($rif){
+        return Proveedor::where('rif',$rif)->first();
+    }
 }
