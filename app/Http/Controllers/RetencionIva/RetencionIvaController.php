@@ -13,19 +13,21 @@ use App\Models\RetencionIva;
 use App\Models\Parametro;
 use App\Models\Empresa;
 use App\Http\Controllers\Herramientas\HerramientasController;
-/* use App\Http\Controllers\Admin\ConfiguracionController; */
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 class RetencionIvaController extends Controller
 {
     public function index(){
+		//metodo donde se agregan los documentos respectivos a la retencion como facturas y notas de debito o credito
 		$herramientas = new HerramientasController();
     	//$conexionSQL = $herramientas->conexionDinamicaBD(session('basedata')); 
 		/* $registros = DB::select("SELECT * FROM retencion_iva_detalles WHERE estatus='N'"); */
-		$registros = RetencionIvaDetalle::where('estatus','S')->where('rif_agente',session('empresaRif'))->get();
-        $proveedores = Proveedor::all();
+		$registros = RetencionIvaDetalle::where('comprobante','0')->where('rif_agente',session('empresaRif'))->get();
+        $proveedores = Proveedor::select('rif','porcentaje_retener','nombre')->get();		
 		$iva = Parametro::buscarVariable('poriva');
-        return view('retencionIva.registroDocumentos',['proveedores'=>$proveedores,'registros'=>$registros,'iva'=>$iva,'empresas'=>$herramientas->listarEmpresas()]);
+		$tipoOperacion = Parametro::buscarVariable('reten_iva_modo_operacion');
+        return view('retencionIva.registroDocumentos',['proveedores'=>$proveedores,'registros'=>$registros,'iva'=>$iva,'empresas'=>$herramientas->listarEmpresas(),'tipoOperacion'=>$tipoOperacion]);
     }
 
 	public function buscarFactura($keycodigo){
@@ -35,19 +37,42 @@ class RetencionIvaController extends Controller
 	public function editarFactura($keycodigo){
 		$iva = Parametro::buscarVariable('poriva');
 		$documento = self::buscarFactura($keycodigo);
-		$proveedores = Proveedor::all();//los proveedores para poder editarlos
+		$proveedores = Proveedor::select('rif','porcentaje_retener','nombre')->get();	
+		//$tipoOperacion = Parametro::buscarVariable('reten_iva_modo_operacion');
 		return view("retencionIva.editarDocumentoIva",['documento'=>$documento,'proveedores'=>$proveedores,'iva'=>$iva]);
 	}
 
-	public function updateFactura(Request $request){
-		
 	
+
+	public function updateFactura(Request $arrayDatos){
+		//actualizamos los datos de la factura enviados esto es en el registro de documentos
+		$proveedor = $arrayDatos->proveedorRif;
+		$detalleProveedor = explode("|",$proveedor);
+		$retencionIvaDetalles = RetencionIvaDetalle::find($arrayDatos->keycodigo);
+		$retencionIvaDetalles->rif_retenido  = $detalleProveedor[0];
+		$retencionIvaDetalles->nom_retenido  = $detalleProveedor[2];
+		$retencionIvaDetalles->fecha_docu    = $arrayDatos->fecha_docu;
+		$retencionIvaDetalles->tipo_docu     = $arrayDatos->tipo_docu;
+		$retencionIvaDetalles->serie         = $arrayDatos->serie;
+		$retencionIvaDetalles->documento     = $arrayDatos->nfactura;		
+		$retencionIvaDetalles->control_fact  = $arrayDatos->control_fact;
+		$retencionIvaDetalles->tipo_trans    = $arrayDatos->tipo_trans;
+		$retencionIvaDetalles->fact_afectada = $arrayDatos->fact_afectada;//cuando son notas de credito se guarda el numero de factural al que pertenece la nota
+		$retencionIvaDetalles->comprasmasiva = $arrayDatos->comprasmasiva;
+		$retencionIvaDetalles->sincredito    = $arrayDatos->sincredito; //exento
+		$retencionIvaDetalles->base_impon    = $arrayDatos->base_impon;
+		$retencionIvaDetalles->porc_alic     = $arrayDatos->porc_alic; //alicuota el porcentaje del iva
+		$retencionIvaDetalles->iva           = $arrayDatos->iva;//monto iva d el afactura
+		$retencionIvaDetalles->iva_retenido  = $arrayDatos->iva_retenido;//es afectado por el porcentaje del proveedor
+		$retencionIvaDetalles->porc_reten    = $arrayDatos->porc_reten;//porcentaje del proveedor
+		$retencionIvaDetalles->estatus		 = $arrayDatos->compra_venta;//editar ipo de operacion compra o venta
+		$retencionIvaDetalles->update();
 		//esto es para cerrar la ventana popup y recargar la pagina principal
 	?>
 		<script>
 			window.opener.location.reload()
 			window.close();
-		  </script>
+		</script>
 	<?php	
 		
 	}
@@ -147,7 +172,7 @@ class RetencionIvaController extends Controller
 						'tipo_docu'=>'FA',
 						'serie'=>'',
 						'documento'=>$registro->documento,
-						'estatus'=>'S',
+						'estatus'=>$request->compra_venta,
 						'control_fact'=>$registro->control_fact,
 						'tipo_trans'=>'no aplica',
 						'fact_afectada'=>'NO',
@@ -260,7 +285,7 @@ class RetencionIvaController extends Controller
 		$retencionIvaDetalles->rif_agente    = $arrayDatos['rif_agente'];//rif empresa
 		$retencionIvaDetalles->nom_agente    = $arrayDatos['nom_agente']; //nombre empresa
 		$retencionIvaDetalles->fecha         = $arrayDatos['fecha'];
-		$retencionIvaDetalles->cod_usua       = $arrayDatos['cod_usua'];
+		$retencionIvaDetalles->cod_usua      = $arrayDatos['cod_usua'];
 		$retencionIvaDetalles->usuario       = $arrayDatos['usuario'];
 		$retencionIvaDetalles->save();
 
@@ -323,7 +348,7 @@ class RetencionIvaController extends Controller
 			$rif_retenido = $datoFactura->rif_retenido;
 			$nom_retenido = $datoFactura->nom_retenido;
 			$sumaIvaRetenido = $sumaIvaRetenido + floatval($datoFactura->iva_retenido);
-			RetencionIvaDetalle::where('keycodigo',$datoFactura->keycodigo)->update(['comprobante'=>$comprobante,'estatus'=>'C']);
+			RetencionIvaDetalle::where('keycodigo',$datoFactura->keycodigo)->update(['comprobante'=>$comprobante]);
 		}
 		$retencionIva = new RetencionIva();
 		$retencionIva->periodo = $anioMes;
@@ -386,7 +411,7 @@ class RetencionIvaController extends Controller
 
 	public function listarRetencionesIva(){
 		$herramientas = new HerramientasController();
-		$retenciones = DB::select( "select * from retenciones_dat where estatus='C' and rif_agente=:rifAgente order by keycodigo desc limit 100",['rifAgente'=>session('empresaRif')]);
+		$retenciones = DB::select( "select * from retenciones_dat where comprobante<>'0' and rif_agente=:rifAgente order by keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
 		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones,'empresas'=>$herramientas->listarEmpresas()]);
 	}
 
@@ -412,19 +437,19 @@ class RetencionIvaController extends Controller
 		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones,'empresas'=>$herramientas->listarEmpresas()]);
 	}
 
-	public function seleccionSucursal($rifEmpresa,$vista=''){
+	public function seleccionSucursal($rifEmpresa,$vista='retencion.iva.listar'){
 		//este solo aplica para el listado de las retenciones de iva ya registradas
 		//debido a que si le dan opcion buscar
         $empresa = Empresa::where('rif','=',$rifEmpresa)->first();		
         session(['empresaNombre'=>$empresa->nombre,'empresaRif'=>$empresa->rif,'codTipoMoneda'=>3,'modoPago'=>'dolares','basedata'=>$empresa->basedata]);
-        return redirect()->route('retencion.iva.listar');        
+        return redirect()->route($vista);        
     }
 
 	public function editarRetencionIva($comprobante){
 		//abre la vista para editar la retencion y se le pasan los parametros 
 		$retencionIva = self::consultarRetencionIva($comprobante);
 		
-		$proveedores = Proveedor::all();//los proveedores para poder editarlos
+		$proveedores = Proveedor::select('rif','porcentaje_retener','nombre')->get();	
 		return view('retencionIva.editarRetencion',['retencionIva'=>$retencionIva,'proveedores'=>$proveedores]);
 	}
 
@@ -475,11 +500,11 @@ class RetencionIvaController extends Controller
 			'porc_alic'=>$request->porc_alic,
 			'iva'=>$request->iva,
 			'iva_retenido'=>$request->iva_retenido,
-			'porc_reten'=>$request->porc_reten]
+			'porc_reten'=>$request->porc_reten,
+			'estatus' => $request->compra_venta]
 			);
 			 
-		self::actualizarTotalRetener($request->comprobante);
-			
+		self::actualizarTotalRetener($request->comprobante);			
 		
 	}
 
@@ -487,6 +512,35 @@ class RetencionIvaController extends Controller
 		DB::update("UPDATE retenciones r JOIN retenciones_dat r_dat ON r.comprobante = r_dat.comprobante SET r.total = (SELECT SUM(iva_retenido) FROM retenciones_dat WHERE comprobante = ?)WHERE r.comprobante=? ",[$comprobante,$comprobante]);
 	}
 
+	public function vistaGenerarTxt(){
+		$herramientas = new HerramientasController();
+		return view('retencionIva.generarTxt',['empresas'=>$herramientas->listarEmpresas()]);
+	}
+
+	public function buscarRegistrosParaElTxt(Request $request){
+		$herramientas = new HerramientasController();
+		$fechaini = $request->fechaini;
+		$fechafin = $request->fechafin;
+		$detalleTxt = DB::select("SELECT r.rif_agente,d.comprobante,r.periodo,r.fecha AS fecha_retencion,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic FROM retenciones r, retenciones_dat d WHERE r.comprobante = d.comprobante AND r.estatus ='N' AND r.rif_agente =:empresaRif AND r.fecha >=:fechaini AND r.fecha <=:fechafin",["empresaRif"=>session('empresaRif'),'fechaini'=>$fechaini,'fechafin'=>$fechafin]); 
+		$contenido ='';
+
+		foreach($detalleTxt as $registro){
+			$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_retencion ."\t". $registro->estatus ."\n";
+		}
+		Storage::disk('local')->put('archivo.txt', $contenido);
+		return view('retencionIva.generarTxt',['empresas'=>$herramientas->listarEmpresas(),'detalleTxt'=>$detalleTxt]);
+	}
+
+	public function descargarTxt(){
+		$archivo = 'archivo.txt';
+    	$rutaArchivo = storage_path('app/' . $archivo);
+
+		if (Storage::disk('local')->exists($archivo)) {
+			return response()->download($rutaArchivo, $archivo, ['Content-Type' => 'text/plain']);
+		} else {
+			return response()->json(['error' => 'El archivo no existe'], 404);
+		}
+	}
 	
 
 }

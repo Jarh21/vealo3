@@ -3,7 +3,7 @@
 <div id="app" class="container-fluid">
 <form name="editarDocumentoForm" id="editarDocumentoForm" action="{{route('retencion.iva.updateDocumento')}}" method="post">
     <div class="row">		
-        <div class="col-8">
+        <div class="col-10">
             <div class="row">
                 <div class="col mt-2">
                     <label for="">Proveedor</label>
@@ -11,14 +11,14 @@
                     <option value=""></option>
                     @if(isset($proveedores))
                         @foreach($proveedores as $proveedor)
-                            <option value="{{$proveedor->rif}}|{{$proveedor->porcentaje_retener}}" @if($proveedor->rif==$documento->rif_retenido)selected @endif>{{$proveedor->rif}} {{$proveedor->nombre}} ({{$proveedor->porcentaje_retener ?? 'No tiene'}}%)</option>		
+                            <option value="{{$proveedor->rif}}|{{$proveedor->porcentaje_retener}}|{{$proveedor->nombre}}" @if($proveedor->rif==$documento->rif_retenido)selected @endif>{{$proveedor->rif}} {{$proveedor->nombre}} ({{$proveedor->porcentaje_retener ?? 'No tiene'}}%)</option>		
                         @endforeach
                     @endif
                     </select>
                 </div>
                 <div class="col">
                     <label for="">Numero de Documento</label>
-
+					<input type="hidden" name="keycodigo" value="{{$documento->keycodigo}}">
                     <input type="text" id="nfactura" required name="nfactura" class="form-control my-2" value="{{$documento->documento ?? ''}}">
                 </div>						
             
@@ -70,7 +70,9 @@
                         <input type="text" name='iva' id='iva' value="{{$documento->iva ?? ''}}" class="form-control" readonly>
                         <label for="">IVA Retenido</label>
                         <input type="text" name='iva_retenido' id='iva_retenido' value="{{$documento->iva_retenido ?? ''}}" class="form-control" readonly>
-                        
+                        <label for="">Tipo de Operacion</label>
+						<label for="compra">Compra</label><input type="radio"  name="compra_venta" value="C" id="compra" @if($documento->estatus=='C')checked @endif>
+						<label for="venta">Venta</label><input type="radio"  name="compra_venta" value="V" id="venta" @if($documento->estatus=='V')checked @endif>
                         <button type="button" id='calcular' name='calcular' class="btn btn-sm btn-warning float-right mt-2">Calcular</button> 
                     </div>                   
                 </div>               

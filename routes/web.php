@@ -363,13 +363,16 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/retencion-iva/listar-retencion',[RetencionIvaController::class,'listarRetencionesIva'])->name('retencion.iva.listar');
     Route::get('/retencion-iva/generar-comprobante/{comprobanteRetencion}/{firma?}',[RetencionIvaController::class,'mostrarComprobanteRetencionIva'])->name('retencion.iva.generar_comprobante');
     Route::post('/retencion-iva/buscar-retencion',[RetencionIvaController::class,'buscarRetencionIva'])->name('retencion.iva.buscar_retencion');
-    Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
+    Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}/{vista?}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
     Route::get('/retencion-iva/editar-retencion/{comprobante}',[RetencionIvaController::class,'editarRetencionIva'])->name('retencion.iva.editar_retencion');
     Route::post('/retencion-iva/update-retencion',[RetencionIvaController::class,'actualizarRetencionIva'])->name('retencion.iva.update_retencion');
     Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}',[RetencionIvaController::class,'consultarDetallesRetencionIva']);
     Route::post('/retencion-iva/editar-retencion/update-detalle-retencion',[RetencionIvaController::class,'updateDetalleRetencionIva']);
     Route::get('/retencion-iva/editar-retencion/consultar-retencion/{comprobante}',[RetencionIvaController::class,'consultarRetencionIva']);
     Route::get('/retencion-iva/buscar-factura/{keycodigo}',[RetencionIvaController::class,'buscarFactura']);
+    Route::get('/retencion-iva/generar-txt',[RetencionIvaController::class,'vistaGenerarTxt'])->name('retencion.iva.generarTxt');
+    Route::post('/retencion-iva/buscar-registros-txt',[RetencionIvaController::class,'buscarRegistrosParaElTxt'])->name('retencion.iva.buscarregistrosparatxt');
+    Route::get('/retencion-iva/descargar-txt',[RetencionIvaController::class,'descargarTxt'])->name('retencion.iva.descargarTxt');
     
 
 });

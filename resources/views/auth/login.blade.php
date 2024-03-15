@@ -1,3 +1,4 @@
+<?php $version='3.1.10'; ?>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -21,7 +22,7 @@
 <body class="antialiased">
 <div class="container-fluid"> 
     <div class="alert alert-warning">
-        <h4> <span>Vealo 3.1.6</span> <span class="font-weight-light">Sistema de Gestion Administrativo.</span></h4>
+        <h4> <span>Vealo {{$version}}</span> <span class="font-weight-light">Sistema de Gestion Administrativo.</span></h4>
     </div>
 </div>
 <div class="container mt-5">

@@ -4,6 +4,7 @@
     
     //use App\User;
     use App\Http\Controllers\HerramientasController;
+    $version = '3.1.10';
 ?>
 <head>
     <meta charset="utf-8">
@@ -11,7 +12,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Vealo 3.1.8</title>    <!-- Scripts -->
+    <title>Vealo {{$version}}</title>    <!-- Scripts -->
 
 
 
@@ -70,7 +71,7 @@
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
                      
-                    <span class="brand-text font-weight-light h4">Vealo 3.1.8 SAN-FDO</span>
+                    <span class="brand-text font-weight-light h4">Vealo {{$version}} SAN-FDO</span>
                 </a>
 
                 <!-- Sidebar -->
@@ -437,9 +438,12 @@
                                     <li class="nav-item">
                                         <a href="{{route('retencion.iva.listar')}}"
                                         class="{{ Request::path() === 'retencion-iva/listar-retencion' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-hand-holding-usd nav-icon mr-2"></i>Retención IVA</a>
-                                    </li>
-                                   
-                                    @endcan                                        
+                                    </li>                                   
+                                    @endcan
+                                    <li class="nav-item">
+                                        <a href="{{route('retencion.iva.generarTxt')}}"
+                                        class="{{ Request::path() === 'retencion-iva/generar-txt' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-file-prescription nav-icon mr-2"></i></i>Generar TXT</a>
+                                    </li>                                        
                                 </ul>
                             </div> <!-- fin de capa Retencion Iva -->
                             @endcan

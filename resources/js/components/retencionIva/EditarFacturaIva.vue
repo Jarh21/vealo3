@@ -43,12 +43,12 @@
                                     <input type="text" v-model="objFactura.sincredito" ref="sincredito" class="form-control">
                                     <label for="">% Alicuota</label>
                                     <input type="text" v-model="objFactura.porc_alic" ref="porc_alic" class="form-control" value="">
-                                    <label for="">% Retencion</label>  {{ objFactura.porc_reten }}                                  
+                                    <label for="">% Retencion</label>                                
                                     <select class="form-control" v-model="objFactura.porc_reten">
                                         <option value="">-- selecciones % --</option>
                                         <option v-for="(porcentaje, i) in porcentajes" :key="i" :value= "porcentaje.porcentaje" :selected ="objFactura.porc_reten === porcentaje.porcentaje">{{porcentaje.porcentaje}}</option>
                                     </select>
-
+                                    
                                 </div>
                                 <div class="col">
                                     <label for="">Base Imponible</label>
@@ -56,7 +56,10 @@
                                     <label for="">Impuesto Iva</label>
                                     <input type="text" v-model='objFactura.iva' id='iva' class="form-control" readonly>
                                     <label for="">IVA Retenido</label>
-                                    <input type="text" v-model='objFactura.iva_retenido' id='iva_retenido' class="form-control" readonly>                                   
+                                    <input type="text" v-model='objFactura.iva_retenido' id='iva_retenido' class="form-control" readonly>
+                                    <label for="">Tipo de Operacion</label>
+						            <label for="compra">Compra</label><input type="radio" v-model="objFactura.compra_venta"  id="compra" :checked="objFactura.compra_venta === 'C'">
+						            <label for="venta">Venta</label><input type="radio"  v-model="objFactura.compra_venta"  id="venta" :checked="objFactura.compra_venta === 'V'">                                   
                                     <button type="button" id='calcular' name='calcular' @click="calcularMontos();" class="btn btn-sm btn-warning float-right mt-2">Calcular</button> 
                                 </div>
                                 
@@ -132,6 +135,7 @@
                 iva:'',
                 iva_retenido:'',
                 fact_afectada:'',
+                compra_venta:'',
             },
             datosProveedor:0,
             total_retenido :0,
@@ -167,6 +171,7 @@
             this.objFactura.iva_retenido='';
             this.objFactura.fact_afectada='';
             this.porce_proveedor='';
+            this.objFactura.compra_venta='';
 
             this.objFactura.keycodigo= datos.keycodigo;
             this.objFactura.comprobante=datos.comprobante;
@@ -184,6 +189,7 @@
             this.objFactura.iva=datos.iva;
             this.objFactura.iva_retenido=datos.iva_retenido;
             this.porce_proveedor = datos.porc_reten;
+            this.objFactura.compra_venta = datos.estatus;
             $('#editarPedido').modal('show')
         },
         cerrarModalEditar(){

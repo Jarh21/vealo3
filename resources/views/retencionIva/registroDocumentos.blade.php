@@ -120,6 +120,9 @@
 										<input type="text" name='iva_retenido' id='iva_retenido' class="form-control" readonly>
 										<label for="">Factura Manual</label>
 										<input type="checkbox" name="factura_import_manual" id="factura_import_manual">
+										<label for="">Tipo de Operacion</label>
+										<label for="compra">Compra</label><input type="radio"  name="compra_venta" value="C" id="compra" @if($tipoOperacion=='C')checked @endif>
+										<label for="venta">Venta</label><input type="radio"  name="compra_venta" value="V" id="venta" @if($tipoOperacion=='V')checked @endif>
 										<button type="button" id='calcular' name='calcular' class="btn btn-sm btn-warning float-right mt-2">Calcular</button> 
 									</div>
 									

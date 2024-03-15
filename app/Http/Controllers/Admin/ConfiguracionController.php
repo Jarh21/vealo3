@@ -319,12 +319,22 @@ class ConfiguracionController extends Controller
 
     public function indexConfiguracionRetencionIva(){
         $porceRetencionIva = self::consultarPorcentajeRetencionIva();
+        //determina si la retencion iva aplica a una compra o una venta
+        $tipoOperacion = Parametro::buscarVariable('reten_iva_modo_operacion');
+        if (empty($tipoOperacion)){
+            //donde C= Compra y V = venta
+            Parametro::actualizarVariable('reten_iva_modo_operacion','C');
+            $tipoOperacion = Parametro::buscarVariable('reten_iva_modo_operacion');
+        }
         
-        return view('admin.configuraciones.confRetencionIva',['porceRetencionIva'=>$porceRetencionIva]);
+        return view('admin.configuraciones.confRetencionIva',['porceRetencionIva'=>$porceRetencionIva,'tipoOperacion'=>$tipoOperacion]);
     }
 
     public function guardarPorcentajeRetencionIva(Request $request){
-        DB::insert("INSERT INTO porcentaje_retencion_iva (porcentaje) VALUES (?)",[$request->porcentaje]);
+        if(!empty($request->porcentaje)){
+            DB::insert("INSERT INTO porcentaje_retencion_iva (porcentaje) VALUES (?)",[$request->porcentaje]);
+        }
+        Parametro::actualizarVariable('reten_iva_modo_operacion',$request->compra_venta);
         return redirect()->route('indexConfiguracionRetencionIva');
     }
 
