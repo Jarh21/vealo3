@@ -21,7 +21,7 @@
            
         </div>
     </div>
-		<hr>
+		
 		
 		<!-- Modal sucursal -->
 		<div class="modal fade" id="modalCambioSucursal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -54,9 +54,10 @@
     <table class='table'>
         <thead>
             <tr>
-                <td>Empresa</td>
+                
                 <td>Fecha</td>
                 <td>Proveedor</td>
+                <td>Tipo</td>
                 <td>Rif Provee</td>
                 <td>Factura</td>
                 <td>Comprobante</td>
@@ -66,9 +67,10 @@
         <tbody>
             @foreach($retenciones as $retencion)
                 <tr>
-                    <td>{{$retencion->nom_agente}}</td>
+                    
                     <td>{{$retencion->fecha_docu}}</td>
-                    <td>{{$retencion->nom_retenido}}</td>
+                    <td style="width: 300px">{{$retencion->nom_retenido}}</td>
+                    <td>{{$retencion->tipo_docu}}</td>
                     <td>{{$retencion->rif_retenido}}</td>
                     <td>{{$retencion->documento}}</td>
                     <td>{{$retencion->comprobante}}</td>

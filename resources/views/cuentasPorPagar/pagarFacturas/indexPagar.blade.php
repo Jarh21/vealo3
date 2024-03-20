@@ -31,10 +31,10 @@
 			<!-- nos traemos el array de facturas para luego volve a enviarlos por un input[] -->
 			@if(isset($id_facturas))
 				@foreach($id_facturas as $id_factura)
-				<input type="hidden" name="idFacturasPorPagar[]" value="{{$id_factura}}">
+			<!-- hidden -->	<input type="hidden" name="idFacturasPorPagar[]" value="{{$id_factura}}">
 				@endforeach
 			@endif
-			<input type="hidden" name="codigo_relacion_pago" value="{{$codigo_relacion_pago}}">
+			<!-- hidden -->	<input type="hidden" name="codigo_relacion_pago" value="{{$codigo_relacion_pago}}">
 			<table class="table" style="font-size:15px">
 				<thead>
 					<tr>
@@ -75,6 +75,7 @@
 									@else
 										{{$registro->concepto_descripcion}}											
 									@endif
+									{{' '.$registro->observacion ?? ''}}
 								</td>
 								<td><!--Concepto -->
 									{{$registro->concepto}}
@@ -399,7 +400,13 @@
 								</div>
 							</div>
 						</div>
-						<div class="row">	
+						<div class="row">
+							<div class="col">
+								<div class="form-group">
+									<label for="">Observación</label>
+									<input type="text" name="observacion" class="form-control">
+								</div>
+							</div>	
 							<div class="col">	
 								<div class="form-group">
 									<label>Fecha de Pago</label>
@@ -410,11 +417,14 @@
 								<div class="form-group">
 									
 									<label>Valor Tasa</label>
-									<select class="form-control" name="tipo_tasa" id="tipo_tasa" >
-																	
-									<option value="{{$cuenta['tasa']}}|tasaFactura" @if(session('modoPago')=='bolivares')selected @endif>Tasa de la Factura {{$cuenta['tasa']}}</option>								
-									<option value="{{$cuenta['tasaDelDia']}}|tasaActual" @if(session('modoPago')<>'bolivares')selected @endif>Tasa Actual {{$cuenta['tasaDelDia']}}</option>								
+									<select class="form-control" name="tipo_tasa" id="tipo_tasa" >																	
+										<option value="{{$cuenta['tasa']}}|tasaFactura" @if(session('modoPago')=='bolivares')selected @endif>Tasa de la Factura {{$cuenta['tasa']}}</option>								
+										<option value="{{$cuenta['tasaDelDia']}}|tasaActual" @if(session('modoPago')<>'bolivares')selected @endif>Tasa Actual {{$cuenta['tasaDelDia']}}</option>							
+										<option value="0|tasaManual">Tasa Manual</option>	
 									</select>
+									<div id="mtm" class="ocultoFacturaManual">
+										<input type="text" name='tasa_manual' id="tasa_manual" class="form-control" placeholder='ingrese el valor de la tasa'>
+									</div>
 									
 								</div>
 							</div>
@@ -439,15 +449,16 @@
 								<div class="form-group">
 									<label>Monto</label>
 									<input type="text" name="monto" value="" class="form-control" id="moneda1" required>
-						<!-- va hidden -->			<input type="hidden" name="total_facturas" value="{{$totalFacturas}}">								
+						<!-- va hidden -->			<input type="hidden" id='total_facturas' name="total_facturas" value="{{$totalFacturas}}">								
 								</div>						
-							</div>
-							
-							
+							</div>			
+											
+						</div>
+						<div class="row">
 							<div class="col">
 
 								<button type="submit" class="btn btn-primary float-right"><i class="fa fa-plus mx-1" aria-hidden="true"></i>Guardar</button>
-							</div>				
+							</div>
 						</div>
 								
 					</div>
@@ -463,7 +474,9 @@
 		/*****dejar selected la tasa del dolar de la factura o el actual con dependiendo si el modo de pago es dolares o bolivares */
 
 
-
+	jQuery(document).ready(function(){
+			
+		$('#mtm').hide();
 
 		/*funcion que formatea el valor numerico al de moneda*/
         $("#moneda1").on({
@@ -562,6 +575,7 @@
 			var isActivarBanco = <?php echo $isActivarBanco; ?>;
 			var monedaBase = '<?php echo $monedaBase; ?>';
 			if(monedaBase=='nacional'){
+			
 				switch(modopago){
 				
 					case "bolivares":
@@ -655,13 +669,14 @@
 			var modopago = $("#modo_pago  option:selected").val();
 			var monedaBase = '<?php echo $monedaBase; ?>';
 			var seleccion = tipoTasa.split('|');
-
+			var total_facturas = $("#total_facturas").val();
+			
 			if(modopago == 'bolivares'){
 				if(monedaBase =='nacional'){
 					// Moneda Nacional /////
 					switch(seleccion[1]){
 						case "tasaFactura":
-							document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+							document.getElementById('moneda1').value= <?php echo round($totalFacturas*$tasaDelDia,3)?>;
 						break;
 
 						case "tasaActual":
@@ -671,42 +686,51 @@
 				}else{
 					// Moneda Extranjera ////
 					switch(seleccion[1]){
+
 						case "tasaFactura":
-							document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+							
+							
+							$('#mtm').hide();
+							document.getElementById('moneda1').value= parseFloat(total_facturas)*seleccion[0];
 						break;
 
 						case "tasaActual":
-							document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3) ?>;
+							
+							$('#mtm').hide();
+							document.getElementById('moneda1').value= parseFloat(total_facturas)*seleccion[0];
 						break;
+
+						case "tasaManual":
+							var tasaManual = $("#tasa_manual").val();
+							$('#mtm').show();
+							document.getElementById('moneda1').value= parseFloat(total_facturas)*tasaManual;
+
+							
+						break;	
 					}
 				}
 				
 			}
 			
 		});
-		/*$("#tipo_tasa").keyup(function(){
-			
-			var tipoTasa = $("#tipo_tasa").val();
+
+		$("#tasa_manual").keyup(function(){
+			console.log('presionando teclas');
+			/*al escribir en el campo tasa manual se calculan los datos*/
+			var tasaManual = $("#tasa_manual").val();
 			var modopago = $("#modo_pago  option:selected").val();
-			var monedaBase = '<?php echo $monedaBase; ?>';
-			
-
-			if(modopago == 'bolivares'){
-				if(monedaBase =='nacional'){
-					// Moneda Nacional /////
-					
-
-					document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3) ?>* tipoTasa;
-						
-				}else{
-					// Moneda Extranjera ////
-					document.getElementById('moneda1').value= <?php echo round($totalFacturas,3) ?>* tipoTasa;
-
-				}
+			var total_facturas = $("#total_facturas").val();
+			var tipoTasa = $("#tipo_tasa option:selected").val();
+			var seleccion = tipoTasa.split('|');
+			console.log(seleccion[1]);
+			if(seleccion[1] == 'tasaManual'){
+				console.log('dentro de seleccion');
+				document.getElementById('moneda1').value= parseFloat(total_facturas)*tasaManual;				
 				
 			}
 			
-		});*/
+		});
+	});	
     </script>
 
     <script type="text/javascript">

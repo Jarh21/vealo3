@@ -1,8 +1,13 @@
 @extends('layouts.app')
 @section('content')
-	<div class="container">
+	@php 
+		//si monedaBase es nacional s calcula el valor de la divisa dividiendo el monto entre la tasa y si es extranjera se multiplica el monto por el valor de la tasa
+		$monedaBase = session('monedaBase'); 
+		
+	@endphp
+	<div class="container-fluid">
 		<h3>Pagar Facturas {{session('empresaNombre')}} {{session('empresaRif')}} <!-- <a href="{{--route('cuentasporpagar.facturasPorPagar')--}}" class="btn btn-warning btn-sm float-right"><i class="fa fa-step-backward"></i> Regresar</a> --></h3><hr>
-		<p>Tipo Moneda 
+		<p>Modo de Pago 
 			@if(session('modoPago') == 'bolivares')
 				<span class="right badge badge-primary">
 					{{session('modoPago')}}</td>
@@ -12,6 +17,7 @@
 					{{session('modoPago')}}</td>
 				</span>
 			@endif
+			Tipo Moneda:<b>{{' '.$monedaBase}}</b>
 		</p>
 		@if(Session::has('message'))
 			<div class="alert alert-danger">
@@ -39,18 +45,26 @@
 						<th>Creditos</th>
 						<th>Total Bs.</th>						
 						<th>Tasa</th>
-						<th>Divisas</th>						
+						@if($monedaBase=='nacional')
+						<th>Divisas</th>
+						@else
+						<th>Bolivares</th>
+						@endif
 						<th>Opciones</th>
 						
 					</tr>
 				</thead>				
 				<tbody>
-					<?php $sumaDebito=0;$sumaCredito=0; $tasa=1; $totalFacturas=0; $totalBs=0; $totalFacturasDivisa=0; ?>
+					<?php $sumaDebito=0;$sumaCredito=0; $tasa=1; $totalFacturas=0; $totalBs=0; $totalFacturasDivisa=0; $totalDivisa=0; $tasaDelDia=0;?>
 
 					@foreach($cuentas as $cuenta)
 						
 						@foreach($cuenta['cxp'] as $registro)
-						<?php if($cuenta['tasa']>0){ $tasa=$cuenta['tasa']; } ?>
+
+						<?php 
+							if($cuenta['tasa']>0){ $tasa=$cuenta['tasa']; } 
+							
+						?>
 							<tr style="background-color: {{$cuenta['color']}}">
 								<td><!--Facturas -->
 									{{$registro->documento}}
@@ -70,12 +84,12 @@
 								</td>							
 								<td><!--Debitos -->
 									@if($registro->debitos > 0.00)
-										{{$registro->debitos}}
+										{{number_format($registro->debitos,2)}}
 									@endif
 								</td> 
 								<td class="text-danger"><!--Creditos -->
 									@if($registro->creditos > 0.00)
-										-{{$registro->creditos}}
+										-{{number_format($registro->creditos,2)}}
 									@endif
 								</td>
 								<td><!-- Total Bs. -->																
@@ -93,28 +107,65 @@
 									
 								</td> 
 								<td><!-- Divisas -->
-								@if(session('modoPago')<>'bolivares')
-									@if($registro->concepto=='CAN')
-												
-											@if($registro->tasa >0.00)
-												@if($registro->monto_divisa <= 0.00)
-													{{'- '.round($registro->creditos/$registro->tasa,2).'$'}}
-												@else	
-												{{'-'.$registro->monto_divisa.'$'}}
+								@if($monedaBase=='nacional')
+									@if(session('modoPago')<>'bolivares')
+										@if($registro->concepto=='CAN')
+													
+												@if($registro->tasa >0.00)
+													@if($registro->monto_divisa <= 0.00)
+														{{'- '.number_format($registro->creditos/$registro->tasa,2).'$'}}
+													@else	
+													{{'--'.$registro->monto_divisa.'$'}}
+													@endif
+												@else
+												{{'---'.number_format($registro->creditos/$tasa,2).'$'}}
+												@endif	
+											
+										@endif	
+									
+										@if($registro->concepto=='FAC' or $registro->concepto=='NDEB')
+										{{number_format($registro->debitos/$tasa,2).'$'}}
+										@endif
+										@if($registro->concepto=='RIVA' or $registro->concepto=='RISLR' or $registro->concepto=='DESC')
+										{{'-'.number_format($registro->creditos/$tasa,2).'$'}}
+										@endif
+									@endif
+								@endif <!-- fin monedaBase -->
+								@if($monedaBase=='extranjera')
+									@if(session('modoPago')<>'bolivares')
+
+										@if($registro->concepto=='FAC' or $registro->concepto=='NDEB')
+										{{number_format($registro->debitos*$tasa,2).'Bs'}}
+										<!-- asignamos a la cuenta el valor de la factura * la tasa registrada -->	
+										@php $totalDivisa = $totalDivisa + $registro->debitos*$tasa;  @endphp
+
+										@endif
+
+										@if($registro->concepto=='CAN')
+													
+												@if($registro->tasa >0.00)
+													@if($registro->monto_divisa <= 0.00)
+														{{'- '.number_format($registro->creditos*$registro->tasa,2).'Bs'}}
+													@else	
+													{{'-'.number_format($registro->creditos*$registro->tasa).'Bs'}}
+													@endif
+												@else
+												{{'-'.number_format($registro->creditos*$tasa,2).'Bs'}}
 												@endif
-											@else
-											{{'- '.round($registro->creditos/$tasa,2).'$'}}
-											@endif	
+												<!-- restamos a la cuenta el valor de la deduccion * la tasa registrada -->	
+												@php $totalDivisa = $totalDivisa - $registro->creditos*$registro->tasa;  @endphp
+											
+										@endif	
+									
 										
-									@endif	
-								
-									@if($registro->concepto=='FAC' or $registro->concepto=='NDEB')
-									{{round($registro->debitos/$tasa,2).'$'}}
+										@if($registro->concepto=='RIVA' or $registro->concepto=='RISLR' or $registro->concepto=='DESC')
+										{{'-'.number_format($registro->creditos*$registro->tasa,2).'Bs'}}
+										<!-- restamos a la cuenta el valor de la deduccion * la tasa registrada -->
+										@php $totalDivisa = $totalDivisa - $registro->creditos*$registro->tasa; @endphp
+
+										@endif
 									@endif
-									@if($registro->concepto=='RIVA' or $registro->concepto=='RISLR' or $registro->concepto=='DESC')
-									{{'-'.round($registro->creditos/$tasa,2).'$'}}
-									@endif
-								@endif
+								@endif <!-- fin monedaBase -->
 								</td>
 								<td><!-- Opciones -->
 									@if($registro->concepto != 'FAC')
@@ -205,6 +256,7 @@
 								</td>
 							</tr>
 							<?php
+								
 								//$sumaDebito += $registro->debitos;
 								//$sumaCredito += $registro->creditos;
 							?>
@@ -212,48 +264,91 @@
 							
 						@endforeach
 
-						<?php $totalBs = $cuenta['restaTotal'];  ?>
-						<?php 
-							if($totalBs >0.00){
-								$totalDivisa = ($totalBs/$cuenta['tasa']);
-							}else{
-								$totalDivisa = 0;
-							} 						
+						<?php  $totalBs = $cuenta['restaTotal'];  ?>
+						<?php
+							if($monedaBase=='nacional'){ //esta parte hace el calculo de los montos a cancelas de las facturas en divisas cuando la moneda base es bolivares
+								if($totalBs >0.00){
+									$totalDivisa = ($totalBs/$cuenta['tasa']);
+									//$totalDivisa = 0;//valor falso
+								}else{
+									$totalDivisa = 0;
+								}
+							} 
+							if($monedaBase=='extranjera'){ // esta comentado porque si la moneda base es divisas los montos quedan en 0 no tocar a menos que entiendas que hace este codigo
+								if($totalBs >0.00){
+									$totalDivisa = ($totalBs*$cuenta['tasa']);
+									//$totalDivisa = 0;//valor falso
+								}else{
+									$totalDivisa = 0;
+								}
+							} 					
 
 						?>
 						<?php $totalDivisaFormato = number_format($totalDivisa,3) ?>
 						<tr>
-							<td colspan="3">Total Factura--</td>
-							<td>{{--$cuenta['sumaDebito']--}}</td>
-							<td class="text-danger">{{--$cuenta['sumaCredito']--}}</td>
-							<td>Bs. {{$totalBs}}</td>							
-							@if(session('modoPago')<>'bolivares')
-							<td>{{$cuenta['tasa']}}</td>
-							<td class="text-success">Divisa$ {{number_format($totalDivisa,3) ?? 0}}</td>
-							@endif
+							@if($monedaBase=='nacional')
+								<td colspan="3">Total Factura--</td>
+								<td>{{--$cuenta['sumaDebito']--}}</td>
+								<td class="text-danger">{{--$cuenta['sumaCredito']--}}</td>
+								<td>Bs. {{number_format($totalBs,2)}}</td>							
+								@if(session('modoPago')<>'bolivares')
+								<td>{{--$cuenta['tasa']--}}</td>
+								<td class="text-success">
+									Divisa$ {{number_format($totalDivisa,3) ?? 0}}
+								</td>
+								@endif
+							@endif <!-- fin moneda base -->
 							
-							<input type="hidden" name="datosPagoFactura[]" value="{{$totalBs}}|{{$cuenta['tasa']}}|{{$totalDivisa}}|{{$cuenta['proveedor_rif']}}|{{$cuenta['documento']}}|{{$cuenta['n_control']}}|{{$cuenta['igtf']}}|{{$cuenta['factura_id']}}">
+							@if($monedaBase=='extranjera')
+							
+								<td colspan="3">Total Factura--</td>
+								<td>{{--$cuenta['sumaDebito']--}}</td>
+								<td class="text-danger">{{--$cuenta['sumaCredito']--}}</td>
+								<td>Usd. {{number_format($totalBs,2)}}</td>							
+								@if(session('modoPago')<>'bolivares')
+								<td>{{--$cuenta['tasa']--}}</td>
+								<td class="text-success">
+									{{number_format($totalDivisa,3) ?? 0}}
+								</td>
+								@endif
+							@endif <!-- fin moneda base -->
+				<!-- va hidden	 --><input type="hidden" name="datosPagoFactura[]" value="{{$totalBs}}|{{$cuenta['tasa']}}|{{$totalDivisa}}|{{$cuenta['proveedor_rif']}}|{{$cuenta['documento']}}|{{$cuenta['n_control']}}|{{$cuenta['igtf']}}|{{$cuenta['factura_id']}}">
 							
 
 							
 						</tr>
-						<?php 
+						<?php
+							
 							$totalFacturas += $totalBs;
 						    $totalFacturasDivisa += $totalDivisa;
 						    $sumaDebito=0; 
 						    $sumaCredito=0;
-							
+							$totalDivisa=0; //iniciamos el contador de los montos de la moneda secundaria en 0 esto es en total facturas 
 						    $totalBs=0;
 						    $tasaDelDia =$cuenta['tasaDelDia']; 
 						  ?>	
 					@endforeach
 					<tr>
+					@if($monedaBase=='nacional')
 						<td colspan="5"><b>Pendiente Por Cancelar</b></td>
 						<td><b>Bs. {{number_format($totalFacturas,2)}}</b></td>
 						@if(session('modoPago')<>'bolivares')
 							<td></td>
+							
 							<td class="text-success"><b>Divisa$ {{number_format($totalFacturasDivisa,3)}}</b></td>
+							
 						@endif
+					@endif
+					@if($monedaBase=='extranjera')					
+						<td colspan="5"><b>Pendiente Por Cancelar</b></td>
+						<td><b>Usd. {{number_format($totalFacturas,2)}}</b></td>
+						@if(session('modoPago')<>'bolivares')
+							<td></td>
+							
+							<td class="text-success"><b>Bs. {{number_format($totalFacturasDivisa,3)}}</b></td>
+							
+						@endif
+					@endif
 					</tr>
 				</tbody>
 			</table>
@@ -317,8 +412,8 @@
 									<label>Valor Tasa</label>
 									<select class="form-control" name="tipo_tasa" id="tipo_tasa" >
 																	
-										<option value="{{$cuenta['tasa']}}|tasaFactura" @if(session('modoPago')=='bolivares')selected @endif>Tasa de la Factura {{$cuenta['tasa']}}</option>								
-										<option value="{{$cuenta['tasaDelDia']}}|tasaActual" @if(session('modoPago')<>'bolivares')selected @endif>Tasa Actual {{$cuenta['tasaDelDia']}}</option>								
+									<option value="{{$cuenta['tasa']}}|tasaFactura" @if(session('modoPago')=='bolivares')selected @endif>Tasa de la Factura {{$cuenta['tasa']}}</option>								
+									<option value="{{$cuenta['tasaDelDia']}}|tasaActual" @if(session('modoPago')<>'bolivares')selected @endif>Tasa Actual {{$cuenta['tasaDelDia']}}</option>								
 									</select>
 									
 								</div>
@@ -344,7 +439,7 @@
 								<div class="form-group">
 									<label>Monto</label>
 									<input type="text" name="monto" value="" class="form-control" id="moneda1" required>
-									<input type="hidden" name="total_facturas" value="{{$totalFacturas}}">								
+						<!-- va hidden -->			<input type="hidden" name="total_facturas" value="{{$totalFacturas}}">								
 								</div>						
 							</div>
 							
@@ -387,7 +482,9 @@
 		  var selector = $("#Select_id  option:selected").val();		  
 		  var isActivarBanco = <?php echo $isActivarBanco; ?>;
 		  var tipoTasaSelect = document.getElementById('tipo_tasa');
-
+		  var monedaBase = '<?php echo $monedaBase; ?>';	
+		  console.log(monedaBase);
+		 
 		  switch(selector){
 		    case "NDEB":		      
 		      $("#banco_id").prop('disabled', true);
@@ -411,24 +508,48 @@
 		      break;	
 
 		    case "CAN":
-		      $("#modo_pago").prop('disabled',false)	
-		      if(modopago=='bolivares'){
-		      	$("#banco_id").prop('disabled', false);
-		      	$("#referencia_pago").prop('disabled', false);
-				$("#nfactura_nota").prop('disabled',true);
-				$("#nfactura_nota").prop('required',false);
-				tipoTasaSelect.selectedIndex = 1;
-		      	document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
-		      }else{
-				/** cual tasa queda por defecto */
-				tipoTasaSelect.selectedIndex = 0;
-						
-				if(isActivarBanco == '1'){
-					$("#banco_id").prop('disabled', false);
-		        	$("#banco_id").prop('required', true);
-			  	}
-		      	 document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3)?>;
-		      }
+				/* verificamos cual es el tipo de moneda si nacional o extranjera */
+				if(monedaBase =='nacional'){
+					$("#modo_pago").prop('disabled',false)	
+					if(modopago=='bolivares'){
+						$("#banco_id").prop('disabled', false);
+						$("#referencia_pago").prop('disabled', false);
+						$("#nfactura_nota").prop('disabled',true);
+						$("#nfactura_nota").prop('required',false);
+						tipoTasaSelect.selectedIndex = 1;
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					}else{
+						/** cual tasa queda por defecto */
+						tipoTasaSelect.selectedIndex = 0;
+								
+						if(isActivarBanco == '1'){
+							$("#banco_id").prop('disabled', false);
+							$("#banco_id").prop('required', true);
+						}
+						document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3)?>;
+					}
+				}else{ 
+					//moneda Base EXTRANJERA
+					$("#modo_pago").prop('disabled',false)	
+					if(modopago=='bolivares'){
+						$("#banco_id").prop('disabled', false);
+						$("#referencia_pago").prop('disabled', false);
+						$("#nfactura_nota").prop('disabled',true);
+						$("#nfactura_nota").prop('required',false);
+						tipoTasaSelect.selectedIndex = 1;
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					}else{
+						/** cual tasa queda por defecto */
+						tipoTasaSelect.selectedIndex = 0;
+								
+						if(isActivarBanco == '1'){
+							$("#banco_id").prop('disabled', false);
+							$("#banco_id").prop('required', true);
+						}
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					}
+				}
+		      
 		      break;
 		  }
 		});
@@ -439,66 +560,153 @@
 			var tipoTasa = $("#tipo_tasa option:selected").val();
 			var seleccion = tipoTasa.split('|');
 			var isActivarBanco = <?php echo $isActivarBanco; ?>;
-			switch(modopago){
-		    
-		    case "bolivares":
-		      $("#banco_id").prop('disabled', false);
-		      $("#referencia_pago").prop('disabled', false);
-		      $("#tipo_tasa").prop('disabled',false);
-		      $("#tipo_tasa").prop('required', true);
-			  ///despues de cambiar la seleccion optenemos el nuevo valor y seteamos
-			  tipoTasaSelect.selectedIndex = 1;
-			  tipoTasa = $("#tipo_tasa option:selected").val();
-			  seleccion = tipoTasa.split('|');
+			var monedaBase = '<?php echo $monedaBase; ?>';
+			if(monedaBase=='nacional'){
+				switch(modopago){
+				
+					case "bolivares":
+					$("#banco_id").prop('disabled', false);
+					$("#referencia_pago").prop('disabled', false);
+					$("#tipo_tasa").prop('disabled',false);
+					$("#tipo_tasa").prop('required', true);
+					///despues de cambiar la seleccion optenemos el nuevo valor y seteamos
+					tipoTasaSelect.selectedIndex = 1;
+					tipoTasa = $("#tipo_tasa option:selected").val();
+					seleccion = tipoTasa.split('|');
 
-		      if(seleccion[1] == 'tasaActual'){
-		      	 document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa*$tasaDelDia,3) ?>;
-		      }
-		      if(seleccion[1] == 'tasaFactura'){
-		      	 document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
-		      }
-		      if(seleccion[1] == ''){
-		      	 document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
-		      }				     
-		     
-		      break;		    
-		    case "dolares":		      	
-				tipoTasaSelect.selectedIndex = 0;
-		      $("#referencia_pago").prop('disabled', true);
-			  
-			    $("#banco_id").prop('disabled', true);
-		        $("#banco_id").prop('required', false);
-				if(isActivarBanco == '1'){
-				$("#banco_id").prop('disabled', false);
-		        $("#banco_id").prop('required', true);
-			  }
-			  
-		      $("#referencia_pago").prop('required', false);
-		      $("#tipo_tasa").prop('disabled',false);
-		      $("#tipo_tasa").prop('required',false)		      
-		      document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3)?>;
-		      break;
-		  }
-		});
-
-		$("#tipo_tasa").change(function(){
-			var tipoTasa = $("#tipo_tasa option:selected").val();
-			var modopago = $("#modo_pago  option:selected").val();
-			var seleccion = tipoTasa.split('|');
-
-			if(modopago == 'bolivares'){
-				switch(seleccion[1]){
-					case "tasaFactura":
-						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
-					break;
-
-					case "tasaActual":
+					if(seleccion[1] == 'tasaActual'){
 						document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa*$tasaDelDia,3) ?>;
+					}
+					if(seleccion[1] == 'tasaFactura'){
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					}
+					if(seleccion[1] == ''){
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					}				     
+					
+					break;		    
+					case "dolares":		      	
+						tipoTasaSelect.selectedIndex = 0;
+					$("#referencia_pago").prop('disabled', true);
+					
+						$("#banco_id").prop('disabled', true);
+						$("#banco_id").prop('required', false);
+						if(isActivarBanco == '1'){
+						$("#banco_id").prop('disabled', false);
+						$("#banco_id").prop('required', true);
+					}
+					
+					$("#referencia_pago").prop('required', false);
+					$("#tipo_tasa").prop('disabled',false);
+					$("#tipo_tasa").prop('required',false)		      
+					document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3)?>;
+					
+					break;
+				}
+			}else{
+				//moneda EXTRANJERA ///////$$$$$
+				switch(modopago){
+				
+					case "bolivares":
+					$("#banco_id").prop('disabled', false);
+					$("#referencia_pago").prop('disabled', false);
+					$("#tipo_tasa").prop('disabled',false);
+					$("#tipo_tasa").prop('required', true);
+					///despues de cambiar la seleccion optenemos el nuevo valor y seteamos
+					tipoTasaSelect.selectedIndex = 1;
+					tipoTasa = $("#tipo_tasa option:selected").val();
+					seleccion = tipoTasa.split('|');
+
+					if(seleccion[1] == 'tasaActual'){
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas*$tasaDelDia,3) ?>;
+					}
+					if(seleccion[1] == 'tasaFactura'){
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas*$tasaDelDia,3)?>;
+					}
+					if(seleccion[1] == ''){
+						document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					}				     
+					
+					break;		    
+					case "dolares":		      	
+						tipoTasaSelect.selectedIndex = 0;
+					$("#referencia_pago").prop('disabled', true);
+					
+						$("#banco_id").prop('disabled', true);
+						$("#banco_id").prop('required', false);
+						if(isActivarBanco == '1'){
+						$("#banco_id").prop('disabled', false);
+						$("#banco_id").prop('required', true);
+					}
+					
+					$("#referencia_pago").prop('required', false);
+					$("#tipo_tasa").prop('disabled',false);
+					$("#tipo_tasa").prop('required',false)		      
+					document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+					
 					break;
 				}
 			}
 			
 		});
+
+		$("#tipo_tasa").change(function(){
+			var tipoTasa = $("#tipo_tasa option:selected").val();
+			var modopago = $("#modo_pago  option:selected").val();
+			var monedaBase = '<?php echo $monedaBase; ?>';
+			var seleccion = tipoTasa.split('|');
+
+			if(modopago == 'bolivares'){
+				if(monedaBase =='nacional'){
+					// Moneda Nacional /////
+					switch(seleccion[1]){
+						case "tasaFactura":
+							document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+						break;
+
+						case "tasaActual":
+							document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa*$tasaDelDia,3) ?>;
+						break;
+					}
+				}else{
+					// Moneda Extranjera ////
+					switch(seleccion[1]){
+						case "tasaFactura":
+							document.getElementById('moneda1').value= <?php echo round($totalFacturas,3)?>;
+						break;
+
+						case "tasaActual":
+							document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3) ?>;
+						break;
+					}
+				}
+				
+			}
+			
+		});
+		/*$("#tipo_tasa").keyup(function(){
+			
+			var tipoTasa = $("#tipo_tasa").val();
+			var modopago = $("#modo_pago  option:selected").val();
+			var monedaBase = '<?php echo $monedaBase; ?>';
+			
+
+			if(modopago == 'bolivares'){
+				if(monedaBase =='nacional'){
+					// Moneda Nacional /////
+					
+
+					document.getElementById('moneda1').value= <?php echo round($totalFacturasDivisa,3) ?>* tipoTasa;
+						
+				}else{
+					// Moneda Extranjera ////
+					document.getElementById('moneda1').value= <?php echo round($totalFacturas,3) ?>* tipoTasa;
+
+				}
+				
+			}
+			
+		});*/
     </script>
 
     <script type="text/javascript">

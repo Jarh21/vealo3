@@ -10,4 +10,5 @@ class RetencionIvaDetalle extends Model
     use HasFactory;
     protected $table="retenciones_dat";
     protected $primaryKey = 'keycodigo';
+    public $timestamps = false;
 }

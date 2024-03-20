@@ -325,13 +325,16 @@ class CuentasPorPagarController extends Controller
     	$modoPago = $request->modo_pago;
     	$empresa = explode('|', $empresa);
     	$rifEmpresa = $empresa[0];
+		$proveedorRifSinCaracteres ='';
+		$cxpProveedorRif ='';
     	$codigoUnico = uniqid();//genera un codigo unico en php
     	//guardamos la empresa seleccionada y el modo de pago en los datos de sessio
     	session(['empresaRif'=>$rifEmpresa,'modoPago'=>$modoPago]);
 
     	$herramientas = new HerramientasController();
     	$conexionSQL = $herramientas->conexionDinamicaBD($empresa[1]);    	
-    	$proveedorRif = $request->get('proveedorRif');
+    	$proveedorRif = trim($request->get('proveedorRif'));
+		$proveedorRifSinCaracteres = str_replace('-','',$proveedorRif);
 		$anioAnterior =date('Y')-1;
     	//buscamos todas las facturas cerradas de la tabla CXP de la empresa seleccionada
     	
@@ -344,8 +347,8 @@ class CuentasPorPagarController extends Controller
     	}
 
     	if(empty($fechaIni) and empty($fechaFin) and !empty($proveedorRif) and !empty($nFactura)){
-    		$registros = $conexionSQL->select("SELECT * from cxp where codorigen=2000 and documento=:nfactura and rif=:rifProveedor and year(fecha)>=:anioAnterior order by keycodigo",
-    			[$nFactura,$proveedorRif,$anioAnterior]);
+    		$registros = $conexionSQL->select("SELECT * from cxp where codorigen=2000 and documento=:nfactura and REPLACE(rif, '-', '') =:rifProveedor and year(fecha)>=:anioAnterior order by keycodigo",
+    			[$nFactura,$proveedorRifSinCaracteres,$anioAnterior]);
     	}
     	
     	if(!empty($registros)){
@@ -356,7 +359,18 @@ class CuentasPorPagarController extends Controller
 	    		$retencionIva=0;
 	    		$retencionIslr=0;
 	    		$credito=0;
-				$proveedorRif = trim($registro->rif);
+				$cxpProveedorRif =str_replace('-','',trim($registro->rif));//de los registro traidos del libro de compras, buscamos el rif del proveedor de la base de datos vealo
+				$proveedor = Proveedor::whereRaw("REPLACE(rif, '-', '') = '$cxpProveedorRif'")->select('rif')->first();
+				
+				if(isset($proveedor->rif)){
+					$proveedorRif = $proveedor->rif;
+					
+				}else{
+					$mensaje['texto']="el proveedor ".$registro->rif." ".$registro->nomprov." del libro de compras que esta importando no coincide con los proveedores registrados en el vealo, posiblemente no esten registrado o el rif es distinto";
+	    			$mensaje['tipo']='alert-warning';
+					return self::facturasPorPagar($mensaje);
+				}
+				
 	    		if(isset($registro->DOCUMENTO)){
 	    			$documento = $registro->DOCUMENTO;
 	    		}
@@ -370,7 +384,8 @@ class CuentasPorPagarController extends Controller
 	    			$concepto=$registro->concepto;
 	    		}
 	    		
-	    		//comparamos si el ya existe para no volve a cargarlo
+	    		//comparamos si el ya existe para no volve a cargarlo 
+				
 	    		if(DB::table('facturas_por_pagars')
 		    		->where('documento',$documento)
 		    		->where('proveedor_rif',$proveedorRif)
@@ -464,6 +479,7 @@ class CuentasPorPagarController extends Controller
 	    			if($concepto =='FAC'){	    				
 	    				
     					////buscamos si la factura tiene retencion de ISLR
+					
 		    			$retencionIslr = self::calcularRetencionISLR($proveedorRif,$registro->exento); 
 		    			//si retencion es mayor a 0.00 activamos bandera	    			
 		    			if($retencionIslr > 0.00){		    				
@@ -1008,9 +1024,17 @@ class CuentasPorPagarController extends Controller
     	//el select tipo tasa esta concatenada con los datos que el formulario necesita para hacer los calculo
     	//por esto el se aplica el explode para que la posicion 0 es el valor y la 1 es tasaActual 
 		//$tasaManual = Parametro::buscarVariable('cxp_valor_tasa_is_manual_en_cancelar_factura');//si el valo de esta variable es 1 el valor de la tasa al cancelar las facturas en manual
-    	$seleccionTasaFormulario = $request->tipo_tasa;
-    	$seleccionTasaFormulario = explode('|', $seleccionTasaFormulario);
-		$tipoTasa = $seleccionTasaFormulario[0];
+    	
+    	$seleccionTasaFormulario = explode('|',$request->tipo_tasa);
+		//si tipoTasa que viene del formulario es tasa manual tomamos el valor del input tasa_manual
+		if($seleccionTasaFormulario[1]=='tasaManual'){
+			$tipoTasa = $request->tasa_manual;
+		}else{
+			$tipoTasa = $seleccionTasaFormulario[0];
+		}
+		
+		
+
 		
     
     	$valorCero=0.01;//esto indica si al cancelar la factura los debitos - creditos cuando se considera pago
@@ -1197,7 +1221,7 @@ class CuentasPorPagarController extends Controller
 									//restamos el monto en divisas de la factura cancelada
 								//caso 1
 								
-								$cuentasPorPagar['observacion'] = 'caso 1 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] = $request->observacion;//'caso 1 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = $montoBs;	
@@ -1223,7 +1247,7 @@ class CuentasPorPagarController extends Controller
 								//caso 3
 								
 								$montoBs = ($montoPagoIngresado) * $tasa;
-								$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 3 fac:'.$montoDivisaFactura.' pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = $montoBs;					
@@ -1289,7 +1313,7 @@ class CuentasPorPagarController extends Controller
 										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
 										break;
 								}
-								$cuentasPorPagar['observacion'] = 'caso 4';
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 4';
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = 'PAGO DE FACTURA Bs.';
 								$cuentasPorPagar['creditos'] = $montoGuardar;
@@ -1328,7 +1352,7 @@ class CuentasPorPagarController extends Controller
 										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
 										break;
 								}
-								$cuentasPorPagar['observacion'] = 'caso 6';    	
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 6';    	
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);		
@@ -1356,7 +1380,7 @@ class CuentasPorPagarController extends Controller
 									//restamos el monto en divisas de la factura cancelada
 								//caso 1
 								
-								$cuentasPorPagar['observacion'] = 'caso 1.1 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 1.1 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = $montoBs;	
@@ -1381,7 +1405,7 @@ class CuentasPorPagarController extends Controller
 								//restamos el monto en divisas de la factura cancelada
 								//caso 1.2
 								
-								$cuentasPorPagar['observacion'] = 'caso 1.2 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 1.2 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = $montoBs;			    	
@@ -1407,7 +1431,7 @@ class CuentasPorPagarController extends Controller
 								//caso 3
 								
 								//$montoBs = ($montoPagoIngresado) * $tasa;
-								$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 3 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;					
@@ -1432,9 +1456,9 @@ class CuentasPorPagarController extends Controller
 							if($montoBs > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago=='bolivares'){
 								//el monto registrado es el abonado del saldo que quedo para pagar
 								//caso 3.2
-								
+								dd('linea 1459');
 								//$montoBs = ($montoPagoIngresado) * $tasa;
-								$cuentasPorPagar['observacion'] = 'caso 3.2 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 3.2 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;					
@@ -1455,7 +1479,7 @@ class CuentasPorPagarController extends Controller
 							}
 
 							//validamos si el modo pago es divisa y un pago se hace en bs y la tasa es la del dia
-							/* if(session('modoPago')=='dolares' and $modoPago=='bolivares'){							
+							 if(session('modoPago')=='dolares' and $modoPago=='bolivares'){							
 								//caso 4
 
 								//$montoPagoIngresado = ($montoPagoIngresado/$tasa);
@@ -1472,7 +1496,7 @@ class CuentasPorPagarController extends Controller
 										$cuentasPorPagar['cod_concepto']= 7;
 										$cuentasPorPagar['monto_divisa'] =0;
 										$cuentasPorPagar['monto_bolivares'] =0;
-										$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR AUMENTO DE TASA #'.$tipoTasa;
+										$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR DIFERENCIAL DE TASA #'.$tipoTasa;
 										self::guardarEnCuentasPorPagar($cuentasPorPagar);
 									}
 									if($montoNotaDebitoCredito < $valorCero){
@@ -1503,7 +1527,7 @@ class CuentasPorPagarController extends Controller
 										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
 										break;
 								}
-								$cuentasPorPagar['observacion'] = 'caso 4 extranje';
+								$cuentasPorPagar['observacion'] = //'caso 4 extranje';
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = 'PAGO DE FACTURA Bs.';
 								$cuentasPorPagar['creditos'] = $montoPagoIngresado;
@@ -1521,7 +1545,7 @@ class CuentasPorPagarController extends Controller
 									// aqui se registrara las deducciones de la sra helen 
 								}
 																
-							} *///fin sesion dolares modo pago Bs y tasa actual 				    	
+							} //fin sesion dolares modo pago Bs y tasa actual 				    	
 
 						}else{///Fin registro 'CAN'	
 						
@@ -1542,7 +1566,7 @@ class CuentasPorPagarController extends Controller
 										$montoPagoIngresado = $montoPagoIngresado - $montoBs;
 										break;
 								}
-								$cuentasPorPagar['observacion'] = 'caso 6';    	
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 6';    	
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
 								$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 								$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);	
@@ -1581,12 +1605,12 @@ class CuentasPorPagarController extends Controller
 					    		$cuentasPorPagar['concepto']='NDEB';
 					    		$cuentasPorPagar['creditos']=0;
 					    		$cuentasPorPagar['concepto_descripcion']='NOTA DE DEBITOS - POR AUMENTO DE TASA';
-								$cuentasPorPagar['observacion'] = 'caso 1 Ndeb:'.$montoBs.' pag:'.$montoPagoIngresado;
+								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 1 Ndeb:'.$montoBs.' pag:'.$montoPagoIngresado;
 					    		self::guardarEnCuentasPorPagar($cuentasPorPagar);
 
 				    		}
 				    		$cuentasPorPagar['debitos'] =0;						    
-						    $cuentasPorPagar['observacion'] = 'caso 1 fac:'.$montoBs.' pag:'.$montoPagoIngresado;
+						    $cuentasPorPagar['observacion'] = $request->observacion; //'caso 1 fac:'.$montoBs.' pag:'.$montoPagoIngresado;
 						    $cuentasPorPagar['concepto'] = $tipoRegistro;
 							$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 							$cuentasPorPagar[$debeOhaver] = $montoBs+$notaDebito;			    	
@@ -1609,7 +1633,7 @@ class CuentasPorPagarController extends Controller
 							//restamos el monto en divisas de la factura cancelada
 							//caso 2
 						    
-						    $cuentasPorPagar['observacion'] = 'caso 2';
+						    $cuentasPorPagar['observacion'] = $request->observacion; //'caso 2';
 						    $cuentasPorPagar['concepto'] = $tipoRegistro;
 							$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 							$cuentasPorPagar[$debeOhaver] = $montoBs;								    	
@@ -1631,7 +1655,7 @@ class CuentasPorPagarController extends Controller
 			    			//el monto registrado es el abonado del saldo que quedo para pagar
 			    			//caso 3			
 			    				    			
-			    			$cuentasPorPagar['observacion'] = 'caso 3 fac:'.$montoBs.' pag:'.$montoPagoIngresado;
+			    			$cuentasPorPagar['observacion'] = $request->observacion; //'caso 3 fac:'.$montoBs.' pag:'.$montoPagoIngresado;
 			    			$cuentasPorPagar['concepto'] = $tipoRegistro;
 							$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 							$cuentasPorPagar[$debeOhaver] = $montoPagoIngresado;					
@@ -1670,7 +1694,7 @@ class CuentasPorPagarController extends Controller
 									$montoPagoIngresado = $montoPagoIngresado - $montoBs;
 									break;
 							}
-							$cuentasPorPagar['observacion'] = 'caso 6';    	
+							$cuentasPorPagar['observacion'] = $request->observacion; //'caso 6';    	
 							$cuentasPorPagar['concepto'] = $tipoRegistro;
 							$cuentasPorPagar['concepto_descripcion'] = $conceptoDescripcion;
 							$cuentasPorPagar[$debeOhaver] = round($montoGuardar,2);					

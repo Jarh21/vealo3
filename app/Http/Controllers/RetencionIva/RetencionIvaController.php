@@ -232,7 +232,7 @@ class RetencionIvaController extends Controller
 			'tipo_docu'=>$request->tipo_docu,
 			'serie'=>$request->serie,
 			'documento'=>$request->nfactura,
-			'estatus'=>'S',
+			'estatus'=>$request->compra_venta,
 			'control_fact'=>$request->control_fact,
 			'tipo_trans'=>$request->tipo_trans,
 			'fact_afectada'=>$request->fact_afectada,
@@ -523,9 +523,19 @@ class RetencionIvaController extends Controller
 		$fechafin = $request->fechafin;
 		$detalleTxt = DB::select("SELECT r.rif_agente,d.comprobante,r.periodo,r.fecha AS fecha_retencion,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic FROM retenciones r, retenciones_dat d WHERE r.comprobante = d.comprobante AND r.estatus ='N' AND r.rif_agente =:empresaRif AND r.fecha >=:fechaini AND r.fecha <=:fechafin",["empresaRif"=>session('empresaRif'),'fechaini'=>$fechaini,'fechafin'=>$fechafin]); 
 		$contenido ='';
+		$tipoDocumento ='';
 
 		foreach($detalleTxt as $registro){
-			$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_retencion ."\t". $registro->estatus ."\n";
+			if($registro->tipo_docu=='FA'){
+				$tipoDocumento='01';
+			}
+			if($registro->tipo_docu=='ND'){
+				$tipoDocumento='02';
+			}
+			if($registro->tipo_docu=='NC'){
+				$tipoDocumento='03';
+			}
+			$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_retencion ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $registro->rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $registro->fact_afectada ."\t". $registro->fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
 		}
 		Storage::disk('local')->put('archivo.txt', $contenido);
 		return view('retencionIva.generarTxt',['empresas'=>$herramientas->listarEmpresas(),'detalleTxt'=>$detalleTxt]);
