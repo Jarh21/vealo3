@@ -135,4 +135,9 @@ class ProveedorController extends Controller
     public function buscar($rif){
         return Proveedor::where('rif',$rif)->first();
     }
+
+    public function eliminar($id){
+        Proveedor::where('id',$id)->delete();
+        return redirect()->route('proveedor.index');
+    }
 }

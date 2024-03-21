@@ -39,11 +39,11 @@
                             <div class="row">
                                 <div class="col">
                                     <label for="">Desde</label>
-                                    <input type="date" class="form-control" name="fechaini">
+                                    <input type="date" class="form-control" name="fechaini" value="{{$fechaini ?? ''}}">
                                 </div>
                                 <div class="col">
                                     <label for="">Hasta</label>
-                                    <input type="date" class="form-control" name="fechafin">
+                                    <input type="date" class="form-control" name="fechafin" value="{{$fechafin ?? ''}}">
                                 </div>
                             </div>
                             <button class="btn btn-primary float-right">Buscar</button>
@@ -57,6 +57,7 @@
         <table border="1">
             <thead>
                 <tr>
+                    <th>Nº</th>
                     <th>Rif Agente</th>
                     <th>Periodo</th>
                     <th>Fecha Fac</th>
@@ -76,8 +77,10 @@
                 </tr>
             </thead>
             <tbody>
+                <?php $contador=1; ?>
                 @foreach($detalleTxt as $detalle)
                     <tr>
+                        <td>{{$contador}}</td>
                         <td>{{$detalle->rif_agente}}</td>
                         <td>{{$detalle->periodo}}</td>
                         <td>{{$detalle->fecha_docu}}</td>
@@ -89,12 +92,12 @@
                         <td>{{$detalle->comprasmasiva}}</td>
                         <td>{{$detalle->base_impon}}</td>
                         <td>{{$detalle->iva}}</td>
-                        <td>{{$detalle->fact_afectada}}</td>
+                        <td>{{$detalle->fecha_docu}}</td>
                         <td>{{$detalle->comprobante}}</td>
                         <td>{{$detalle->iva_retenido}}</td>
                         <td>{{$detalle->porc_alic}}</td>
                         <td>0</td>
-                        
+                        <?php $contador++; ?>
                     </tr>
                 @endforeach
             </tbody>

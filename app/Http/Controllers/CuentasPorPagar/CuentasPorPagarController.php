@@ -114,8 +114,9 @@ class CuentasPorPagarController extends Controller
 				//esto es por si elimina del siace una factura por relacionar o ya relacionada
 				//ya que si las elimnan no se les debe pagar all proveedor bien sea por devolucion
 				if($verificarFacturaSiace==1 and $facturaPorPagar->origen=='siace'){
-					$conexionSQL = $herramientas->conexionDinamicaBD(session('basedata'));    				
-					$registros = $conexionSQL->select("SELECT keycodigo,debitos from cxp where codorigen=2000 and documento=:nfactura and rif=:rifProveedor order by keycodigo",['nfactura'=>$facturaPorPagar->documento,'rifProveedor'=>$facturaPorPagar->proveedor_rif]);
+					$conexionSQL = $herramientas->conexionDinamicaBD(session('basedata')); 
+					$proveedorRifSinCaracteres= str_replace('-','',$facturaPorPagar->proveedor_rif);  				
+					$registros = $conexionSQL->select("SELECT keycodigo,debitos from cxp where codorigen=2000 and documento=:nfactura and REPLACE(rif, '-', '') =:rifProveedor order by keycodigo",['nfactura'=>$facturaPorPagar->documento,'rifProveedor'=>$proveedorRifSinCaracteres]);
 					foreach($registros as $registro){
 						if($registro->keycodigo > 0){
 							$banderaFacturaSiaceEncontrada=1;
@@ -1919,8 +1920,8 @@ class CuentasPorPagarController extends Controller
     public function reciboPagoFacturas($codigoRelacion){
     	$facturas = array();		
     	$datosDelPago = self::prepararPagarFacturas($codigoRelacion,$facturas);
-	
-    	return view('cuentasPorPagar.pagarFacturas.reciboPago',['datosDelPago'=>$datosDelPago]);
+		$empresa = Empresa::where('rif',session('empresaRif'))->first();
+    	return view('cuentasPorPagar.pagarFacturas.reciboPago',['datosDelPago'=>$datosDelPago,'empresa'=>$empresa]);
     }
  
     ///////////////RELACION PAGO FACTURAS EN DIVISAS //////////

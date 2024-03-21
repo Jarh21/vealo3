@@ -187,6 +187,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/proveedor/edit/{id}/{origen?}',[ProveedorController::class,'edit'])->name('proveedor.edit');
     Route::PUT('/proveedor/update/{id}/{origen?}',[ProveedorController::class,'update'])->name('proveedor.update');
     Route::get('/proveedor/buscar/{rif}',[ProveedorController::class,'buscar'])->name('proveedor.buscar');
+    Route::get('/proveedor/eliminar/{id}',[ProveedorController::class,'eliminar'])->name('proveedor.eliminar');
     /*fin rutas de proveedores */
 
     /*Registro de las retenciones ISLR*/

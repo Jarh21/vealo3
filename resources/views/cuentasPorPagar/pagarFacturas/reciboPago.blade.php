@@ -12,7 +12,8 @@
 	<table class="ml-5" style="width: 800px; height: 50px;">
 		<tr>
 			<td>
-				<img src="{{ asset(session('logo_empresa'))}}" alt="AdminLTE Logo" class="" style="opacity: .8" width="100px">
+				<img src="{{asset($empresa->logo)}}" alt="AdminLTE Logo" class="" style="opacity: .8" width="100px">
+				
             </td>
 			<td>
 				
