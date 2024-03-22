@@ -78,6 +78,10 @@
 			</select>
 		  </div>
 		  <div class="form-group">
+			<label for="">Correo Electronico</label>
+			<input type="email" name="correo" id="" class="form-control">
+		  </div>
+		  <div class="form-group">
 		    <label for="direccion">Dirección</label>
 		    <textarea class="form-control" id="exampleFormControlTextarea5" rows="4" name="direccion" placeholder="Direccion del proveedor"></textarea>
 		  </div>		  

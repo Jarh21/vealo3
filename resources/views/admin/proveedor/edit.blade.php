@@ -82,6 +82,10 @@
 		    <input type="text" class="form-control" name="codigoFiscal" placeholder="001,007 ..." value="{{$proveedor->codigoFiscal}}">
 		  </div>
 		  <div class="form-group">
+			<label for="">Correo Electronico</label>
+			<input type="email" name="correo" id="" class="form-control" value="{{$proveedor->correo}}">
+		  </div>
+		  <div class="form-group">
 		    <label for="direccion">Direccion</label>
 		    <textarea class="form-control" id="exampleFormControlTextarea5" rows="4" name="direccion">{{$proveedor->direccion}}</textarea>
 		  </div>

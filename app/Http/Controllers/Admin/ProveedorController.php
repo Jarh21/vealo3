@@ -52,6 +52,7 @@ class ProveedorController extends Controller
         $proveedor->tipo_proveedor = $request->get('tipo_proveedor');
         $proveedor->porcentaje_retener = $request->get('porcentaje_retener');
         $proveedor->tipo_contribuyente = $request->get('tipo_contribuyente');
+        $proveedor->correo = $request->correo;
     	$proveedor->save();
 
     	return self::index($origen);
@@ -109,6 +110,7 @@ class ProveedorController extends Controller
         $proveedor->porcentaje_retener = $request->get('porcentaje_retener');
         $proveedor->direccion = $request->get('direccion');
         $proveedor->tipo_contribuyente = $request->get('tipo_contribuyente');
+        $proveedor->correo = $request->correo;
         $proveedor->descontar_nota_credito=$descontarNotaCredito;
         $proveedor->agregar_nota_debito=$agregar_nota_debito;
         $proveedor->agregar_igtf=$agregar_igtf;

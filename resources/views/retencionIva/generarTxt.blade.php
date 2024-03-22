@@ -46,15 +46,16 @@
                                     <input type="date" class="form-control" name="fechafin" value="{{$fechafin ?? ''}}">
                                 </div>
                             </div>
-                            <button class="btn btn-primary float-right">Buscar</button>
-                            
+                            <button class="btn btn-primary float-right my-2">Buscar</button>
+                            @if(isset($detalleTxt))<a href="{{route('retencion.iva.descargarTxt')}}" class="btn btn-success my-2">Exportar TXT</a>@endif
                         </div>
                     </div>
                 </form>
             </div>
         </div>
         @if(isset($detalleTxt))
-        <table border="1">
+        <div>
+        <table  id="txt" class="table">
             <thead>
                 <tr>
                     <th>Nº</th>
@@ -79,11 +80,11 @@
             <tbody>
                 <?php $contador=1; ?>
                 @foreach($detalleTxt as $detalle)
-                    <tr>
+                    <tr @if($detalle->tipo_docu!='FA') style="background:#F8F1A2" @endif>
                         <td>{{$contador}}</td>
                         <td>{{$detalle->rif_agente}}</td>
                         <td>{{$detalle->periodo}}</td>
-                        <td>{{$detalle->fecha_docu}}</td>
+                        <td>{{$detalle->fecha}}</td>
                         <td>{{$detalle->estatus}}</td>
                         <td>{{$detalle->tipo_docu}}</td>
                         <td>{{$detalle->rif_retenido}}</td>
@@ -92,7 +93,7 @@
                         <td>{{$detalle->comprasmasiva}}</td>
                         <td>{{$detalle->base_impon}}</td>
                         <td>{{$detalle->iva}}</td>
-                        <td>{{$detalle->fecha_docu}}</td>
+                        <td>{{$detalle->fact_afectada}}</td>
                         <td>{{$detalle->comprobante}}</td>
                         <td>{{$detalle->iva_retenido}}</td>
                         <td>{{$detalle->porc_alic}}</td>
@@ -103,7 +104,26 @@
             </tbody>
         </table>
         <div class="text-center"><a href="{{route('retencion.iva.descargarTxt')}}" class="btn btn-success my-2">Exportar TXT</a></div>
+        </div>
+        
         @endif
         
     </div>
+@endsection
+@section('js')
+<script type="text/javascript">
+    $(document).ready(function() {	
+		
+        $('#txt').DataTable({
+        
+        select: false,
+        paging: false,
+        searching: true,
+        ordering:  false
+        });
+        
+        
+
+    } );
+    </script>
 @endsection
