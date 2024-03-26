@@ -16,6 +16,7 @@ use App\Http\Controllers\Herramientas\HerramientasController;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
 class RetencionIvaController extends Controller
 {
     public function index(){
@@ -367,19 +368,18 @@ class RetencionIvaController extends Controller
 		$variable = 'contador_reten_iva_'.session('empresaRif');
 		$valor = Parametro::buscarVariable($variable);
 		Parametro::actualizarVariable($variable,$valor+1);
-		return self::mostrarComprobanteRetencionIva($comprobante,$request->firma_digital);
+		return self::mostrarComprobanteRetencionIva($comprobante,session('empresaRif'),$request->firma_digital);
 	}
 
-	public function mostrarComprobanteRetencionIva($comprobante,$firma=''){
+	public function mostrarComprobanteRetencionIva($comprobante,$empresaRif,$firma=''){
 		//Generamos el comprobante de retencion en PDF
 		
-		$retencionIva = RetencionIva::where('comprobante',$comprobante)->first();
-		$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
+		$retencionIva = RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->first();
+		$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->get();//buscamos los datos de las facturas
 		$datosEmpresa = Empresa::select('direccion','logo','firma')->where('rif',$retencionIva->rif_agente)->first();
 		$datosModificados=array();
 		
-		//modificamos datos necesarios para el formato de retencion de iva 
-		
+		//modificamos datos necesarios para el formato de retencion de iva 		
 		$anio = substr($retencionIva->periodo, 0, 4);
 		$mes = substr($retencionIva->periodo,4,2);
 		
@@ -404,7 +404,36 @@ class RetencionIvaController extends Controller
         $pdf->loadHtml($html);
         $pdf->render();
 
-        return $pdf->stream($retencionIva->nom_agente.'-'.$retencionIva->nom_retenido.'-'.$retencionIva->comprobante.'.pdf');
+
+		//eliminar los archivos de la carpeta storage
+		// Verificar si el directorio existe
+		
+		$rutaDirectorio='pdf/';
+		$archivos = Storage::files($rutaDirectorio);
+
+		if (!empty($archivos)) {
+			foreach ($archivos as $archivo) {
+				// Eliminar cada archivo individualmente
+				Storage::delete($archivo);
+			}			
+		}
+
+		///codigo de chat GPT3
+		//guardamos el documento en storage de laravel
+		$nombreArchivo = $retencionIva->nom_agente.'-'.$retencionIva->nom_retenido.'-'.$retencionIva->comprobante.'.pdf';
+		$nombreArchivo = str_replace(' ','_',$nombreArchivo);
+		$rutaArchivo = 'pdf/' . $nombreArchivo; // Ruta donde se guardará el archivo dentro de la carpeta storage
+
+		Storage::put($rutaArchivo, $pdf->output()); // Guardar el archivo PDF en la carpeta storage
+		//retornamos el archivo pdf
+		return response()->stream(function () use ($pdf) {
+			echo $pdf->output();
+		}, 200, [
+			'Content-Type' => 'application/pdf',
+			'Content-Disposition' => 'inline; filename="' . $nombreArchivo . '"'
+		]);//fin codigo GPT3
+
+        //return $pdf->stream($retencionIva->nom_agente.'-'.$retencionIva->nom_retenido.'-'.$retencionIva->documento.'.pdf');
 			
 
 	}
@@ -445,7 +474,7 @@ class RetencionIvaController extends Controller
         return redirect()->route($vista);        
     }
 
-	public function editarRetencionIva($comprobante){
+	public function editarRetencionIva($comprobante,$empresaRif){
 		//abre la vista para editar la retencion y se le pasan los parametros 
 		$retencionIva = self::consultarRetencionIva($comprobante);
 		
@@ -458,7 +487,7 @@ class RetencionIvaController extends Controller
 		$proveedoRequest = explode('|',$request->proveedorRif);
 		$proveedorRif = $proveedoRequest[0];
 		
-		$retencionIva = RetencionIva::where('comprobante',$request->comprobante)->first();
+		$retencionIva = RetencionIva::where('comprobante',$request->comprobante)->where('rif_agente',session('empresaRif'))->first();
 		
 		//verificamos que se ha modificado el dato del proveedor para modificarlo tambien el los detallados de las facturas.
 		if($retencionIva->rif_retenido <> $proveedorRif){
@@ -466,7 +495,7 @@ class RetencionIvaController extends Controller
 			$retencionIva->rif_retenido = $proveedor->rif;
 			$retencionIva->nom_retenido = $proveedor->nombre;
 			//actualizamos en detalle de la retencion
-			RetencionIvaDetalle::where('comprobante',$request->comprobante)->update(['rif_retenido'=>$proveedor->rif,'nom_retenido'=>$proveedor->nombre]);
+			RetencionIvaDetalle::where('comprobante',$request->comprobante)->where('rif_agente',session('empresaRif'))->update(['rif_retenido'=>$proveedor->rif,'nom_retenido'=>$proveedor->nombre]);
 		}
 		
 		$retencionIva->fecha = $request->fecha;
@@ -476,12 +505,18 @@ class RetencionIvaController extends Controller
 		return redirect()->route('retencion.iva.listar');
 	}
 
-	public function consultarRetencionIva($comprobante){
-		return RetencionIva::where('comprobante',$comprobante)->first();
+	public function consultarRetencionIva($comprobante,$empresaRif = ''){
+		if(empty($empresaRif)){
+			$empresaRif = session('empresaRif');
+		}
+		return RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->first();
 	}
 
-	public function consultarDetallesRetencionIva($comprobante){
-		return RetencionIvaDetalle::where('comprobante',$comprobante)->get();//buscamos los datos de las facturas
+	public function consultarDetallesRetencionIva($comprobante,$empresaRif = ''){
+		if(empty($empresaRif)){
+			$empresaRif = session('empresaRif');
+		}
+		return RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->get();//buscamos los datos de las facturas
 
 	}
 
@@ -509,7 +544,8 @@ class RetencionIvaController extends Controller
 	}
 
 	public function actualizarTotalRetener($comprobante){
-		DB::update("UPDATE retenciones r JOIN retenciones_dat r_dat ON r.comprobante = r_dat.comprobante SET r.total = (SELECT SUM(iva_retenido) FROM retenciones_dat WHERE comprobante = ?)WHERE r.comprobante=? ",[$comprobante,$comprobante]);
+		$empresaRif = session('empresaRif');
+		DB::update("UPDATE retenciones r JOIN retenciones_dat r_dat ON r.comprobante = r_dat.comprobante SET r.total = (SELECT SUM(iva_retenido) FROM retenciones_dat WHERE comprobante = ? and rif_agente = ?)WHERE r.comprobante=? and r.rif_agente = ?",[$comprobante,$empresaRif,$comprobante,$empresaRif]);
 	}
 
 	public function vistaGenerarTxt(){

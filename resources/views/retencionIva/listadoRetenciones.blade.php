@@ -50,7 +50,34 @@
 			</div>
 			</div>
 		</div>	<!--fin modal-->
+        <!-- Modal cargando pagina-->
+        <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Enviando Correo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Espere un momento por favor enviando...
+                </div>
+                
+                </div>
+            </div>
+        </div>
 <div>
+    <div>
+        @if(Session::has('message'))
+			<div class="alert {!! Session::get('alert') !!}" id='alerta'>
+				<button type="button" class="close" id='cerrarAlerta'aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				{!! Session::get('message') !!}				
+			</div>  			
+		@endif
+    </div>
     <table class='table'>
         <thead>
             <tr>
@@ -75,9 +102,10 @@
                     <td>{{$retencion->documento}}</td>
                     <td>{{$retencion->comprobante}}</td>
                     <td>
-                        <a href="{{route('retencion.iva.generar_comprobante',$retencion->comprobante)}}" class='btn btn-secondary btn-sm'><i class="fas fa-file-pdf"></i> ver</a>
-                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,'firma'])}}" class='btn btn-secondary btn-sm'><i class="fas fa-file-pdf"></i> ver+firma</a>
-                        <a href="{{route('retencion.iva.editar_retencion',$retencion->comprobante)}}" class='btn btn-warning btn-sm'>Editar</a>
+                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-secondary btn-sm'><i class="fas fa-file-pdf"></i> ver</a>
+                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente,'firma'])}}" class='btn btn-secondary btn-sm'><i class="fas fa-file-pdf"></i> ver+firma</a>
+                        <a href="{{route('retencion.iva.editar_retencion',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-warning btn-sm'>Editar</a>
+                        <a href="{{route('retencion.iva.envioemail',[$retencion->comprobante,$retencion->rif_agente])}}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#staticBackdrop">Email</a>
                     </td>
                 </tr>
             @endforeach
@@ -92,15 +120,20 @@
 
 	$(document).ready(function() {	
 		
-			$('#retenciones').DataTable({
-		    scrollY: 500,
-		    select: true,
-		    paging: true,
-		    searching: true,
-    		ordering:  false
-			});			
+        $('#retenciones').DataTable({
+        scrollY: 500,
+        select: true,
+        paging: true,
+        searching: true,
+        ordering:  false
+        });			
     	
+        $("#cerrarAlerta").click(function(){
+			//cerramos el alerta que indica si un archivo fue cargado o no se cargo			
+			$("#alerta").hide();
+		});
 
 	} );
+    
 </script>
 @endsection

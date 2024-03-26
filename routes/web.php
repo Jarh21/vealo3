@@ -30,6 +30,7 @@ use App\Http\Controllers\InformesAdicionales\VendedorComisionController;
 use App\Http\Controllers\InformesAdicionales\HabladoresController;
 use App\Http\Controllers\AsistenteCompras\AsistenteComprasController;
 use App\Http\Controllers\RetencionIva\RetencionIvaController;
+use App\Http\Controllers\herramientas\EmailController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -362,7 +363,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/retencion-iva/generar-retencion',[RetencionIvaController::class,'generarRetencionIva'])->name('retencion.iva.generar');
     Route::post('/retencion-iva/guardar-retencion',[RetencionIvaController::class,'guardarComprobanteRetencionIva'])->name('retencion.iva.guardar');
     Route::get('/retencion-iva/listar-retencion',[RetencionIvaController::class,'listarRetencionesIva'])->name('retencion.iva.listar');
-    Route::get('/retencion-iva/generar-comprobante/{comprobanteRetencion}/{firma?}',[RetencionIvaController::class,'mostrarComprobanteRetencionIva'])->name('retencion.iva.generar_comprobante');
+    Route::get('/retencion-iva/generar-comprobante/{comprobanteRetencion}/{empresaRif}/{firma?}',[RetencionIvaController::class,'mostrarComprobanteRetencionIva'])->name('retencion.iva.generar_comprobante');
     Route::post('/retencion-iva/buscar-retencion',[RetencionIvaController::class,'buscarRetencionIva'])->name('retencion.iva.buscar_retencion');
     Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}/{vista?}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
     Route::get('/retencion-iva/editar-retencion/{comprobante}',[RetencionIvaController::class,'editarRetencionIva'])->name('retencion.iva.editar_retencion');
@@ -374,7 +375,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/retencion-iva/generar-txt',[RetencionIvaController::class,'vistaGenerarTxt'])->name('retencion.iva.generarTxt');
     Route::post('/retencion-iva/buscar-registros-txt',[RetencionIvaController::class,'buscarRegistrosParaElTxt'])->name('retencion.iva.buscarregistrosparatxt');
     Route::get('/retencion-iva/descargar-txt',[RetencionIvaController::class,'descargarTxt'])->name('retencion.iva.descargarTxt');
-    
+    Route::get('/retencion-iva/evio-email-retencion-iva/{comprobante?}/{empresaRif?}',[EmailController::class,'enviarEmailRetencionIva'])->name('retencion.iva.envioemail');
 
 });
 //se sacaron del middleware Auth para que no requiere de inicio de sesion al momento de buscar informacion
