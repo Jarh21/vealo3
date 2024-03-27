@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container-fluid">
         <!-- Modal Editar cantidades-->
         <div class="modal fade" id="editarPedido" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
@@ -79,7 +79,7 @@
             </div>
         </div>
         <!--fin modal Editar Cantidades-->
-      <p>Datos de Facturas</p>
+      <h4>Datos de Facturas</h4>
         <table id="facturas" class="table">
             <thead>
                 <tr>
@@ -111,7 +111,7 @@
         </table>
         <div class="row">
             <div class="col">
-                <h4 class="">Total Retenido : {{total_retenido}}</h4> 
+                <h4 class="float-right">Total Retenido : {{total_retenido}}</h4> 
             </div>
         </div>
     </div>

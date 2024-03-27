@@ -36,7 +36,27 @@
 			</div>
 			</div>
 		</div>	<!--fin modal-->	
-				
+
+		<!-- Modal cargando pagina-->
+        <div class="modal fade"  id="mi-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Cargando Documento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Espere un momento por favor cargando...
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar progress-bar-striped " role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+        </div><!-- fin Modal cargando pagina-->
 			
 		<div class="mb-3">				
 			<a href="#facturaManual1" class="btn btn-outline-success btn-sm mx-3 abrirFacturaManual">
@@ -137,7 +157,7 @@
 					</div>					
 					
 					<div class="col">
-						<button type="submit" class="btn btn-primary btn-sm d-inline" id='guardarBtn' title="buscar"><i class="fa fa-search"></i>Guardar</button>
+						<button type="submit" class="btn btn-primary btn-sm d-inline" id='guardarBtn' title="buscar" onclick="abrirModalCargando()"><i class="fa fa-search"></i>Guardar</button>
 						<a href="#info1" class="inf mx-2">+ Opciones</a>
 					</div>	    				
 				</div>
@@ -204,7 +224,13 @@
 							<td>{{$registro->tipo_docu}}</td>
 							<td>{{$registro->documento}}</td>
 							<td>{{$registro->base_impon}}</td>
-							<td>{{$registro->iva}}</td>
+							<td>
+								@if($registro->iva==0)
+									la factura no posee IVA
+								@else
+									{{$registro->iva}}
+								@endif
+							</td>
 							<td>{{$registro->iva_retenido}}</td> 
 							<td>
 							<a href="{{route('retencion.iva.editarDocumento',$registro->keycodigo)}}" target="popup" onClick="window.open(this.href, this.target, 'width=850,height=650,left=100,top=50');   return false;" class="btn btn-secondary btn-sm">Editar</a>
@@ -466,6 +492,10 @@
 				.replace(new RegExp('(?:^|\\s)'+ 'bg-primary' + '(?:\\s|$)'), '');
 			}
 			
+		}
+		function abrirModalCargando(){
+			$('#mi-modal').modal('show'); // Muestra el modal con fade
+			$('.progress-bar').animate({width:'95%'}, 4000); // Cambia 1000 por la duración deseada en milisegundos
 		}
 	</script>
 

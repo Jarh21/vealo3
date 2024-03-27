@@ -157,7 +157,9 @@ class RetencionIvaController extends Controller
 						$comprasmasiva = ($registro->comprasmasiva*$tasa);
 						$sincredito = ($registro->sincredito*$tasa);
 						$base_impon = ($registro->base_impon*$tasa);
+						echo"Moneda base Extranjera";
 					}else{
+						echo"Moneda base Nacional";
 						$iva = $registro->iva;
 						$comprasmasiva = $registro->comprasmasiva;
 						$sincredito = $registro->sincredito;
@@ -440,8 +442,8 @@ class RetencionIvaController extends Controller
 
 	public function listarRetencionesIva(){
 		$herramientas = new HerramientasController();
-		$retenciones = DB::select( "select * from retenciones_dat where comprobante<>'0' and rif_agente=:rifAgente order by keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
-		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones,'empresas'=>$herramientas->listarEmpresas()]);
+		$retenciones_dat = DB::select( "select * from retenciones_dat where comprobante<>'0' and rif_agente=:rifAgente order by keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
+		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas()]);
 	}
 
 	public function buscarRetencionIva(Request $request){
@@ -474,9 +476,12 @@ class RetencionIvaController extends Controller
         return redirect()->route($vista);        
     }
 
-	public function editarRetencionIva($comprobante,$empresaRif){
+	public function editarRetencionIva($comprobante,$empresaRif=''){
+		if($empresaRif==''){
+			$empresaRif= session('empresaRif');
+		}
 		//abre la vista para editar la retencion y se le pasan los parametros 
-		$retencionIva = self::consultarRetencionIva($comprobante);
+		$retencionIva = self::consultarRetencionIva($comprobante,$empresaRif);
 		
 		$proveedores = Proveedor::select('rif','porcentaje_retener','nombre')->get();	
 		return view('retencionIva.editarRetencion',['retencionIva'=>$retencionIva,'proveedores'=>$proveedores]);

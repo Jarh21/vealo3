@@ -55,7 +55,7 @@
         </div>
         @if(isset($detalleTxt))
         <div>
-        <table  id="txt" class="table">
+        <table  id="txt" class="table table-sm">
             <thead>
                 <tr>
                     <th>Nº</th>

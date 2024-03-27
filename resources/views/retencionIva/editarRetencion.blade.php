@@ -25,18 +25,30 @@
                     <input type="date" name="fecha" class="form-control" value="{{$retencionIva->fecha}}" required>
                     <label for="">Cheque o Referencia de Pago</label>
                     <input type="text" name="cheque" class="form-control" value="{{$retencionIva->cheque}}">
-                </div>
-                <div class="col">
                     <div class="row align-items-center">
                         <div class="col text-center">
-                            <button class="btn btn-primary text-center" type="submit">Actualizar Retención</button>
+                            
                         </div>
                         
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Opciones Generales</b>
+                        </div>
+                        <div class="card-body">
+                        <button class="btn btn-primary my-2" type="submit">Actualizar Retención</button>
+                        <button class="btn btn-secondary my-2" onclick="anularRetencion()">Anular Retención</button>
+                        </div>
                     </div>
                 </div>
             </div>
             
         </div>
+    </div>
+    <div class="progress" style="height: 10px;">
+        <div class="progress-bar progress-bar-striped " role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
     <detalle-retencion-iva :comprobante="{{$retencionIva->comprobante}}"></detalle-retencion-iva>
     
@@ -47,10 +59,24 @@
 @section('js')
     <script type='text/javascript'>
         /****************************************************************************************************** */
-			// select 2
-			$('.js-example-basic-single').select2({			
-				placeholder: 'Seleccione el proveedor',    	
-				/* maximumSelectionLength:1, */
-			});
+        // select 2
+        $('.js-example-basic-single').select2({			
+            placeholder: 'Seleccione el proveedor',    	
+            /* maximumSelectionLength:1, */
+        });
+        
+        function anularRetencion(comprobante){
+            let confirmar = confirm("¿Confirma que desea anular esta retencion?");
+            if(confirmar){
+                window.location = "eliminar-factura/"+comprobante;
+            }
+        }
     </script>
+    <script>
+    $(document).ready(function(){
+        $(window).on('load', function(){
+            $('.progress-bar').animate({width:'100%'}, 1400); // Cambia 1000 por la duración deseada en milisegundos
+        });
+    });
+</script>
 @endsection

@@ -1,7 +1,40 @@
 @extends('layouts.app')
 @section('css')
+<style>
+    .modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4); /* Fondo oscuro */
+}
 
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
 
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+</style>
 @endsection
 @section('content')
 <h4>Listado Retencion IVA <a href="#" data-toggle="modal" data-target="#modalCambioSucursal" class="btn btn-outline-primary my-2">Seleccione sucursal ->{{session('empresaRif')}} {{session('empresaNombre') ?? 'No hay sucursal seleccionada'}}</a> <a href="{{route('retencion.iva.index')}}" class='btn btn-warning btn-sm float-right'>< Regresar</a></h4><hr>
@@ -51,7 +84,7 @@
 			</div>
 		</div>	<!--fin modal-->
         <!-- Modal cargando pagina-->
-        <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal fade"  id="mi-modal">
             <div class="modal-dialog">
                 <div class="modal-content">
                 <div class="modal-header">
@@ -62,6 +95,9 @@
                 </div>
                 <div class="modal-body">
                     Espere un momento por favor enviando...
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar progress-bar-striped " role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
                 </div>
                 
                 </div>
@@ -82,30 +118,43 @@
         <thead>
             <tr>
                 
-                <td>Fecha</td>
-                <td>Proveedor</td>
-                <td>Tipo</td>
-                <td>Rif Provee</td>
-                <td>Factura</td>
-                <td>Comprobante</td>
-                <td>Opciones</td>
+                <th>Fecha</th>
+                <th>Proveedor</th>
+                <th>Tipo</th>
+                <th>Rif Provee</th>
+                <th>Factura</th>
+                <th>Comprobante</th>
+                <th>Retención</th>
+                <th>Opciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($retenciones as $retencion)
+            @foreach($retenciones_dat as $retencion)
                 <tr>
                     
                     <td>{{$retencion->fecha_docu}}</td>
                     <td style="width: 300px">{{$retencion->nom_retenido}}</td>
-                    <td>{{$retencion->tipo_docu}}</td>
+                    <td>
+                        @if($retencion->tipo_docu=='FA')
+                        Factura
+                        @endif
+                        @if($retencion->tipo_docu=='NC')
+                        Nota Credito
+                        @endif
+                        @if($retencion->tipo_docu=='ND')
+                        Nota Debito
+                        @endif
+                        
+                    </td>
                     <td>{{$retencion->rif_retenido}}</td>
                     <td>{{$retencion->documento}}</td>
                     <td>{{$retencion->comprobante}}</td>
+                    <td>{{$retencion->iva_retenido}}</td>
                     <td>
-                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-secondary btn-sm'><i class="fas fa-file-pdf"></i> ver</a>
-                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente,'firma'])}}" class='btn btn-secondary btn-sm'><i class="fas fa-file-pdf"></i> ver+firma</a>
-                        <a href="{{route('retencion.iva.editar_retencion',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-warning btn-sm'>Editar</a>
-                        <a href="{{route('retencion.iva.envioemail',[$retencion->comprobante,$retencion->rif_agente])}}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#staticBackdrop">Email</a>
+                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-secondary btn-sm' title="descargar PDF" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i></a>
+                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente,'firma'])}}" class='btn btn-secondary btn-sm' title="descargar PDF con Firma" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i>+firma</a>
+                        <a href="{{route('retencion.iva.editar_retencion',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-warning btn-sm'><i class="fas fa-edit" title="Editar"></i></a>
+                        <a href="{{route('retencion.iva.envioemail',[$retencion->comprobante,$retencion->rif_agente])}}" class="btn btn-success btn-sm" title="Enviar correo al proveedor con la retención" onclick="abrirModalEnvioCorreo()">Email</a>
                     </td>
                 </tr>
             @endforeach
@@ -134,6 +183,11 @@
 		});
 
 	} );
+    function abrirModalEnvioCorreo(){
+        $('#mi-modal').modal('show'); // Muestra el modal con fade
+        $('.progress-bar').animate({width:'95%'}, 4000); // Cambia 1000 por la duración deseada en milisegundos
+    }
     
 </script>
+
 @endsection
