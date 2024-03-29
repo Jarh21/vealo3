@@ -442,7 +442,9 @@ class RetencionIvaController extends Controller
 
 	public function listarRetencionesIva(){
 		$herramientas = new HerramientasController();
-		$retenciones_dat = DB::select( "select * from retenciones_dat where comprobante<>'0' and rif_agente=:rifAgente order by keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
+		$retenciones_dat = DB::select( "select d.*,r.estatus as estatus_retencion from retenciones_dat d,retenciones r where  d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente order by d.keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
+		
+
 		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas()]);
 	}
 
@@ -452,10 +454,11 @@ class RetencionIvaController extends Controller
 		$fechaDesde = $request->fecha_desde;
 		$fechaHasta = $request->fecha_hasta;
 		$documento = $request->documento;
-
+	
 		$condicion = array();
 		$condicion[]="estatus='C'";
 		$condicion[]="rif_agente='".session('empresaRif')."'";
+		$condicion[]="comprobante <> ''";
 		if(!empty($comprobante)){$condicion[]="comprobante =".$comprobante;}
 		if(!empty($proveedor)){ $condicion[]="nom_retenido like '%".$proveedor."%'";}
 		if(!empty($fechaDesde)){ $condicion[]=" fecha_docu >='".$fechaDesde."'"; }
@@ -464,8 +467,9 @@ class RetencionIvaController extends Controller
 		$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 
 		$herramientas = new HerramientasController();
-		$retenciones = DB::select( "select * from retenciones_dat where  ". $whereClause." order by keycodigo desc ");
-		return view('retencionIva.listadoRetenciones',['retenciones'=>$retenciones,'empresas'=>$herramientas->listarEmpresas()]);
+		$retenciones_dat = DB::select( "select * from retenciones_dat where  ". $whereClause." order by keycodigo desc ");			
+
+		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas()]);
 	}
 
 	public function seleccionSucursal($rifEmpresa,$vista='retencion.iva.listar'){
@@ -559,18 +563,19 @@ class RetencionIvaController extends Controller
 	}
 
 	public function buscarRegistrosParaElTxt(Request $request){
+		//generamos el archivo txt
 		$herramientas = new HerramientasController();
 		$fechaini = $request->fechaini;
 		$fechafin = $request->fechafin;
 		$empresaRif =session('empresaRif');
 		$detalleTxt = DB::select("
-		SELECT r.rif_agente,r.fecha,d.comprobante,r.periodo,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic 
+		SELECT r.rif_agente,r.fecha,d.comprobante,r.periodo,r.estatus as estatus_retencion,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic 
 		FROM 
 		retenciones_dat d
 		INNER JOIN retenciones r ON d.comprobante = r.comprobante
 		WHERE
 		(
-		(d.tipo_docu='FA' AND (r.fecha BETWEEN :fechaini_fa AND :fechafin_fa) AND r.estatus='N')
+		(d.tipo_docu='FA' AND (r.fecha BETWEEN :fechaini_fa AND :fechafin_fa) AND r.estatus in('N','A'))
 		OR 
 		(d.tipo_docu<>'FA' AND (r.fecha BETWEEN :fechaini_nc AND :fechafin_nc) AND r.estatus='N' AND (d.`fact_afectada` IN(SELECT det.documento FROM retenciones_dat det,retenciones ret WHERE ret.comprobante = det.comprobante AND (ret.fecha BETWEEN :fechaini_afec AND :fechafin_afec) AND ret.rif_agente= :empresaRif_afec)))
 		)  
@@ -589,7 +594,13 @@ class RetencionIvaController extends Controller
 			if($registro->tipo_docu=='NC'){
 				$tipoDocumento='03';
 			}
-			$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $registro->rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $registro->fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
+			if($registro->estatus_retencion=='N'){
+				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $registro->rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $registro->fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
+			}else{
+				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $registro->rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". 0 ."\t". 0 ."\t". 0 ."\t". 0 ."\t". $registro->comprobante ."\t". 0 ."\t". 0 ."\t". '0' ."\n";
+			
+			}	
+
 		}
 		Storage::disk('local')->put('archivo.txt', $contenido);
 		return view('retencionIva.generarTxt',['empresas'=>$herramientas->listarEmpresas(),'detalleTxt'=>$detalleTxt,'fechaini'=>$fechaini,'fechafin'=>$fechafin]);
@@ -604,6 +615,14 @@ class RetencionIvaController extends Controller
 		} else {
 			return response()->json(['error' => 'El archivo no existe'], 404);
 		}
+	}
+
+	public function anularComprobante($comprobante,$empresaRif=''){
+		if(empty($empresaRif)){
+			$empresaRif = session('empresaRif');
+		}
+		RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['estatus'=>'A','total'=>0]);
+		return redirect()->back();
 	}
 	
 

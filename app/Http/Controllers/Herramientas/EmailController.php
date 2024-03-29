@@ -8,6 +8,7 @@ use Illuminate\support\facades\Mail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RetencionIva\RetencionIvaController;
 use App\Models\Proveedor;
+use App\Models\RetencionIvaDetalle;
 
 class EmailController extends Controller
 {
@@ -36,14 +37,13 @@ class EmailController extends Controller
         //buscamos el correo del proveedor
         $proveedor = Proveedor::where('rif',$datosRetencion->rif_retenido)->select('correo')->first();
         if(!empty($proveedor->correo)){
+            
             $response = Mail::to($proveedor->correo)->cc('gerenciasistemasfh@gmail.com')->send(new Notification($nomRetenido,$comprobante,$nomAgente));
-            \Session::flash('message', 'Correo enviado al proveedor '.$datosRetencion->nom_retenido);
-            \Session::flash('alert','alert-success');
-            return redirect()->back();
+            //actualizamos la bandera de correo enviado en la tabla retenciones_dat
+            RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);
+            return 1;
         }else{
-            \Session::flash('message', 'El Proveedor '.$datosRetencion->nom_retenido.' al cual desea enviar la retencion de IVA no tiene correo registrado por lo tanto no se envio el correo');
-            \Session::flash('alert','alert-warning');
-            return redirect()->back();
+            return 0;
         }
         
     }

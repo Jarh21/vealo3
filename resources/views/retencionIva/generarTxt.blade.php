@@ -80,7 +80,7 @@
             <tbody>
                 <?php $contador=1; ?>
                 @foreach($detalleTxt as $detalle)
-                    <tr @if($detalle->tipo_docu!='FA') style="background:#F8F1A2" @endif>
+                    <tr @if($detalle->tipo_docu!='FA') style="background:#F8F1A2" @endif @if($detalle->estatus_retencion=='A') style="background:#F95656" @endif>
                         <td>{{$contador}}</td>
                         <td>{{$detalle->rif_agente}}</td>
                         <td>{{$detalle->periodo}}</td>

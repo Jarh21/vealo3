@@ -364,7 +364,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/retencion-iva/guardar-retencion',[RetencionIvaController::class,'guardarComprobanteRetencionIva'])->name('retencion.iva.guardar');
     Route::get('/retencion-iva/listar-retencion',[RetencionIvaController::class,'listarRetencionesIva'])->name('retencion.iva.listar');
     Route::get('/retencion-iva/generar-comprobante/{comprobanteRetencion}/{empresaRif}/{firma?}',[RetencionIvaController::class,'mostrarComprobanteRetencionIva'])->name('retencion.iva.generar_comprobante');
-    Route::post('/retencion-iva/buscar-retencion',[RetencionIvaController::class,'buscarRetencionIva'])->name('retencion.iva.buscar_retencion');
+    Route::post('/retencion-iva/listar-retencion',[RetencionIvaController::class,'buscarRetencionIva'])->name('retencion.iva.buscar_retencion');
     Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}/{vista?}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
     Route::get('/retencion-iva/editar-retencion/{comprobante}',[RetencionIvaController::class,'editarRetencionIva'])->name('retencion.iva.editar_retencion');
     Route::post('/retencion-iva/update-retencion',[RetencionIvaController::class,'actualizarRetencionIva'])->name('retencion.iva.update_retencion');
@@ -376,6 +376,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/retencion-iva/buscar-registros-txt',[RetencionIvaController::class,'buscarRegistrosParaElTxt'])->name('retencion.iva.buscarregistrosparatxt');
     Route::get('/retencion-iva/descargar-txt',[RetencionIvaController::class,'descargarTxt'])->name('retencion.iva.descargarTxt');
     Route::get('/retencion-iva/evio-email-retencion-iva/{comprobante?}/{empresaRif?}',[EmailController::class,'enviarEmailRetencionIva'])->name('retencion.iva.envioemail');
+    Route::get('/retencion-iva/anular-comprobante/{comprobante?}/{empresaRif?}',[RetencionIvaController::class,'anularComprobante'])->name('retencion.iva.anularcomprobante');
 
 });
 //se sacaron del middleware Auth para que no requiere de inicio de sesion al momento de buscar informacion

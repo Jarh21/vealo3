@@ -39,7 +39,7 @@
                         </div>
                         <div class="card-body">
                         <button class="btn btn-primary my-2" type="submit">Actualizar Retención</button>
-                        <button class="btn btn-secondary my-2" onclick="anularRetencion()">Anular Retención</button>
+                        <button class="btn btn-secondary my-2" onclick="anularRetencion('{{$retencionIva->comprobante}}','{{$retencionIva->rif_agente}}')">Anular Retención</button>
                         </div>
                     </div>
                 </div>
@@ -65,10 +65,10 @@
             /* maximumSelectionLength:1, */
         });
         
-        function anularRetencion(comprobante){
+        function anularRetencion(comprobante,rifagente){
             let confirmar = confirm("¿Confirma que desea anular esta retencion?");
             if(confirmar){
-                window.location = "eliminar-factura/"+comprobante;
+                window.location = "anular-comprobante/"+comprobante+"/"+rifagente;
             }
         }
     </script>

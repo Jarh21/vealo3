@@ -130,7 +130,7 @@
         </thead>
         <tbody>
             @foreach($retenciones_dat as $retencion)
-                <tr>
+                <tr @if($retencion->estatus_retencion=='A') style="background:#F95656" @endif>
                     
                     <td>{{$retencion->fecha_docu}}</td>
                     <td style="width: 300px">{{$retencion->nom_retenido}}</td>
@@ -151,10 +151,13 @@
                     <td>{{$retencion->comprobante}}</td>
                     <td>{{$retencion->iva_retenido}}</td>
                     <td>
+                        @if($retencion->estatus_retencion=='N')
                         <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-secondary btn-sm' title="descargar PDF" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i></a>
-                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente,'firma'])}}" class='btn btn-secondary btn-sm' title="descargar PDF con Firma" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i>+firma</a>
+                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente,'firma'])}}" class='btn btn-secondary btn-sm' title="descargar PDF con Firma" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i>+<i class="fas fa-marker"></i></a>
                         <a href="{{route('retencion.iva.editar_retencion',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-warning btn-sm'><i class="fas fa-edit" title="Editar"></i></a>
-                        <a href="{{route('retencion.iva.envioemail',[$retencion->comprobante,$retencion->rif_agente])}}" class="btn btn-success btn-sm" title="Enviar correo al proveedor con la retención" onclick="abrirModalEnvioCorreo()">Email</a>
+                        <enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}'}"></enviar-correo-retencion>
+                       @endif
+                        
                     </td>
                 </tr>
             @endforeach
