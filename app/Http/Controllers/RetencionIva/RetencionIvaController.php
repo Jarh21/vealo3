@@ -486,9 +486,13 @@ class RetencionIvaController extends Controller
 		}
 		//abre la vista para editar la retencion y se le pasan los parametros 
 		$retencionIva = self::consultarRetencionIva($comprobante,$empresaRif);
+		$ultimaRetencion =  RetencionIva::where('rif_agente', $empresaRif)//esto es para comparar si la retencion que estoy editando es la ultima ya que la ultima se puede eliminar
+		->orderBy('keycodigo', 'desc')
+		->select('comprobante')
+		->first();
 		
 		$proveedores = Proveedor::select('rif','porcentaje_retener','nombre')->get();	
-		return view('retencionIva.editarRetencion',['retencionIva'=>$retencionIva,'proveedores'=>$proveedores]);
+		return view('retencionIva.editarRetencion',['retencionIva'=>$retencionIva,'proveedores'=>$proveedores,'ultimaRetencion'=>$ultimaRetencion]);
 	}
 
 	public function actualizarRetencionIva(Request $request){
@@ -618,11 +622,27 @@ class RetencionIvaController extends Controller
 	}
 
 	public function anularComprobante($comprobante,$empresaRif=''){
+		///anulamos el comprobante de retencion
 		if(empty($empresaRif)){
 			$empresaRif = session('empresaRif');
 		}
+		
 		RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['estatus'=>'A','total'=>0]);
 		return redirect()->back();
+	}
+
+	public function eliminarComprobante($comprobante,$empresaRif=''){
+		//eliminamos el comprobante de rentcion 
+		if(empty($empresaRif)){
+			$empresaRif = session('empresaRif');
+		}
+		
+		RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->delete();
+		RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->delete();
+		$contador = Parametro::buscarVariable('contador_reten_iva_'.$empresaRif);//buscamos el valor del contador
+		$contador = $contador - 1; //le restamos 1 ya que se elimino el anterior y pode asignar el mismo contador a la nueva retencion
+		Parametro::actualizarVariable('contador_reten_iva_'.$empresaRif,$contador);//asignamos el valor -1 al contador con esto no hay saltos al eliminar
+		return redirect()->route("retencion.iva.listar");
 	}
 	
 

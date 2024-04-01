@@ -3,7 +3,7 @@
 <div id="app" class="container-fluid">
 <form name="editarDocumentoForm" id="editarDocumentoForm" action="{{route('retencion.iva.updateDocumento')}}" method="post">
     <div class="row">		
-        <div class="col-10">
+        <div class="col">
             <div class="row">
                 <div class="col mt-2">
                     <label for="">Proveedor</label>
@@ -25,65 +25,65 @@
             </div>
             
                 
-                @csrf
-                <div class="row border">
-                
-                    <div class="col  mb-2">
-                        <label for="">Fecha Documento</label>
-                        <input type="date" id='fecha_docu' name='fecha_docu' class="form-control" value="{{$documento->fecha_docu}}" required>
-                        <label for="">Tipo de Documento</label>
-                        <select name="tipo_docu" id="tipo_documento" class="form-control">
-                            <option value="FA" @if($documento->tipo_docu=='FA')selected @endif >Factura</option>
-                            <option value="NC" @if($documento->tipo_docu=='NC')selected @endif >Nota Credito</option>
-                            <option value="ND" @if($documento->tipo_docu=='ND')selected @endif >Nota Debito</option>
-                        </select>
-                        
-                        <label for="factura_afectada" id="label_factura_afectada">Factura Afectada</label>
-                        <input id="factura_afectada" name='fact_afectada' type="text" class="form-control" value="{{$codumento->fact_afectada ?? ''}}">
-                    </div>
-                    <div class="col">
-                        <label for="">Serie</label>
-                        <input type="text" name='serie' class="form-control" value="{{$documento->serie ?? ''}}">
-                        <label for="">Numero de Control</label>
-                        <input type="text" id='control_fact' name='control_fact' value="{{$documento->control_fact ?? ''}}" class="form-control">
-                        <label for="">Tipo Transacción</label>
-                        <input type="text" id='tipo_trans' name='tipo_trans' value="{{$documento->tipo_trans ?? ''}}" class="form-control">
-                    </div>
+			@csrf
+			<div class="row border">
+			
+				<div class="col  mb-2">
+					<label for="">Fecha Documento</label>
+					<input type="date" id='fecha_docu' name='fecha_docu' class="form-control" value="{{$documento->fecha_docu}}" required>
+					<label for="">Tipo de Documento</label>
+					<select name="tipo_docu" id="tipo_documento" class="form-control">
+						<option value="FA" @if($documento->tipo_docu=='FA')selected @endif >Factura</option>
+						<option value="NC" @if($documento->tipo_docu=='NC')selected @endif >Nota Credito</option>
+						<option value="ND" @if($documento->tipo_docu=='ND')selected @endif >Nota Debito</option>
+					</select>
+					
+					<label for="factura_afectada" id="label_factura_afectada">Factura Afectada</label>
+					<input id="factura_afectada" name='fact_afectada' type="text" class="form-control" value="{{$codumento->fact_afectada ?? ''}}">
+				</div>
+				<div class="col">
+					<label for="">Serie</label>
+					<input type="text" name='serie' class="form-control" value="{{$documento->serie ?? ''}}">
+					<label for="">Numero de Control</label>
+					<input type="text" id='control_fact' name='control_fact' value="{{$documento->control_fact ?? ''}}" class="form-control">
+					<label for="">Tipo Transacción</label>
+					<input type="text" id='tipo_trans' name='tipo_trans' value="{{$documento->tipo_trans ?? ''}}" class="form-control">
+				</div>
 
-                </div>
-                <div class="row border" style="background-color:#F6F5F3">
-                    <div class="col mb-2">
-                        <label for="">Total Compra + Iva</label>
-                        <input type="text" name="comprasmasiva" id="comprasmasiva" value="{{$documento->comprasmasiva ?? ''}}" class="form-control" required>
-                        <label for="">Excento</label>
-                        <input type="text" name="sincredito" id="sincredito" value="{{$documento->sincredito ?? ''}}" class="form-control">
-                        <label for="">% Alicuota</label>
-                        <input type="text" name="porc_alic" id="porc_alic" class="form-control" value="{{$iva ?? 0}}">
-                        <label for="">% Retencion</label>
-                        <input type="text" name="porc_reten" id="porc_reten" value="{{$documento->porc_reten}}" class="form-control" required>
+			</div>
+			<div class="row border" style="background-color:#F6F5F3">
+				<div class="col mb-2">
+					<label for="">Total Compra + Iva</label>
+					<input type="text" name="comprasmasiva" id="comprasmasiva" value="{{$documento->comprasmasiva ?? ''}}" class="form-control" required>
+					<label for="">Excento</label>
+					<input type="text" name="sincredito" id="sincredito" value="{{$documento->sincredito ?? ''}}" class="form-control">
+					<label for="">% Alicuota</label>
+					<input type="text" name="porc_alic" id="porc_alic" class="form-control" value="{{$iva ?? 0}}">
+					<label for="">% Retencion</label>
+					<input type="text" name="porc_reten" id="porc_reten" value="{{$documento->porc_reten}}" class="form-control" required>
 
-                    </div>
-                    <div class="col">
-                        <label for="">Base Imponible</label>
-                        <input type="text" name='base_impon' id='base_impon' value="{{$documento->base_impon ?? ''}}" class="form-control" readonly required>
-                        <label for="">Impuesto Iva</label>
-                        <input type="text" name='iva' id='iva' value="{{$documento->iva ?? ''}}" class="form-control" readonly>
-                        <label for="">IVA Retenido</label>
-                        <input type="text" name='iva_retenido' id='iva_retenido' value="{{$documento->iva_retenido ?? ''}}" class="form-control" readonly>
-                        <label for="">Tipo de Operacion</label>
-						<label for="compra">Compra</label><input type="radio"  name="compra_venta" value="C" id="compra" @if($documento->estatus=='C')checked @endif>
-						<label for="venta">Venta</label><input type="radio"  name="compra_venta" value="V" id="venta" @if($documento->estatus=='V')checked @endif>
-                        <button type="button" id='calcular' name='calcular' class="btn btn-sm btn-warning float-right mt-2">Calcular</button> 
-                    </div>                   
-                </div>               
+				</div>
+				<div class="col">
+					<label for="">Base Imponible</label>
+					<input type="text" name='base_impon' id='base_impon' value="{{$documento->base_impon ?? ''}}" class="form-control" readonly required>
+					<label for="">Impuesto Iva</label>
+					<input type="text" name='iva' id='iva' value="{{$documento->iva ?? ''}}" class="form-control" readonly>
+					<label for="">IVA Retenido</label>
+					<input type="text" name='iva_retenido' id='iva_retenido' value="{{$documento->iva_retenido ?? ''}}" class="form-control" readonly>
+					<label for="">Tipo de Operacion</label>
+					<label for="compra">Compra</label><input type="radio"  name="compra_venta" value="C" id="compra" @if($documento->estatus=='C')checked @endif>
+					<label for="venta">Venta</label><input type="radio"  name="compra_venta" value="V" id="venta" @if($documento->estatus=='V')checked @endif>
+					<button type="button" id='calcular' name='calcular' class="btn btn-sm btn-warning float-right mt-2">Calcular</button> 
+				</div>                   
+			</div>               
                 
-            
+            <div class="">
+            <button type="submit" class="btn btn-primary btn-sm d-inline float-right my-2" id='guardarBtn' title="buscar"><i class="fa fa-search"></i>Guardar</button>        
+        </div>
                                     
         </div>					
         
-        <div class="col">
-            <button type="submit" class="btn btn-primary btn-sm d-inline" id='guardarBtn' title="buscar"><i class="fa fa-search"></i>Guardar</button>        
-        </div>	    				
+        	    				
     </div>
     </form>
 </div>

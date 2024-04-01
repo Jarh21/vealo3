@@ -8,9 +8,9 @@
             <div class="row">
                 <div class="col-6">
 
-                    <label for="">Comprobante</label><b>{{$retencionIva->comprobante}}</b>
-                    <input type="hidden" name="comprobante" value="{{$retencionIva->comprobante}}">
-                    <b>Agente</b> {{$retencionIva->rif_agente}} {{$retencionIva->nom_agente}}
+                    <label for="" class="mr-2">Comprobante</label><span>{{$retencionIva->comprobante ?? ''}}</span>
+                    <input type="hidden" name="comprobante" value="{{$retencionIva->comprobante ?? ''}}">
+                    <b>Agente</b> {{$retencionIva->rif_agente ?? ''}} {{$retencionIva->nom_agente ?? ''}}<br>
                     <label for="">Datos del Retenido</label>                    
                     <select name="proveedorRif"  id="proveedorRif" class="js-example-basic-single " style="width: 100%;" title="Seleccionar el proveedor de la facturas del siace" >
                     <option value=""></option>
@@ -39,7 +39,10 @@
                         </div>
                         <div class="card-body">
                         <button class="btn btn-primary my-2" type="submit">Actualizar Retención</button>
-                        <button class="btn btn-secondary my-2" onclick="anularRetencion('{{$retencionIva->comprobante}}','{{$retencionIva->rif_agente}}')">Anular Retención</button>
+                        <a class="btn btn-secondary my-2 text-white" onclick="anularRetencion('{{$retencionIva->comprobante}}')">Anular Retención</a>
+                        @if($ultimaRetencion->comprobante == $retencionIva->comprobante)
+                        <a class="btn btn-danger text-white" onclick="eliminarRetencion('{{$retencionIva->comprobante}}')">Eliminar Retencion</a>
+                        @endif
                         </div>
                     </div>
                 </div>
@@ -50,7 +53,7 @@
     <div class="progress" style="height: 10px;">
         <div class="progress-bar progress-bar-striped " role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
-    <detalle-retencion-iva :comprobante="{{$retencionIva->comprobante}}"></detalle-retencion-iva>
+    <detalle-retencion-iva :comprobante='{{$retencionIva->comprobante}}'></detalle-retencion-iva>
     
     
 </form>    
@@ -65,18 +68,36 @@
             /* maximumSelectionLength:1, */
         });
         
-        function anularRetencion(comprobante,rifagente){
+        function anularRetencion(comprobante){
             let confirmar = confirm("¿Confirma que desea anular esta retencion?");
+            
             if(confirmar){
-                window.location = "anular-comprobante/"+comprobante+"/"+rifagente;
+                
+                location.href = "../../retencion-iva/anular-comprobante/"+comprobante;
             }
         }
+
+        function eliminarRetencion(comprobante){
+            let confirmar = confirm("¿Confirma que desea Eliminar esta retencion?");
+            
+            if(confirmar){
+                
+                location.href = "../../retencion-iva/eliminar-comprobante/"+comprobante;
+            }
+        }
+
     </script>
     <script>
     $(document).ready(function(){
         $(window).on('load', function(){
             $('.progress-bar').animate({width:'100%'}, 1400); // Cambia 1000 por la duración deseada en milisegundos
+            setTimeout(function(){
+                // Oculta la barra de progreso después de 3 segundos (3000 milisegundos)
+                $('.progress').hide();
+            }, 3000);
+            
         });
+        
     });
 </script>
 @endsection

@@ -368,7 +368,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/retencion-iva/seleccion-sucursal/{empresa_rif}/{vista?}',[RetencionIvaController::class,'seleccionSucursal'])->name('retencion.iva.seleccion_sucursal');
     Route::get('/retencion-iva/editar-retencion/{comprobante}',[RetencionIvaController::class,'editarRetencionIva'])->name('retencion.iva.editar_retencion');
     Route::post('/retencion-iva/update-retencion',[RetencionIvaController::class,'actualizarRetencionIva'])->name('retencion.iva.update_retencion');
-    Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}',[RetencionIvaController::class,'consultarDetallesRetencionIva']);
+    Route::get('/retencion-iva/editar-retencion/listar-detalle-retencion/{comprobante}/{rifAgente?}',[RetencionIvaController::class,'consultarDetallesRetencionIva']);
     Route::post('/retencion-iva/editar-retencion/update-detalle-retencion',[RetencionIvaController::class,'updateDetalleRetencionIva']);
     Route::get('/retencion-iva/editar-retencion/consultar-retencion/{comprobante}',[RetencionIvaController::class,'consultarRetencionIva']);
     Route::get('/retencion-iva/buscar-factura/{keycodigo}',[RetencionIvaController::class,'buscarFactura']);
@@ -377,6 +377,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/retencion-iva/descargar-txt',[RetencionIvaController::class,'descargarTxt'])->name('retencion.iva.descargarTxt');
     Route::get('/retencion-iva/evio-email-retencion-iva/{comprobante?}/{empresaRif?}',[EmailController::class,'enviarEmailRetencionIva'])->name('retencion.iva.envioemail');
     Route::get('/retencion-iva/anular-comprobante/{comprobante?}/{empresaRif?}',[RetencionIvaController::class,'anularComprobante'])->name('retencion.iva.anularcomprobante');
+    Route::get('/retencion-iva/eliminar-comprobante/{comprobante?}/{empresaRif?}',[RetencionIvaController::class,'eliminarComprobante'])->name('retencion.iva.eliminarcomprobante');
 
 });
 //se sacaron del middleware Auth para que no requiere de inicio de sesion al momento de buscar informacion

@@ -5,7 +5,7 @@
 @endsection
 @section('content')
     <h4>Retencion IVA Registro de Retención <a href="{{route('retencion.iva.index')}}" class='btn btn-warning btn-sm float-right'>< Regresar</a></h4><hr>
-    <form action="{{route('retencion.iva.guardar')}}" method="post" name='registroRetencion' id='registroRetencion'>
+    <form action="{{route('retencion.iva.guardar')}}" method="post" name='registroRetencion' id='registroRetencion' target="_blank">
         @csrf
         <div class="card">
             <div class="card-body">
@@ -110,6 +110,9 @@
             if(formValido){
                 $("#guardarBtn").prop('disabled', true);
             }
+
+            window.open('', 'myNewWindow'); // Abre una nueva ventana o pestaña con un nombre específico
+            $(this).attr('target', 'myNewWindow'); // Establece el atributo target para que el resultado del formulario se abra en la nueva ventana o pestaña
         });
 
     });

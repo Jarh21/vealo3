@@ -128,7 +128,7 @@
 										<label for="">% Alicuota</label>
 										<input type="text" name="porc_alic" id="porc_alic" class="form-control" value="{{$iva ?? 0}}">
 										<label for="">% Retencion</label>
-										<input type="text" name="porc_reten" id="porc_reten" class="form-control">
+										<input type="text" name="porc_reten" id="porc_reten" class="form-control" readonly>
 
 									</div>
 									<div class="col">
@@ -139,7 +139,7 @@
 										<label for="">IVA Retenido</label>
 										<input type="text" name='iva_retenido' id='iva_retenido' class="form-control" readonly>
 										<label for="">Factura Manual</label>
-										<input type="checkbox" name="factura_import_manual" id="factura_import_manual">
+										<input type="checkbox" name="factura_import_manual" id="factura_import_manual"><br>
 										<label for="">Tipo de Operacion</label>
 										<label for="compra">Compra</label><input type="radio"  name="compra_venta" value="C" id="compra" @if($tipoOperacion=='C')checked @endif>
 										<label for="venta">Venta</label><input type="radio"  name="compra_venta" value="V" id="venta" @if($tipoOperacion=='V')checked @endif>
@@ -158,7 +158,7 @@
 					
 					<div class="col">
 						<button type="submit" class="btn btn-primary btn-sm d-inline" id='guardarBtn' title="buscar" onclick="abrirModalCargando()"><i class="fa fa-search"></i>Guardar</button>
-						<a href="#info1" class="inf mx-2">+ Opciones</a>
+						<!-- <a href="#info1" class="inf mx-2">+ Opciones</a> -->
 					</div>	    				
 				</div>
 				
@@ -219,21 +219,20 @@
 					@if(isset($registros))
 						@foreach($registros as $registro)
 						<tr id="tr{{$registro->keycodigo}}">
-							<td><input type="checkbox" id="check{{$registro->keycodigo}}" name="facturasPorRetener[]" onchange="isCheckBoxSeleccionado({{$registro->keycodigo}})" class="CheckedAK" value="{{$registro->keycodigo}}">{{$registro->keycodigo}}</td>
-							<td>{{$registro->nom_retenido}} <span class="badge badge-secondary">{{$registro->porc_reten ?? '0'}}%</span> </td>
-							<td>{{$registro->tipo_docu}}</td>
-							<td>{{$registro->documento}}</td>
-							<td>{{$registro->base_impon}}</td>
 							<td>
 								@if($registro->iva==0)
 									la factura no posee IVA
 								@else
-									{{$registro->iva}}
-								@endif
-							</td>
+									<input type="checkbox" id="check{{$registro->keycodigo}}" name="facturasPorRetener[]" onchange="isCheckBoxSeleccionado({{$registro->keycodigo}})" class="CheckedAK" value="{{$registro->keycodigo}}">{{$registro->keycodigo}}</td>
+								@endif	
+							<td>{{$registro->nom_retenido}} <span class="badge badge-secondary">{{$registro->porc_reten ?? '0'}}%</span> </td>
+							<td>{{$registro->tipo_docu}}</td>
+							<td>{{$registro->documento}}</td>
+							<td>{{$registro->base_impon}}</td>
+							<td>{{$registro->iva}}</td>
 							<td>{{$registro->iva_retenido}}</td> 
 							<td>
-							<a href="{{route('retencion.iva.editarDocumento',$registro->keycodigo)}}" target="popup" onClick="window.open(this.href, this.target, 'width=850,height=650,left=100,top=50');   return false;" class="btn btn-secondary btn-sm">Editar</a>
+							<a href="{{route('retencion.iva.editarDocumento',$registro->keycodigo)}}" target="popup" onClick="window.open(this.href, this.target, 'width=700,height=750,left=100,top=50');   return false;" class="btn btn-secondary btn-sm">Editar</a>
 
 								<button type='button' id='eliminarBtn{{$registro->keycodigo}}' class='btn btn-danger btn-sm' onclick="eliminar('{{$registro->keycodigo}}')">Eliminar</button>
 							</td>
@@ -318,7 +317,7 @@
 			}
 			/*validamos que le monto porcentaje re retencion 100 o 75 no este vacio*/
 			if(document.getElementById('porc_reten').value == ''){
-				alert("Debe ingresar el Porcentaje de retención del Impuesto del proveedor 100 o 75, si selecciona el proveedor este dato se cargara automaticamente");
+				alert("El proveedor seleccionado no tiene registrado cuanto porcentaje de retención se le calculara, por lo tanto modifique esta informacion en el proveedor para continuar.");
 				document.getElementById('porc_reten').focus();
 				return;
 			}
@@ -406,12 +405,16 @@
 			$("#guardarDocumentoForm").submit(function(){
 				/*******************validamos los campos del formulario dependiendo si es manual o importado */
 				 if ($('#factura_import_manual').is(':checked')) {
+
+					
 				
 					if ($('#base_impon').val() === '') {
 						alert('Antes de enviar el formulario debes calcular los montos, preciona el boton amarillo calcular');
 						event.preventDefault(); // Evita que el formulario se envíe
 					}
-				}				
+				}
+				$('#mi-modal').modal('show'); // Muestra el modal con fade
+				$('.progress-bar').animate({width:'95%'}, 4000); // Cambia 1000 por la duración deseada en milisegundos				
 				 	
 				$('#guardarBtn').prop('disabled',true);
 			});
@@ -494,8 +497,9 @@
 			
 		}
 		function abrirModalCargando(){
-			$('#mi-modal').modal('show'); // Muestra el modal con fade
-			$('.progress-bar').animate({width:'95%'}, 4000); // Cambia 1000 por la duración deseada en milisegundos
+			
+			
+			
 		}
 	</script>
 
