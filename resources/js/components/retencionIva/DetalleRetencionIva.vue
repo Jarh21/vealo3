@@ -38,16 +38,14 @@
                             <div class="row border" style="background-color:#F6F5F3">
                                 <div class="col mb-2">
                                     <label for="">Total Compra + Iva</label>
-                                    <input type="text" v-model="objFactura.comprasmasiva" ref="comprasmasiva" class="form-control">
+                                    <input type="text" v-model="objFactura.comprasmasiva" ref="comprasmasiva" class="form-control"  v-on:keyup="resetiva()">
                                     <label for="">Excento</label>
-                                    <input type="text" v-model="objFactura.sincredito" ref="sincredito" class="form-control">
+                                    <input type="text" v-model="objFactura.sincredito" ref="sincredito" class="form-control" v-on:keyup="resetiva()">
                                     <label for="">% Alicuota</label>
-                                    <input type="text" v-model="objFactura.porc_alic" ref="porc_alic" class="form-control" value="">
+                                    <input type="text" v-model="objFactura.porc_alic" ref="porc_alic" class="form-control" readonly>
                                     <label for="">% Retencion</label>                              
-                                    <select class="form-control" v-model="objFactura.porc_reten">
-                                        <option value="">-- selecciones % --</option>
-                                        <option v-for="(porcentaje, i) in porcentajes" :key="i" :value= "porcentaje.porcentaje" :selected ="objFactura.porc_reten === porcentaje.porcentaje">{{porcentaje.porcentaje}}</option>
-                                    </select>
+                                    <input type="text" v-model="objFactura.porc_reten" class="form-control" readonly>
+                                        
 
                                 </div>
                                 <div class="col">
@@ -130,7 +128,7 @@
             
             this.listarFacturas();
             this.consultarRetencion();
-            this.consultarPorcentajeRetencionIva();          
+                    
         },
     data(){
         return{
@@ -182,11 +180,7 @@
             let resultado = await axios.get("consultar-retencion/"+comprobante);
             this.total_retenido = resultado.data.total;
         },
-        async consultarPorcentajeRetencionIva(){
-            let resultado = await axios.get('../../admin/configuracion/lista-porce-retencionIva')
-            
-            this.porcentajes = resultado.data;
-        },
+        
         async buscarProveedor(rif){
             this.datosProveedor =0;
             let resultado = await axios.get('../../proveedor/buscar/'+rif)
@@ -271,7 +265,8 @@
 				this.$refs.porc_reten.focus();
 				return;
 			}
-					
+			
+            
 
 			let TC=parseFloat(this.objFactura.comprasmasiva);	
 			let CSC=parseFloat(this.objFactura.sincredito);
@@ -287,7 +282,7 @@
 
 			//Validamos que el monto excento no sea mayor que el monto total de la factura /	
 			if(CSC >= TC) {
-				alert("El Monto Excento"+CSC+" no debe ser mayor o igual al Total de la Compra !"+TC);				
+				alert("El Monto Excento = "+CSC+" no debe ser mayor o igual al Total de la Compra = "+TC);				
 				return;
 			}
 
@@ -297,11 +292,22 @@
 			this.objFactura.iva = IVA;
 			this.objFactura.iva_retenido = ((IVA*RET)/100).toFixed(2); 
         },
-       async updateFactura(){
-            await axios.post("update-detalle-retencion",this.objFactura);
-            alert("¡Registro de factura actualizado con exito!");
-            this.cerrarModalEditar();
-        }
+        async updateFactura(){
+            if(this.objFactura.iva_retenido == 0){
+				alert("antes de continuar debe calcular los valores de la retencion, haga click en el boton cacular");
+				
+				return;
+			}else{
+                await axios.post("update-detalle-retencion",this.objFactura);
+                alert("¡Registro de factura actualizado con exito!");
+                this.cerrarModalEditar();
+            }
+            
+        },
+        resetiva(){
+            this.objFactura.iva_retenido = 0;
+        },
+
     },
   };
   </script>

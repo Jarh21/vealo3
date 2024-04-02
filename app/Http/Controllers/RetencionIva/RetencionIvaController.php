@@ -303,6 +303,7 @@ class RetencionIvaController extends Controller
 	public function generarRetencionIva(Request $request){
 		//este metodo toma las facturas seleccionadas y genera la retencion de iva
 		$idFacturasPorRetener = $request->facturasPorRetener;
+		session(['documentos_seleccionados_iva'=>$idFacturasPorRetener]);//guardamos en la variable session por si regresamos a la vista anterior queden tildados los registros
 		$proveedorRif ='';
 		$proveedorNombre ='';
 		$rifProveedorComparar=array();
@@ -442,10 +443,30 @@ class RetencionIvaController extends Controller
 
 	public function listarRetencionesIva(){
 		$herramientas = new HerramientasController();
-		$retenciones_dat = DB::select( "select d.*,r.estatus as estatus_retencion from retenciones_dat d,retenciones r where  d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente order by d.keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
+		$cantidad=0;
+		if(empty(session('comprobanteIva')) and empty(session('proveedorIva')) and empty(session('fecha_desdeIva')) and empty(session('fecha_hastaIva')) and empty(session('documentoIva'))){
+			$retenciones_dat = DB::select( "select d.*,r.estatus as estatus_retencion from retenciones_dat d,retenciones r where  d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente order by d.keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
+			
+		}else{
+			
+			$condicion = array();
+			$condicion[]="retenciones_dat.estatus='C'";
+			$condicion[]="retenciones_dat.rif_agente='".session('empresaRif')."'";
+			$condicion[]="retenciones_dat.comprobante <> '0.00'";
+			$condicion[]="retenciones_dat.comprobante = retenciones.comprobante";
+			$condicion[]="retenciones_dat.rif_agente = retenciones.rif_agente";
+			if(!empty($comprobante)){$condicion[]="retenciones_dat.comprobante =".$comprobante;}
+			if(!empty($proveedor)){ $condicion[]="retenciones_dat.nom_retenido like '%".$proveedor."%'";}
+			if(!empty($fechaDesde)){ $condicion[]=" retenciones_dat.fecha_docu >='".$fechaDesde."'"; }
+			if(!empty($fechaHasta)){ $condicion[]=" retenciones_dat.fecha_docu <='".$fechaHasta."'";}
+			if(!empty($documento)){ $condicion[] = " retenciones_dat.documento in(".$documento.")";}
+			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
+			
+			$retenciones_dat = DB::select( "select retenciones_dat.*,retenciones.estatus as estatus_retencion from retenciones_dat,retenciones where  ". $whereClause." order by keycodigo desc ");	
+			$cantidad = count($retenciones_dat);
+		}	
 		
-
-		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas()]);
+		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas(),'cantidad'=>$cantidad]);
 	}
 
 	public function buscarRetencionIva(Request $request){
@@ -454,22 +475,41 @@ class RetencionIvaController extends Controller
 		$fechaDesde = $request->fecha_desde;
 		$fechaHasta = $request->fecha_hasta;
 		$documento = $request->documento;
+
+		 // Guardar los valores en variables de sesión
+		 if(!empty($comprobante)) { 
+			session(['comprobanteIva' => $comprobante]);
+		}
+		if(!empty($proveedor)) { 
+			session(['proveedorIva' => $proveedor]);
+		}
+		if(!empty($fechaDesde)) { 
+			session(['fecha_desdeIva' => $fechaDesde]);
+		}
+		if(!empty($fechaHasta)) { 
+			session(['fecha_hastaIva' => $fechaHasta]);
+		}
+		if(!empty($documento)) { 
+			session(['documentoIva' => $documento]);
+		}
 	
 		$condicion = array();
-		$condicion[]="estatus='C'";
-		$condicion[]="rif_agente='".session('empresaRif')."'";
-		$condicion[]="comprobante <> ''";
-		if(!empty($comprobante)){$condicion[]="comprobante =".$comprobante;}
-		if(!empty($proveedor)){ $condicion[]="nom_retenido like '%".$proveedor."%'";}
-		if(!empty($fechaDesde)){ $condicion[]=" fecha_docu >='".$fechaDesde."'"; }
-		if(!empty($fechaHasta)){ $condicion[]=" fecha_docu <='".$fechaHasta."'";}
-		if(!empty($documento)){ $condicion[] = " documento in(".$documento.")";}
+		$condicion[]="retenciones_dat.estatus='C'";
+		$condicion[]="retenciones_dat.rif_agente='".session('empresaRif')."'";
+		$condicion[]="retenciones_dat.comprobante <> '0.00'";
+		$condicion[]="retenciones_dat.comprobante = retenciones.comprobante";
+		$condicion[]="retenciones_dat.rif_agente = retenciones.rif_agente";
+		if(!empty($comprobante)){$condicion[]="retenciones_dat.comprobante =".$comprobante;}
+		if(!empty($proveedor)){ $condicion[]="retenciones_dat.nom_retenido like '%".$proveedor."%'";}
+		if(!empty($fechaDesde)){ $condicion[]=" retenciones_dat.fecha_docu >='".$fechaDesde."'"; }
+		if(!empty($fechaHasta)){ $condicion[]=" retenciones_dat.fecha_docu <='".$fechaHasta."'";}
+		if(!empty($documento)){ $condicion[] = " retenciones_dat.documento in(".$documento.")";}
 		$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 
 		$herramientas = new HerramientasController();
-		$retenciones_dat = DB::select( "select * from retenciones_dat where  ". $whereClause." order by keycodigo desc ");			
-
-		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas()]);
+		$retenciones_dat = DB::select( "select retenciones_dat.*,retenciones.estatus as estatus_retencion from retenciones_dat,retenciones where  ". $whereClause." order by keycodigo desc ");			
+		$cantidad = count($retenciones_dat);
+		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas(),'cantidad'=>$cantidad]);
 	}
 
 	public function seleccionSucursal($rifEmpresa,$vista='retencion.iva.listar'){
@@ -628,7 +668,7 @@ class RetencionIvaController extends Controller
 		}
 		
 		RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['estatus'=>'A','total'=>0]);
-		return redirect()->back();
+		return redirect()->route("retencion.iva.listar");
 	}
 
 	public function eliminarComprobante($comprobante,$empresaRif=''){

@@ -44,11 +44,11 @@
                 @csrf
                 Buscar Retencion <br>
                 Comprobante
-                <input type="text" name="comprobante" id="" placeholder='Nº de Comprobante'>
-                <input type="text" name="proveedor" placeholder='Nombre del proveedor'>
-                <input type="date" name="fecha_desde" title='fecha desde'>
-                <input type="date" name="fecha_hasta" title='fecha hasta'>
-                <input type="text" name="documento" placeholder='Documento ej:1234,555' title="Numero de documentos en caso de ser varios separar con coma(555,444)">
+                <input type="text" name="comprobante" id="" placeholder='Nº de Comprobante' value="{{ session('comprobanteIva') ?? ''}}">
+                <input type="text" name="proveedor" placeholder='Nombre del proveedor' value="{{ session('proveedorIva') ?? ''}}">
+                <input type="date" name="fecha_desde" title='fecha desde' value="{{ session('fecha_desdeIva') ?? ''}}">
+                <input type="date" name="fecha_hasta" title='fecha hasta' value="{{ session('fecha_hastaIva') ?? ''}}">
+                <input type="text" name="documento" placeholder='Documento ej:1234,555' title="Numero de documentos en caso de ser varios separar con coma(555,444)" value="{{ session('documentoIva') ?? ''}}">
                 <button type="submit">Buscar</button>
             </form>
            
@@ -114,7 +114,12 @@
 			</div>  			
 		@endif
     </div>
-    <table class='table'>
+    <div>      
+        
+        Resultado: {{$cantidad}} Registros
+        
+    </div>
+    <table class='table table-sm'>
         <thead>
             <tr>
                 

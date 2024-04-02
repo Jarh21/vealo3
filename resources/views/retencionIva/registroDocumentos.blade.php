@@ -126,7 +126,7 @@
 										<label for="">Excento</label>
 										<input type="text" name="sincredito" id="sincredito" class="form-control">
 										<label for="">% Alicuota</label>
-										<input type="text" name="porc_alic" id="porc_alic" class="form-control" value="{{$iva ?? 0}}">
+										<input type="text" name="porc_alic" id="porc_alic" class="form-control" value="{{$iva ?? 0}}" readonly>
 										<label for="">% Retencion</label>
 										<input type="text" name="porc_reten" id="porc_reten" class="form-control" readonly>
 
@@ -221,18 +221,28 @@
 						<tr id="tr{{$registro->keycodigo}}">
 							<td>
 								@if($registro->iva==0)
-									la factura no posee IVA
+									<b class="text-danger">La factura no posee IVA</b>
 								@else
-									<input type="checkbox" id="check{{$registro->keycodigo}}" name="facturasPorRetener[]" onchange="isCheckBoxSeleccionado({{$registro->keycodigo}})" class="CheckedAK" value="{{$registro->keycodigo}}">{{$registro->keycodigo}}</td>
+									<input type="checkbox" id="check{{$registro->keycodigo}}" name="facturasPorRetener[]" onchange="isCheckBoxSeleccionado({{$registro->keycodigo}})" class="CheckedAK" value="{{$registro->keycodigo}}" @if(in_array($registro->keycodigo, session('documentos_seleccionados_iva', []))) checked @endif></td>
 								@endif	
 							<td>{{$registro->nom_retenido}} <span class="badge badge-secondary">{{$registro->porc_reten ?? '0'}}%</span> </td>
-							<td>{{$registro->tipo_docu}}</td>
+							<td>
+								@if($registro->tipo_docu=='FA')
+									Factura
+								@endif
+								@if($registro->tipo_docu=='NC')
+									Nota Credito
+								@endif
+								@if($registro->tipo_docu=='ND')
+									Nota Debito
+								@endif
+							</td>
 							<td>{{$registro->documento}}</td>
 							<td>{{$registro->base_impon}}</td>
 							<td>{{$registro->iva}}</td>
 							<td>{{$registro->iva_retenido}}</td> 
 							<td>
-							<a href="{{route('retencion.iva.editarDocumento',$registro->keycodigo)}}" target="popup" onClick="window.open(this.href, this.target, 'width=700,height=750,left=100,top=50');   return false;" class="btn btn-secondary btn-sm">Editar</a>
+							<a href="{{route('retencion.iva.editarDocumento',$registro->keycodigo)}}" onclick="centeredPopup(this.href, 'myWindow', 700, 750); return false;" class="btn btn-secondary btn-sm">Editar</a>
 
 								<button type='button' id='eliminarBtn{{$registro->keycodigo}}' class='btn btn-danger btn-sm' onclick="eliminar('{{$registro->keycodigo}}')">Eliminar</button>
 							</td>
@@ -337,7 +347,7 @@
 
 			/**Validamos que el monto excento no sea mayor que el monto total de la factura */	
 			if(CSC >= TC) {
-				alert("El Monto Excento"+CSC+" no debe ser mayor o igual al Total de la Compra !"+TC);				
+				alert("El Monto Excento = "+CSC+" no debe ser mayor o igual al Total de la Compra = "+TC);				
 				return;
 			}
 
@@ -384,6 +394,10 @@
 /******************************************************************************************************** */
 		//mostart y ocultar div
 		jQuery(document).ready(function(){
+			/**si carga la pagina y hay un check habilitamos el boton Generar Retencion */
+			if ($('.CheckedAK').is(':checked')) {
+				document.getElementById("pagarcuentas").disabled = false;
+			}	
 			$(".oculto").hide();
 			$(".ocultoFacturaManual").hide();
 			/***************cuando presione el signo + y despliega otras opciones del formulario******** */
@@ -496,11 +510,27 @@
 			}
 			
 		}
-		function abrirModalCargando(){
-			
-			
-			
-		}
+		
 	</script>
+
+<script>
+	function centeredPopup(url, winName, w, h) {
+		/*centar la ventana pop up*/
+		const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screen.left;
+		const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screen.top;
+
+		const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+		const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+		const left = (width / 2) - (w / 2) + dualScreenLeft;
+		const top = (height / 2) - (h / 2) + dualScreenTop;
+
+		const newWindow = window.open(url, winName, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+		if (window.focus) {
+			newWindow.focus();
+		}
+	}
+</script>
 
 @endsection

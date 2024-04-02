@@ -4,8 +4,9 @@
 <form name="editarDocumentoForm" id="editarDocumentoForm" action="{{route('retencion.iva.updateDocumento')}}" method="post">
     <div class="row">		
         <div class="col">
+			<h4>Editar Documento</h4>
             <div class="row">
-                <div class="col mt-2">
+                <div class="col">
                     <label for="">Proveedor</label>
                     <select name="proveedorRif"  id="proveedorRif" class="js-example-basic-single " style="width: 100%;" title="Seleccionar el proveedor de la facturas del siace" >
                     <option value=""></option>
@@ -54,13 +55,13 @@
 			<div class="row border" style="background-color:#F6F5F3">
 				<div class="col mb-2">
 					<label for="">Total Compra + Iva</label>
-					<input type="text" name="comprasmasiva" id="comprasmasiva" value="{{$documento->comprasmasiva ?? ''}}" class="form-control" required>
+					<input type="text" name="comprasmasiva" id="comprasmasiva" value="{{$documento->comprasmasiva ?? ''}}" class="form-control" onkeyup="resetiva()" required>
 					<label for="">Excento</label>
-					<input type="text" name="sincredito" id="sincredito" value="{{$documento->sincredito ?? ''}}" class="form-control">
+					<input type="text" name="sincredito" id="sincredito" value="{{$documento->sincredito ?? ''}}" class="form-control" onkeyup="resetiva()">
 					<label for="">% Alicuota</label>
-					<input type="text" name="porc_alic" id="porc_alic" class="form-control" value="{{$iva ?? 0}}">
+					<input type="text" name="porc_alic" id="porc_alic" class="form-control" value="{{$iva ?? 0}}" readonly>
 					<label for="">% Retencion</label>
-					<input type="text" name="porc_reten" id="porc_reten" value="{{$documento->porc_reten}}" class="form-control" required>
+					<input type="text" name="porc_reten" id="porc_reten" value="{{$documento->porc_reten}}" class="form-control" required readonly>
 
 				</div>
 				<div class="col">
@@ -170,7 +171,7 @@
 
 			/**Validamos que el monto excento no sea mayor que el monto total de la factura */	
 			if(CSC >= TC) {
-				alert("El Monto Excento"+CSC+" no debe ser mayor o igual al Total de la Compra !"+TC);				
+				alert("El Monto Excento = "+CSC+" no debe ser mayor o igual al Total de la Compra = "+TC);				
 				return;
 			}
 
@@ -190,7 +191,7 @@
 		/********************cuando envias el documento deshabilita el boton guardar******************** */
 		$("#editarDocumentoForm").submit(function(){			
 			
-			if ($('#base_impon').val() === '') {
+			if ($('#iva_retenido').val() === 0) {
 				alert('Antes de enviar el formulario debes calcular los montos, preciona el boton amarillo calcular');
 				event.preventDefault(); // Evita que el formulario se envíe
 			}
@@ -200,5 +201,9 @@
 			}	
 			$('#guardarBtn').prop('disabled',true);
 		});
+
+		function resetiva(){
+			$('#iva_retenido').val('0');
+		}
 		
 	</script>
