@@ -191,11 +191,11 @@
 		/********************cuando envias el documento deshabilita el boton guardar******************** */
 		$("#editarDocumentoForm").submit(function(){			
 			
-			if ($('#iva_retenido').val() === 0) {
+			if ($('#iva_retenido').val() == 0) {
 				alert('Antes de enviar el formulario debes calcular los montos, preciona el boton amarillo calcular');
 				event.preventDefault(); // Evita que el formulario se envíe
 			}
-			if($('#tipo_documento').val() != 'FA' && $("#factura_afectada")===''){
+			if($('#tipo_documento').val() != 'FA' && $("#factura_afectada")==''){
 				alert('El campo Factura Afectada es requerido ya que es una nota de credito o debito que se esta registrando');
 				event.preventDefault(); // Evita que el formulario se envíe					
 			}	

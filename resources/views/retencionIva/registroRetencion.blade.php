@@ -25,7 +25,7 @@
                         <input type="date" class='form-control' name='fecha' required>
                         <label for="">Nº Comprobante</label>
                         <input type="text" class='form-control' name='comprobante' value='{{$contador}}' readonly>
-                        <label for="">Nº Egreso/Cheque</label>
+                        <label for="">Nº Referencia Bancaria</label>
                         <input type="text" class='form-control' name='cheque' >
                     </div>
                     <div class="col">
@@ -107,9 +107,9 @@
                 }
             });
             // Si los campos están llenos, deshabilitar el botón de submit
-            if(formValido){
-                $("#guardarBtn").prop('disabled', true);
-            }
+           
+            $("#guardarBtn").prop('disabled', true);
+            
 
             window.open('', 'myNewWindow'); // Abre una nueva ventana o pestaña con un nombre específico
             $(this).attr('target', 'myNewWindow'); // Establece el atributo target para que el resultado del formulario se abra en la nueva ventana o pestaña

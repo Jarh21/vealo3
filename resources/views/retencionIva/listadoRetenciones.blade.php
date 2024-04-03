@@ -49,6 +49,8 @@
                 <input type="date" name="fecha_desde" title='fecha desde' value="{{ session('fecha_desdeIva') ?? ''}}">
                 <input type="date" name="fecha_hasta" title='fecha hasta' value="{{ session('fecha_hastaIva') ?? ''}}">
                 <input type="text" name="documento" placeholder='Documento ej:1234,555' title="Numero de documentos en caso de ser varios separar con coma(555,444)" value="{{ session('documentoIva') ?? ''}}">
+                Limite
+                <input type="text" name="limite" value="{{ session('limite') ?? '100'}} " style="width:60px">
                 <button type="submit">Buscar</button>
             </form>
            

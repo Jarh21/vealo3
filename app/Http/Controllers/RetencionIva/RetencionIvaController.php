@@ -444,8 +444,12 @@ class RetencionIvaController extends Controller
 	public function listarRetencionesIva(){
 		$herramientas = new HerramientasController();
 		$cantidad=0;
+		$limite = 100;
+		if(!empty(session('limite'))){
+			$limite = (session('limite'));
+		}
 		if(empty(session('comprobanteIva')) and empty(session('proveedorIva')) and empty(session('fecha_desdeIva')) and empty(session('fecha_hastaIva')) and empty(session('documentoIva'))){
-			$retenciones_dat = DB::select( "select d.*,r.estatus as estatus_retencion from retenciones_dat d,retenciones r where  d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente order by d.keycodigo desc limit 20",['rifAgente'=>session('empresaRif')]);
+			$retenciones_dat = DB::select( "select d.*,r.estatus as estatus_retencion from retenciones_dat d,retenciones r where  d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente order by d.keycodigo desc limit 100",['rifAgente'=>session('empresaRif')]);
 			
 		}else{
 			
@@ -462,7 +466,7 @@ class RetencionIvaController extends Controller
 			if(!empty($documento)){ $condicion[] = " retenciones_dat.documento in(".$documento.")";}
 			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 			
-			$retenciones_dat = DB::select( "select retenciones_dat.*,retenciones.estatus as estatus_retencion from retenciones_dat,retenciones where  ". $whereClause." order by keycodigo desc ");	
+			$retenciones_dat = DB::select( "select retenciones_dat.*,retenciones.estatus as estatus_retencion from retenciones_dat,retenciones where  ". $whereClause." order by keycodigo desc limit ".$limite);	
 			$cantidad = count($retenciones_dat);
 		}	
 		
@@ -475,24 +479,38 @@ class RetencionIvaController extends Controller
 		$fechaDesde = $request->fecha_desde;
 		$fechaHasta = $request->fecha_hasta;
 		$documento = $request->documento;
-
+		$limite = $request->limite;
 		 // Guardar los valores en variables de sesión
-		 if(!empty($comprobante)) { 
+		if(!empty($comprobante)) { 
 			session(['comprobanteIva' => $comprobante]);
+		}else{
+			session(['comprobanteIva' => '']);
 		}
 		if(!empty($proveedor)) { 
 			session(['proveedorIva' => $proveedor]);
+		}else{
+			session(['proveedorIva' => '']);
 		}
 		if(!empty($fechaDesde)) { 
 			session(['fecha_desdeIva' => $fechaDesde]);
+		}else{
+			session(['fecha_desdeIva' => '']);
 		}
 		if(!empty($fechaHasta)) { 
 			session(['fecha_hastaIva' => $fechaHasta]);
+		}else{
+			session(['fecha_hastaIva' => '']);
 		}
 		if(!empty($documento)) { 
 			session(['documentoIva' => $documento]);
+		}else{
+			session(['documentoIva' => '']);
 		}
-	
+		if(!empty($limite)) { 
+			session(['limite' => $limite]);
+		}else{
+			session(['limite' => '']);
+		}
 		$condicion = array();
 		$condicion[]="retenciones_dat.estatus='C'";
 		$condicion[]="retenciones_dat.rif_agente='".session('empresaRif')."'";
@@ -507,7 +525,7 @@ class RetencionIvaController extends Controller
 		$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 
 		$herramientas = new HerramientasController();
-		$retenciones_dat = DB::select( "select retenciones_dat.*,retenciones.estatus as estatus_retencion from retenciones_dat,retenciones where  ". $whereClause." order by keycodigo desc ");			
+		$retenciones_dat = DB::select( "select retenciones_dat.*,retenciones.estatus as estatus_retencion from retenciones_dat,retenciones where  ". $whereClause." order by keycodigo desc limit ".$limite);			
 		$cantidad = count($retenciones_dat);
 		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas(),'cantidad'=>$cantidad]);
 	}
