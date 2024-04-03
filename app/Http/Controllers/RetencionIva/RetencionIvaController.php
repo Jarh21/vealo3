@@ -459,11 +459,11 @@ class RetencionIvaController extends Controller
 			$condicion[]="retenciones_dat.comprobante <> '0.00'";
 			$condicion[]="retenciones_dat.comprobante = retenciones.comprobante";
 			$condicion[]="retenciones_dat.rif_agente = retenciones.rif_agente";
-			if(!empty($comprobante)){$condicion[]="retenciones_dat.comprobante =".$comprobante;}
-			if(!empty($proveedor)){ $condicion[]="retenciones_dat.nom_retenido like '%".$proveedor."%'";}
-			if(!empty($fechaDesde)){ $condicion[]=" retenciones_dat.fecha_docu >='".$fechaDesde."'"; }
-			if(!empty($fechaHasta)){ $condicion[]=" retenciones_dat.fecha_docu <='".$fechaHasta."'";}
-			if(!empty($documento)){ $condicion[] = " retenciones_dat.documento in(".$documento.")";}
+			if(!empty(session('comprobanteIva'))){$condicion[]="retenciones_dat.comprobante =".session('comprobanteIva');}
+			if(!empty(session('proveedorIva'))){ $condicion[]="retenciones_dat.nom_retenido like '%".session('proveedorIva')."%'";}
+			if(!empty(session('fecha_desdeIva'))){ $condicion[]=" retenciones_dat.fecha_docu >='".session('fecha_desdeIva')."'"; }
+			if(!empty(session('fecha_hastaIva'))){ $condicion[]=" retenciones_dat.fecha_docu <='".session('fecha_hastaIva')."'";}
+			if(!empty(session('documentoIva'))){ $condicion[] = " retenciones_dat.documento in(".session('documentoIva').")";}
 			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 			
 			$retenciones_dat = DB::select( "select retenciones_dat.*,retenciones.estatus as estatus_retencion from retenciones_dat,retenciones where  ". $whereClause." order by keycodigo desc limit ".$limite);	
