@@ -1,4 +1,4 @@
-<?php $version='3.1.12'; ?>
+<?php $version='3.2'; ?>
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>

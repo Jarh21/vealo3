@@ -73,18 +73,18 @@
             </div>
         </div>
         @endcan
-        @can('cuadres.index')
+        @can('retencion.iva.index')
         <div class="card m-1 offset-3" style="width: 23rem; border-radius: 6px;">
             <div class="card-body d-inline-flex m-0 p-0 border" style="border-radius: 6px;">
                 <div class="row-cols">
                     <div class="bg-modulo-card1 m-0 p-0 d-flex justify-content-center align-content-center" style="width: 7rem; height: 100%; border-radius: 6px;">
-                        <img src="{{asset('imagen/bg-card6.jpeg')}}" class="mt-5 rounded-circle" style="width: 92px; height: 92px;">
+                        <img src="{{asset('imagen/seniat-iva.jpg')}}" class="mt-5 rounded-circle" style="width: 92px; height: 92px;">
                     </div>
                 </div>
                 <div class="row-col m-3">
-                    <h4 class="card-title font-weight-bold text-info ">CUADRES</h4>
-                    <p class="card-text text-dark text-center">Registro y control de cuadres, {{session('nombre_general_empresa')}}</p>
-                    <a href="{{route('cuadres.index')}}" class="btn btn-info d-flex justify-content-center">Ir al modulo<i class="fas fa-arrow-circle-right ml-2 mt-1"></i></a>
+                    <h4 class="card-title font-weight-bold " style="color:#D4A5FB">Retención IVA</h4>
+                    <p class="card-text text-dark text-center">Registro de retencion de IVA, {{session('nombre_general_empresa')}}</p>
+                    <a href="{{route('retencion.iva.index')}}" class="btn btn-info d-flex justify-content-center" style="background-color:#D4A5FB">Ir al modulo<i class="fas fa-arrow-circle-right ml-2 mt-1"></i></a>
                 </div>
             </div>
         </div>
