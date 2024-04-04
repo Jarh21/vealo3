@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Herramientas;
 
 use App\Http\Controllers\Controller;
 use App\Mail\Notification;
-use Illuminate\support\facades\Mail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\RetencionIva\RetencionIvaController;
 use App\Models\Proveedor;
