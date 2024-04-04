@@ -30,7 +30,7 @@ use App\Http\Controllers\InformesAdicionales\VendedorComisionController;
 use App\Http\Controllers\InformesAdicionales\HabladoresController;
 use App\Http\Controllers\AsistenteCompras\AsistenteComprasController;
 use App\Http\Controllers\RetencionIva\RetencionIvaController;
-use App\Http\Controllers\herramientas\EmailController;
+use App\Http\Controllers\Herramientas\EmailController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
