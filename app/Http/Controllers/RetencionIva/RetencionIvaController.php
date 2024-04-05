@@ -388,13 +388,58 @@ class RetencionIvaController extends Controller
 		
 
 		//nombre del mes
-		setlocale(LC_TIME, 'es-ES');		
-		$dateObj   = DateTime::createFromFormat('!m', $mes);
-		$monthName = strftime('%B', $dateObj->getTimestamp());
 		
+		if($mes == '01'){
+		$monthName="ENERO";				
+		}
+			
+		if($mes == '02'){
+		$monthName="FEBRERO";		
+		}
+					
+		if($mes == '03'){
+		$monthName="MARZO";				
+		}
+			
+		if($mes == '04'){
+		$monthName="ABRIL";				
+		}
+			
+		if($mes == '05'){
+		$monthName="MAYO";				
+		}
+			
+		if($mes == '06'){
+		$monthName="JUNIO";				
+		}
+			
+		if($mes == '07'){
+		$monthName="JULIO";				
+		}
+			
+		if($mes == '08'){
+		$monthName="AGOSTO";			
+		}
+				
+		if($mes == '09'){
+		$monthName="SEPTIEMBRE";
+		}				
+			
+		if($mes == '10'){
+		$monthName="OCTUBRE";		
+		}
+					
+		if($mes == '11'){
+		$monthName="NOVIEMBRE";
+		}
+							
+		if($mes == '12'){
+		$monthName="DICIEMBRE";
+		}
+										
 
 		$datosModificados['anio']=$anio;
-		$datosModificados['mes']=ucfirst($monthName);
+		$datosModificados['mes']=$monthName;
 
 		$pdf = new Dompdf();
         $options = new Options();
