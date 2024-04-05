@@ -443,8 +443,7 @@
 					$('#proveedorRif').removeAttr('required');
 					$('#proveedorRif').removeAttr('required');
 					$('#fecha_docu').removeAttr('required');
-					$('#control_fact').removeAttr('required');
-					$('#tipo_trans').removeAttr('required');					
+					$('#control_fact').removeAttr('required');										
 					$('#comprasmasiva').removeAttr('required');
 					$('#porc_alic').removeAttr('required');
 					$('#porc_reten').removeAttr('required');
@@ -457,8 +456,7 @@
 					$('#factura_import_manual').prop('checked', true);
 					$('#proveedorRif').attr('required', 'required');
 					$('#fecha_docu').attr('required', 'required');
-					$('#control_fact').attr('required', 'required');
-					$('#tipo_trans').attr('required', 'required');					
+					$('#control_fact').attr('required', 'required');										
 					$('#comprasmasiva').attr('required', 'required');
 					$('#porc_alic').attr('required', 'required');
 					$('#porc_reten').attr('required', 'required');

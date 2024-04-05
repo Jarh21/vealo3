@@ -400,7 +400,7 @@ class RetencionIvaController extends Controller
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
-		$pdf->setPaper('legal','landscape'); // Establecer la orientación a horizontal
+		$pdf->setPaper('letter','landscape'); // Establecer la orientación a horizontal
         $pdf->setOptions($options);
         $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa,'datosModificados'=>$datosModificados,'firma'=>$firma])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
 
