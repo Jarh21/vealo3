@@ -637,7 +637,7 @@ class RetencionIvaController extends Controller
 		INNER JOIN retenciones r ON d.comprobante = r.comprobante
 		WHERE
 		(
-		(d.tipo_docu='FA' AND (r.fecha BETWEEN :fechaini_fa AND :fechafin_fa) AND r.estatus in('N','A'))
+		(d.tipo_docu='FA' AND (r.fecha BETWEEN :fechaini_fa AND :fechafin_fa) AND r.estatus in('N'))
 		OR 
 		(d.tipo_docu<>'FA' AND (r.fecha BETWEEN :fechaini_nc AND :fechafin_nc) AND r.estatus='N' AND (d.`fact_afectada` IN(SELECT det.documento FROM retenciones_dat det,retenciones ret WHERE ret.comprobante = det.comprobante AND (ret.fecha BETWEEN :fechaini_afec AND :fechafin_afec) AND ret.rif_agente= :empresaRif_afec)))
 		)  
@@ -645,7 +645,8 @@ class RetencionIvaController extends Controller
 		",['fechaini_fa'=>$fechaini,'fechafin_fa'=>$fechafin,'fechaini_nc'=>$fechaini,'fechafin_nc'=>$fechafin,'fechaini_afec'=>$fechaini,'fechafin_afec'=>$fechafin,'empresaRif_afec'=>$empresaRif,'empresaRif'=>$empresaRif]); 
 		$contenido ='';
 		$tipoDocumento ='';
-
+		$fact_afectada=0.00;
+		$rif_retenido='';		
 		foreach($detalleTxt as $registro){
 			if($registro->tipo_docu=='FA'){
 				$tipoDocumento='01';
@@ -657,9 +658,15 @@ class RetencionIvaController extends Controller
 				$tipoDocumento='03';
 			}
 			if($registro->estatus_retencion=='N'){
-				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $registro->rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $registro->fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
+				if(empty($registro->fact_afectada)){
+					$fact_afectada=0.00;
+				}else{
+					$fact_afectada=$registro->fact_afectada;
+				}
+				$rif_retenido = str_replace("-","",$registro->rif_retenido);
+				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
 			}else{
-				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $registro->rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". 0 ."\t". 0 ."\t". 0 ."\t". 0 ."\t". $registro->comprobante ."\t". 0 ."\t". 0 ."\t". '0' ."\n";
+				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". 0 ."\t". 0 ."\t". 0 ."\t". 0 ."\t". $registro->comprobante ."\t". 0 ."\t". 0 ."\t". '0' ."\n";
 			
 			}	
 

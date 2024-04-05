@@ -1,5 +1,7 @@
 <?php 
  // use DateTime;
+ date_default_timezone_set('UTC');
+date_default_timezone_set("America/Caracas");
   $ofecha = new DateTime($retencionIva->fecha);
   $fecha = $ofecha->format('d-m-Y');
   
@@ -47,9 +49,9 @@
           <td align="center">&nbsp;</td>
         </tr>
         <tr>
-          <td width="258"><span class="Estilo1">NOMBRE O RAZON SOCIAL DEL AGENTE DE RETENCION</span></td>
-          <td width="258" align="center"><span class="Estilo1">REGISTRO DE INFORMACION FISCAL DEL AGENTE DE RETENCION (RIF)</span></td>
-          <td width="258" align="center"><span class="Estilo1">PERIODO FISCAL</span></td>
+          <td width="250"><span class="Estilo1">NOMBRE O RAZON SOCIAL DEL AGENTE DE RETENCION</span></td>
+          <td width="270" align="center"><span class="Estilo1">REGISTRO DE INFORMACION FISCAL DEL AGENTE DE RETENCION (RIF)</span></td>
+          <td width="242" align="center"><span class="Estilo1">PERIODO FISCAL</span></td>
         </tr>
         <tr>
           <td class="Estilo2">{{$retencionIva->nom_agente}}</td>
@@ -133,7 +135,7 @@
         <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'ND'){{$datosFactura->documento}}@endif </span></td> <!-- nota debito -->
         <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'NC'){{$datosFactura->documento}}@endif </span></td> <!-- nota credito -->
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->tipo_trans}}</span></td>
-        <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->fact_afectada}}</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->fact_afectada ?? ''}}</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->comprasmasiva,2,',','.')}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->sincredito,2,',','.')}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->base_impon,2,',','.')}}&nbsp;</span></td>

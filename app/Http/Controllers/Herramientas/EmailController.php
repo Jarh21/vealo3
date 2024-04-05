@@ -38,7 +38,7 @@ class EmailController extends Controller
         $proveedor = Proveedor::where('rif',$datosRetencion->rif_retenido)->select('correo')->first();
         if(!empty($proveedor->correo)){
             
-            $response = Mail::to($proveedor->correo)->cc('gerenciasistemasfh@gmail.com')->send(new Notification($nomRetenido,$comprobante,$nomAgente));
+            $response = Mail::to($proveedor->correo)->cc('gfdpagos@gmail.com')->send(new Notification($nomRetenido,$comprobante,$nomAgente));
             //actualizamos la bandera de correo enviado en la tabla retenciones_dat
             RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);
             return 1;
