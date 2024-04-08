@@ -16,6 +16,8 @@ use App\Http\Controllers\Herramientas\HerramientasController;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Exports\RetencionIvaContableExcel;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RetencionIvaController extends Controller
 {
@@ -677,7 +679,7 @@ class RetencionIvaController extends Controller
 		$empresaRif =session('empresaRif');
 		$nomCortoEmpresa = Empresa::where('rif',$empresaRif)->select('nom_corto')->first();
 		$detalleTxt = DB::select("
-		SELECT r.rif_agente,r.fecha,d.comprobante,r.periodo,r.estatus as estatus_retencion,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic 
+		SELECT r.rif_agente,r.fecha,d.comprobante,r.periodo,r.estatus as estatus_retencion,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic,d.porc_reten 
 		FROM 
 		retenciones_dat d
 		INNER JOIN retenciones r ON d.comprobante = r.comprobante
@@ -690,13 +692,18 @@ class RetencionIvaController extends Controller
 		AND d.rif_agente= :empresaRif
 		",['fechaini_fa'=>$fechaini,'fechafin_fa'=>$fechafin,'fechaini_nc'=>$fechaini,'fechafin_nc'=>$fechafin,'fechaini_afec'=>$fechaini,'fechafin_afec'=>$fechafin,'empresaRif_afec'=>$empresaRif,'empresaRif'=>$empresaRif]); 
 		$contenido ='';
+		$contenidoContable ='';
 		$tipoDocumento ='';
 		$fact_afectada=0.00;
 		$rif_retenido='';	
 		$rif_agente ='';	
 		$periodo ='';
+		$newNombre ='';
+		$quincena ='';
+		$fecha='';
 		foreach($detalleTxt as $registro){
 			$periodo = $registro->periodo;
+			$fecha = date("d/m/Y", strtotime($registro->fecha));
 			if($registro->tipo_docu=='FA'){
 				$tipoDocumento='01';
 			}
@@ -715,22 +722,86 @@ class RetencionIvaController extends Controller
 				$rif_retenido = str_replace("-","",$registro->rif_retenido);
 				$rif_agente = str_replace("-","",$registro->rif_agente);
 				$contenido.= $rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
+				$contenidoContable.= $fecha ."\t". $registro->nom_retenido ."\t". $rif_retenido ."\t". $registro->iva_retenido ."\t". $registro->porc_reten ."\t". $registro->comprobante ."\t".$fecha."\n";
 			}else{
 				$contenido.= $rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". 0 ."\t". 0 ."\t". 0 ."\t". 0 ."\t". $registro->comprobante ."\t". 0 ."\t". 0 ."\t". '0' ."\n";
 			
 			}	
 
 		}
-		Storage::disk('local')->put('SENIAT_'.$nomCortoEmpresa.'_'.$periodo.'.txt', $contenido);
-		return view('retencionIva.generarTxt',['empresas'=>$herramientas->listarEmpresas(),'detalleTxt'=>$detalleTxt,'fechaini'=>$fechaini,'fechafin'=>$fechafin]);
+		Storage::disk('local')->put('SENIAT_'.$nomCortoEmpresa->nom_corto.'.txt', $contenido);
+		Storage::disk('local')->put('CONTABLE_'.$nomCortoEmpresa->nom_corto.'.txt', $contenidoContable);
+		//preparar el nombre del archivo
+		$anio = substr($periodo, 0, 4);
+		$mes = substr($periodo,4,2);
+		
+		//nombre del mes
+
+			if($mes == '01'){
+			$monthName="Ene";				
+			}
+				
+			if($mes == '02'){
+			$monthName="Feb";		
+			}
+						
+			if($mes == '03'){
+			$monthName="Mar";				
+			}
+				
+			if($mes == '04'){
+			$monthName="Abr";				
+			}
+				
+			if($mes == '05'){
+			$monthName="May";				
+			}
+				
+			if($mes == '06'){
+			$monthName="Jun";				
+			}
+				
+			if($mes == '07'){
+			$monthName="Jul";				
+			}
+				
+			if($mes == '08'){
+			$monthName="Ago";			
+			}
+					
+			if($mes == '09'){
+			$monthName="Sep";
+			}				
+				
+			if($mes == '10'){
+			$monthName="Oct";		
+			}
+						
+			if($mes == '11'){
+			$monthName="Nov";
+			}
+								
+			if($mes == '12'){
+			$monthName="Dic";
+			}
+
+			if($fechafin >= $anio.'-'.$mes.'-16'){
+				$quincena = '2QC';
+			}else{
+				$quincena = '1QC';
+			}
+			$newNombre=$nomCortoEmpresa->nom_corto.'_'.$quincena.'_'.$monthName.$anio.'.txt';
+
+		return view('retencionIva.generarTxt',['empresas'=>$herramientas->listarEmpresas(),'detalleTxt'=>$detalleTxt,'fechaini'=>$fechaini,'fechafin'=>$fechafin,'archivo'=>$nomCortoEmpresa->nom_corto.'.txt','newNombre'=>$newNombre]);
 	}
 
-	public function descargarTxt(){
-		$archivo = 'archivo.txt';
+	public function descargarTxt($archivo,$newNombre){
+		
+		
     	$rutaArchivo = storage_path('app/' . $archivo);
 
 		if (Storage::disk('local')->exists($archivo)) {
-			return response()->download($rutaArchivo, $archivo, ['Content-Type' => 'text/plain']);
+			return response()->download($rutaArchivo, $newNombre, ['Content-Type' => 'text/plain']);
 		} else {
 			return response()->json(['error' => 'El archivo no existe'], 404);
 		}

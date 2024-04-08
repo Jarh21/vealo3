@@ -9,7 +9,7 @@ date_default_timezone_set("America/Caracas");
 <!-- /******************************************************************** */ -->
 <style type="text/css">
   html {
-	  margin: 10pt 12pt;
+	  margin: 10pt 25pt;
   }
 
 .Estilo1 {
@@ -21,10 +21,7 @@ date_default_timezone_set("America/Caracas");
 
 
 </style>
-<style type="text/css" media="print">
-.nover {display:none}
 
-</style>
 <span class="Estilo2">{{now()}}</span>
 <table width="775"  border="0" cellspacing="0" cellpadding="0">
   <tr>
@@ -94,7 +91,7 @@ date_default_timezone_set("America/Caracas");
     <td>&nbsp;</td>
   </tr>
   <tr>
-    <td><table width="768" border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
+    <td><table width="765" border="0" cellpadding="0" cellspacing="1" bgcolor="#000000">
 
       <tr align="center">
         <td colspan="10" bgcolor="#FFFFFF">&nbsp;</td>
@@ -142,7 +139,7 @@ date_default_timezone_set("America/Caracas");
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->porc_alic}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->iva,2,',','.')}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->iva_retenido,2,',','.')}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->porc_reten}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->porc_reten,2,',','.')}}&nbsp;</span></td>
       </tr>   
       <?php 
         $contador++; 
@@ -190,7 +187,7 @@ date_default_timezone_set("America/Caracas");
 	</td>
   </tr>
 </table>
-<table width="768" border="0" >
+<table width="764" border="0" >
   <tr>
       <td>&nbsp;</td>
   </tr>

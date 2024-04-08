@@ -47,7 +47,10 @@
                                 </div>
                             </div>
                             <button class="btn btn-primary float-right my-2">Buscar</button>
-                            @if(isset($detalleTxt))<a href="{{route('retencion.iva.descargarTxt')}}" class="btn btn-success my-2">Exportar TXT</a>@endif
+                            @if(isset($detalleTxt))
+                                <a href="{{route('retencion.iva.descargarTxt',['SENIAT_'.$archivo,'SENIAT_'.$newNombre])}}" class="btn btn-danger my-2">Exportar TXT SENIAT</a>
+                                <a href="{{route('retencion.iva.descargarTxt',['CONTABLE_'.$archivo,'CONTABLE_'.$newNombre])}}" class="btn btn-success my-2">Exportar TXT CONTABLE</a>
+                            @endif
                         </div>
                     </div>
                 </form>
@@ -103,7 +106,7 @@
                 @endforeach
             </tbody>
         </table>
-        <div class="text-center"><a href="{{route('retencion.iva.descargarTxt')}}" class="btn btn-success my-2">Exportar TXT</a></div>
+        
         </div>
         
         @endif

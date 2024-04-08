@@ -6,3 +6,7 @@ PHP extension php_iconv enabled
 PHP extension php_simplexml enabled
 PHP extension php_xmlreader enabled
 PHP extension php_zlib enabled
+--------para los archivos pdf------
+PHP extension php-gd apt-get install php-gd
+php extension php-curl apt-get install php-curl
+composer require barryvdh/laravel-dompdf
