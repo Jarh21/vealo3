@@ -675,6 +675,7 @@ class RetencionIvaController extends Controller
 		$fechaini = $request->fechaini;
 		$fechafin = $request->fechafin;
 		$empresaRif =session('empresaRif');
+		$nomCortoEmpresa = Empresa::where('rif',$empresaRif)->select('nom_corto')->first();
 		$detalleTxt = DB::select("
 		SELECT r.rif_agente,r.fecha,d.comprobante,r.periodo,r.estatus as estatus_retencion,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic 
 		FROM 
@@ -691,8 +692,11 @@ class RetencionIvaController extends Controller
 		$contenido ='';
 		$tipoDocumento ='';
 		$fact_afectada=0.00;
-		$rif_retenido='';		
+		$rif_retenido='';	
+		$rif_agente ='';	
+		$periodo ='';
 		foreach($detalleTxt as $registro){
+			$periodo = $registro->periodo;
 			if($registro->tipo_docu=='FA'){
 				$tipoDocumento='01';
 			}
@@ -709,14 +713,15 @@ class RetencionIvaController extends Controller
 					$fact_afectada=$registro->fact_afectada;
 				}
 				$rif_retenido = str_replace("-","",$registro->rif_retenido);
-				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
+				$rif_agente = str_replace("-","",$registro->rif_agente);
+				$contenido.= $rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". $registro->comprasmasiva ."\t". $registro->base_impon ."\t". $registro->iva_retenido ."\t". $fact_afectada ."\t". $registro->comprobante ."\t". $registro->sincredito ."\t". $registro->porc_alic ."\t". '0' ."\n";
 			}else{
-				$contenido.= $registro->rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". 0 ."\t". 0 ."\t". 0 ."\t". 0 ."\t". $registro->comprobante ."\t". 0 ."\t". 0 ."\t". '0' ."\n";
+				$contenido.= $rif_agente . "\t" . $registro->periodo . "\t" . $registro->fecha_docu ."\t". $registro->estatus ."\t". $tipoDocumento ."\t". $rif_retenido ."\t". $registro->documento ."\t". $registro->control_fact ."\t". 0 ."\t". 0 ."\t". 0 ."\t". 0 ."\t". $registro->comprobante ."\t". 0 ."\t". 0 ."\t". '0' ."\n";
 			
 			}	
 
 		}
-		Storage::disk('local')->put('archivo.txt', $contenido);
+		Storage::disk('local')->put('SENIAT_'.$nomCortoEmpresa.'_'.$periodo.'.txt', $contenido);
 		return view('retencionIva.generarTxt',['empresas'=>$herramientas->listarEmpresas(),'detalleTxt'=>$detalleTxt,'fechaini'=>$fechaini,'fechafin'=>$fechafin]);
 	}
 

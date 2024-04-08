@@ -1,7 +1,7 @@
-@extends('layouts.app')
-@section('content')
+<link href="{{ asset('css/app.css') }}" rel="stylesheet">
+<div id="app">
     <div class="row">
-        <div class="col-6">
+        <div class="col">
             <div class="card">
                 <div class="card-body">
             
@@ -11,5 +11,5 @@
             
         </div>
     </div>
-
-@endsection
+</div>
+    <script src="{{ asset('js/app.js')}}"></script>

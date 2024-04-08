@@ -52,7 +52,7 @@
                     <!-- Notifications Dropdown Menu -->
                     <li class="nav-item dropdown">
                         @can('guardarValorTasa')
-                            <a href="{{route('cotizacion.tasa')}}" class="nav-link" >
+                            <a href="{{route('cotizacion.tasa')}}" onclick="centeredPopup(this.href, 'myWindow', 700, 750); return false;" class="nav-link" >
                             
                             <span class="badge badge-warning navbar-badge" >                               
                                         
@@ -561,5 +561,24 @@
     <script src="{{ asset('js/app.js')}}"></script>
 
     @yield('js')
+    <script>
+        function centeredPopup(url, winName, w, h) {
+            /*centar la ventana pop up*/
+            const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screen.left;
+            const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screen.top;
+
+            const width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+            const height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+            const left = (width / 2) - (w / 2) + dualScreenLeft;
+            const top = (height / 2) - (h / 2) + dualScreenTop;
+
+            const newWindow = window.open(url, winName, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+
+            if (window.focus) {
+                newWindow.focus();
+            }
+        }
+    </script>
 </body>
 </html>

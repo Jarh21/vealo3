@@ -15,7 +15,7 @@
                     <div class="col">
                         <label for="">Tasa</label>
                         <input type="text" class="form-control" v-model="datosForm.tasa" required >
-                        <a class="btn btn-primary float-right mt-2 text-white" @click="guardarTasa()"><i class="fas fa-save "></i> Guardar </a>
+                        <a class="btn btn-primary float-right mt-2 text-white"  @click="guardarTasa()"><i class="fas fa-save "></i> Guardar </a>
                     </div>
                     
                 </div>
@@ -25,16 +25,10 @@
                     </form>
                     
                 </div>
-                <div v-if="loading" class="text-center">
-                    <span class="sr-only">Cargando...</span>
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                    
-                </div>
+                
                 <div class="">
-                    
-                    <table id="cotizaciones" class="table">
+                    <p v-if="cargando">Cargando...</p>
+                    <table id="cotizaciones" v-if="!cargando" class="table">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -80,22 +74,25 @@ window.JSZip = jszip
 
         data(){
             return {
-               loading: true, // Inicialmente se muestra el indicador de carga
+                cargando: false, // Inicialmente se muestra el indicador de carga
                tasaDelDia:'',
                listadoTasas:[],
                datosForm:{
                     fecha:'',
                     tasa:'',
                 },
-                
+                dataTableInitialized:false,
             }
         },
         methods:{
             tabla(){ //asi se llama datatabes en vue
-                this.$nextTick(()=>{
+                if (!this.dataTableInitialized) {
+                    this.$nextTick(()=>{
                     $('#cotizaciones').DataTable({
                         dom: 'Bfrtip',
                         ordering: false,
+                        scrollY: 300,
+                        paging: false,
                         buttons: [
                             {
                                 "extend":"copyHtml5",
@@ -111,6 +108,9 @@ window.JSZip = jszip
                         ]
                     });
                 });
+                this.dataTableInitialized = true;
+            }
+                
             },
             abrirModal(){
         
@@ -139,13 +139,15 @@ window.JSZip = jszip
             async ListarTodasLasTasas(){
                 let resultado = await axios.get("/vealo3/public/herraminetas/listarTodasLasTasas");
                     this.listadoTasas = resultado.data
+                    
                     this.tabla()
-                this.loading = false;
+                   
                 
             },
 
             async guardarTasa(){
                 if(this.datosForm.fecha !='' &&  this.datosForm.tasa !=''){
+                    
                     await axios.post("/vealo3/public/herraminetas/guardarTasa",this.datosForm);
                     this.consultarUltimaTasa();
                     this.ListarTodasLasTasas();
