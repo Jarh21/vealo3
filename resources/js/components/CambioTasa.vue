@@ -5,7 +5,7 @@
             <div class="">
                 <div class="">
                     
-                    <h3>Tasa actual: {{ tasaDelDia.tasa_segunda_actualizacion}}</h3>
+                    <h3>Ultima Tasa Registrada: {{ tasaDelDia.tasa_segunda_actualizacion}}</h3>
                     <form action="" method="post">
                 <div class="row mb-3">
                     <div class="col">

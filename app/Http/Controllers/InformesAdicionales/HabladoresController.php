@@ -98,6 +98,7 @@ class HabladoresController extends Controller
         session(['nombreListaHablador'=>$nombreDeLaLista]);
         $hablador=array();
         $habladores = array();
+        //conexion a base de datos siace
         $conexionSQL = $this->herramientas->conexionDinamicaBD(session('basedata'));
         $precio = 0;
         $montoDivisa=0;
@@ -116,32 +117,60 @@ class HabladoresController extends Controller
                 $divisa =  $moneda;
             }
         }        
+        $monedaBase = $this->herramientas->consultarMonedaBase();
+        if($monedaBase=='nacional'){
+            //por cada hablador buscamos los datos del producto porque en habladores solo esta es el codigo
+            foreach($listaHabladores as $datoslista){
+                $productos = $conexionSQL->select("SELECT nombre,costo,precio,tipoIva,stock FROM productos WHERE codprod=:codigoproducto and stock >0 ",[$datoslista->codprod]);
+                
+                foreach($productos as $producto){
+                    $tipoIva=trim($producto->tipoIva);
 
-        //por cada hablador buscamos los datos del producto porque en habladores solo esta es el codigo
-        foreach($listaHabladores as $datoslista){
-            $productos = $conexionSQL->select("SELECT nombre,costo,precio,tipoIva,stock FROM productos WHERE codprod=:codigoproducto and stock >0 ",[$datoslista->codprod]);
-            
-            foreach($productos as $producto){
-                $tipoIva=trim($producto->tipoIva);
+                    //verificamos si el producto tiene iva
+                    if($tipoIva=='NORMAL'){
+                        //BUSCAMOS EL VALOR DEL IVA SI EL PRODUCTO TIENE IVA
+                        $precio = $producto->precio + (($producto->precio * $iva)/100);
+                        $tipoIva='con IVA';
+                    }else{
+                        $precio = $producto->precio;
+                        $tipoIva='EXENTO';
+                    }
 
-                //verificamos si el producto tiene iva
-                if($tipoIva=='NORMAL'){
-                    //BUSCAMOS EL VALOR DEL IVA SI EL PRODUCTO TIENE IVA
-                    $precio = $producto->precio + (($producto->precio * $iva)/100);
-                    $tipoIva='con IVA';
-                }else{
-                    $precio = $producto->precio;
-                    $tipoIva='EXENTO';
+                    $montoDivisa = $precio/$divisa->precio_venta_moneda_nacional;
+                    $hablador= array('id'=>$datoslista->id,'codprod'=>$datoslista->codprod,'tipoIva'=>$tipoIva,'nombre'=>$producto->nombre,'precio'=>$precio,'divisa'=>$montoDivisa,'abreviaturaMonedaSecundaria'=>$divisa->abreviatura);
+                    $tipoIva='';                               
                 }
-
-                $montoDivisa = $precio/$divisa->precio_venta_moneda_nacional;
-                $hablador= array('id'=>$datoslista->id,'codprod'=>$datoslista->codprod,'tipoIva'=>$tipoIva,'nombre'=>$producto->nombre,'precio'=>$precio,'divisa'=>$montoDivisa,'abreviaturaMonedaSecundaria'=>$divisa->abreviatura);
-                $tipoIva='';                               
+                $habladores[] = $hablador;
+                $hablador = array();
             }
-            $habladores[] = $hablador;
-            $hablador = array();
+        }else{
+            //moneda base extranjera
+            //por cada hablador buscamos los datos del producto porque en habladores solo esta es el codigo
+            foreach($listaHabladores as $datoslista){
+                $productos = $conexionSQL->select("SELECT nombre,costo,precio,tipoIva,stock FROM productos WHERE codprod=:codigoproducto and stock >0 ",[$datoslista->codprod]);
+                
+                foreach($productos as $producto){
+                    $tipoIva=trim($producto->tipoIva);
+
+                    //verificamos si el producto tiene iva
+                    if($tipoIva=='NORMAL'){
+                        //BUSCAMOS EL VALOR DEL IVA SI EL PRODUCTO TIENE IVA
+                        $precio = $producto->precio + (($producto->precio * $iva)/100);
+                        $tipoIva='con IVA';
+                    }else{
+                        $precio = $producto->precio;
+                        $tipoIva='EXENTO';
+                    }
+
+                    $montoDivisa = $precio;
+                    $montoNacional = $precio*$divisa->precio_venta_moneda_nacional;
+                    $hablador= array('id'=>$datoslista->id,'codprod'=>$datoslista->codprod,'tipoIva'=>$tipoIva,'nombre'=>$producto->nombre,'precio'=>$montoNacional,'divisa'=>$montoDivisa,'abreviaturaMonedaSecundaria'=>$divisa->abreviatura);
+                    $tipoIva='';                               
+                }
+                $habladores[] = $hablador;
+                $hablador = array();
+            }
         }
-       
         return view('informesAdicionales.habladores.listaHabladores',['nombreDeLaLista'=>$nombreDeLaLista,'habladores'=>$habladores,'tipoMonedas'=>$tipoMonedas,'empresas'=>$this->herramientas->listarEmpresas()]);
     }
 

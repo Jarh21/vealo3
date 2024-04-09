@@ -105,6 +105,7 @@ class HerramientasController extends Controller
 		if(empty($dolar) or $dolar==0.000){
 			
 			\Session::flash('message', 'No se pudo optener el valor de la Tasa del Dolar a la fecha '.$fecha);
+			\Session::flash('alert','alert-warning');
 			return 1;
 		}else{
 			return $dolar[0]->tasa_segunda_actualizacion;

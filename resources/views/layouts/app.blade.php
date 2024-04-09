@@ -434,16 +434,18 @@
                                         class="{{ Request::path() === 'retencion-iva/index' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-receipt nav-icon mr-2"></i>Registro Documento</a>
                                     </li>
                                     @endcan
-                                    @can('comisionPorVentas')
+                                    @can('retencion.iva.listar')
                                     <li class="nav-item">
                                         <a href="{{route('retencion.iva.listar')}}"
                                         class="{{ Request::path() === 'retencion-iva/listar-retencion' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-hand-holding-usd nav-icon mr-2"></i>Retención IVA</a>
                                     </li>                                   
                                     @endcan
+                                    @can('retencion.iva.generarTxt')
                                     <li class="nav-item">
                                         <a href="{{route('retencion.iva.generarTxt')}}"
                                         class="{{ Request::path() === 'retencion-iva/generar-txt' ? 'nav-link active' : 'nav-link' }}"><i class="fas fa-file-prescription nav-icon mr-2"></i></i>Generar TXT</a>
-                                    </li>                                        
+                                    </li>                        
+                                    @endcan                
                                 </ul>
                             </div> <!-- fin de capa Retencion Iva -->
                             @endcan

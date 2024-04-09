@@ -154,7 +154,7 @@ class RetencionIvaController extends Controller
 					//se debe hacer el cambio a bolivares ya que la retencion es en bolivares.
 
 					if($herramientas->consultarMonedaBase()=='extranjera'){
-						$tasa = valorDolarPorFecha($registro->fecha_docu);
+						$tasa = HerramientasController::valorDolarPorFecha($registro->fecha_docu);
 						$iva = ($registro->iva*$tasa);
 						$comprasmasiva = ($registro->comprasmasiva*$tasa);
 						$sincredito = ($registro->sincredito*$tasa);
@@ -207,8 +207,10 @@ class RetencionIvaController extends Controller
 		
 		switch($bandera){
 			case'guardado':
+				if (!\Session::has('message')) {
 				\Session::flash('message', 'Factura registrada con exito');
 				\Session::flash('alert','alert-success');
+				}
 			break;
 			case'duplicado'	:
 				\Session::flash('message', 'La Factura  no se puede guardar porque ya fue registrada anteriormente');
