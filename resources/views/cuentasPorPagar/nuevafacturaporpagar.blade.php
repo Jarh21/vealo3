@@ -93,12 +93,12 @@
 						</div>
 						<div class="col">
 							<label>Gravado</label>
-							<input type="number" name="gravado_f" id="gravado" class="form-control text-right moneda" value="0"  onkeyup="calculoIva();calculo();">
+							<input type="number" step="0.01" name="gravado_f" id="gravado" class="form-control text-right moneda" value="0"  onkeyup="calculoIva();calculo();">
 							
 						</div>
 						<div class="col">
 							<label>exento</label>
-							<input type="number" name="excento" id="exento" class="form-control text-right" value="0" onkeyup="calculo();">
+							<input type="number" step="0.01" name="excento" id="exento" class="form-control text-right" value="0" onkeyup="calculo();">
 						</div>
 						<div class="col">
 							<label>Monto iva</label>
