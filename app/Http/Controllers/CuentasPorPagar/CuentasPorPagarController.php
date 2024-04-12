@@ -607,7 +607,7 @@ class CuentasPorPagarController extends Controller
 		$retencionIslr =0;
 		$retencionIva = 0;
 		$montoIva=$request->montoiva;
-    	$debitos = HerramientasController::convertirMonto($request->get('debitos'));
+    	$debitos = $request->get('debitos');
     	$monedaSecundaria = HerramientasController::valorDolarPorFecha($request->fecha_factura);
     	$herramientas = new HerramientasController();
     	$conexionSQL = $herramientas->conexionDinamicaBD(session('basedata'));
