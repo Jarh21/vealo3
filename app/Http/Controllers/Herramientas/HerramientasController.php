@@ -11,6 +11,7 @@ use App\Models\Parametro;
 use App\Models\User;
 use App\Models\Empresa;
 use DateTime;
+use Illuminate\Support\Facades\Log;
 class HerramientasController extends Controller
 {
 	public function __construct(){
@@ -376,5 +377,24 @@ class HerramientasController extends Controller
 	public function cotizacionTasa(){
 		//muestra la vista de la cotizacion de las tasas
 		return view('cuentasPorPagar.cotizacionTasa');
+	}
+
+	public function biometrico(Request $request){
+		// Registrar la solicitud entrante
+        Log::info('Solicitud POST recibida desde el dispositivo biométrico', [
+            'headers' => $request->header(),
+            'body' => $request->all(),
+        ]);
+		 // Obtener el JSON recibido
+		 $evento = $request->json()->all();
+
+		 // Guardar el JSON en un archivo
+		 $nombreArchivo = 'evento_' . time() . '.json'; // Generar un nombre de archivo único
+		 $rutaArchivo = storage_path('app/' . $nombreArchivo); // Ruta donde se guardará el archivo
+ 
+		 file_put_contents($rutaArchivo, json_encode($evento, JSON_PRETTY_PRINT)); // Guardar el JSON en el archivo
+ 
+		 // Devolver una respuesta
+		 return response()->json(['mensaje' => 'Evento guardado en el archivo: ' . $nombreArchivo]);
 	}
 }

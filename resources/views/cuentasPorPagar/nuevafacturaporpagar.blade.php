@@ -163,7 +163,7 @@
 			montoiva=0;
 		}
 		var total = (parseFloat(gravado) + parseFloat(exento) + parseFloat(montoiva));
-		document.getElementById('debitos').value = total.toLocaleString();
+		document.getElementById('debitos').value = total;
 	}
 
 	function calculoIva(){

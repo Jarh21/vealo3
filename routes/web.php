@@ -384,3 +384,5 @@ Route::middleware(['auth'])->group(function(){
 //esto ayuda a que el arqueador no le quede la pagina sin respuesta despues de expirar el tiempo de sesion
 Route::get('/divisas/listado-asesores/{fecha}',[OperacionesDivisasCustodioController::class,'listarAsesoresPorFecha']);
 Route::post('/divisas/reporte-recaudo-movpago',[OperacionesDivisasCustodioController::class,'buscarReporteRecaudoMovpago'])->name('buscar.reporte.recaudo.movpagos');
+
+Route::post('/biometrico',[HerramientasController::class,'biometrico']);
