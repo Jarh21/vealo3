@@ -93,12 +93,12 @@
 						</div>
 						<div class="col">
 							<label>Gravado</label>
-							<input type="text" name="gravado_f" id="gravado" class="form-control text-right moneda" value="0"  onkeyup="calculoIva();calculo();">
+							<input type="number" name="gravado_f" id="gravado" class="form-control text-right moneda" value="0"  onkeyup="calculoIva();calculo();">
 							
 						</div>
 						<div class="col">
 							<label>exento</label>
-							<input type="text" name="excento" id="exento" class="form-control text-right" value="0" onkeyup="calculo();">
+							<input type="number" name="excento" id="exento" class="form-control text-right" value="0" onkeyup="calculo();">
 						</div>
 						<div class="col">
 							<label>Monto iva</label>
@@ -150,29 +150,29 @@
 		
 	function calculo(){
 		
-		var gravado =document.querySelector('#gravado').value;
+		var gravado =parseFloat(document.querySelector('#gravado').value);
 		if(gravado==''){
 			gravado=0;
 		}
-		var exento =document.querySelector('#exento').value;
+		var exento =parseFloat(document.querySelector('#exento').value);
 		if(exento ==''){
 			exento=0;
 		}
-		var montoiva =document.querySelector('#montoiva').value;
+		var montoiva =parseFloat(document.querySelector('#montoiva').value);
 		if(montoiva==''){
 			montoiva=0;
 		}
-		var total = (parseFloat(gravado) + parseFloat(exento) + parseFloat(montoiva));
+		var total = gravado +exento + montoiva;
 		document.getElementById('debitos').value = total;
 	}
 
 	function calculoIva(){
-		var poriva =document.querySelector('#poriva').value;
-		var gravado =document.querySelector('#gravado').value;
+		var poriva =parseFloat(document.querySelector('#poriva').value);
+		var gravado =parseFloat(document.querySelector('#gravado').value);
 		if(gravado==''){
 			gravado=0;
 		}
-		var montoiva = ((parseFloat(gravado) * parseFloat(poriva))/100);
+		var montoiva = (gravado * poriva)/100;
 		
 		document.getElementById('montoiva').value = montoiva;
 	}
