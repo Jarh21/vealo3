@@ -312,7 +312,13 @@ class CuentasPorPagarController extends Controller
     }
 
     public function optenerFacturasPorPagar(Request $request){
+		
     	//Metodo que Importamos las facturas del libro de compra al sistema cuentas por pagar
+		if(empty(session('empresaRif')) or empty(session('modoPago'))){
+
+    		return self::seleccionarEmpresa('cuentasporpagar.facturasPorPagar');
+    	}
+		
     	$porcentajeRetencionIva='';
     	$mensaje = array();
     	$fechaActual = date('Y-m-d');
@@ -323,14 +329,13 @@ class CuentasPorPagarController extends Controller
 		$observacion = $request->get('observacion');
     	$diasCredito = $request->dias_credito;
     	$porcDescuento= $request->porcentaje_descuento;
-    	$modoPago = $request->modo_pago;
+    	$modoPago = session('modoPago');
     	$empresa = explode('|', $empresa);
-    	$rifEmpresa = $empresa[0];
+    	$rifEmpresa = session('empresaRif');
 		$proveedorRifSinCaracteres ='';
 		$cxpProveedorRif ='';
     	$codigoUnico = uniqid();//genera un codigo unico en php
-    	//guardamos la empresa seleccionada y el modo de pago en los datos de sessio
-    	session(['empresaRif'=>$rifEmpresa,'modoPago'=>$modoPago]);
+    	
 
     	$herramientas = new HerramientasController();
     	$conexionSQL = $herramientas->conexionDinamicaBD($empresa[1]);    	
