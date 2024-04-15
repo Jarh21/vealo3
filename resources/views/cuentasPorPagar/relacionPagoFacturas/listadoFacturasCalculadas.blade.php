@@ -140,7 +140,7 @@
 							<td><!-- PROVEEDOR -->
 								{{$cuenta->proveedor_nombre}}|{{$cuenta->proveedor_rif}}
 								@if(!empty($cuenta->observacion))
-								<span class="right badge badge-warning d-print-none">{{$cuenta->observacion}}</span>
+								<span class="right badge badge-warning">{{$cuenta->observacion}}</span>
 								@endif
 							</td>
 							<td>{{$cuenta->documento}}</td><!-- NRO FACTURA -->		    				   				
