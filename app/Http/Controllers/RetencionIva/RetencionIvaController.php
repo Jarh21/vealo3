@@ -21,6 +21,16 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class RetencionIvaController extends Controller
 {
+	public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return redirect()->route('inicioSesion');
+            }
+
+            return $next($request);
+        });
+    }
     public function index(){
 		//metodo donde se agregan los documentos respectivos a la retencion como facturas y notas de debito o credito
 		$herramientas = new HerramientasController();

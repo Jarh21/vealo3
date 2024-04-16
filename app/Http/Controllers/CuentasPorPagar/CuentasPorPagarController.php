@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Http\Controllers\Admin\ProveedorController;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Banco;
 use App\Models\Proveedor;
 use App\Models\CuentasPorPagar;
@@ -17,6 +18,18 @@ use Illuminate\Support\Facades\DB;
 
 class CuentasPorPagarController extends Controller
 {
+
+	public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return redirect()->route('inicioSesion');
+            }
+
+            return $next($request);
+        });
+    }
+
     public function seleccionarEmpresa($rutaSolicitante=''){
 		$herramientas  = new HerramientasController();		
         return view('cuentasPorPagar.seleccionEmpresa',['empresas'=>$herramientas->listarEmpresas(),'rutaSolicitante'=>$rutaSolicitante]);

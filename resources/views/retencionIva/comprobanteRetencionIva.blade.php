@@ -128,7 +128,7 @@ date_default_timezone_set("America/Caracas");
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$contador}}</span></td>
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{date("d-m-Y", strtotime($datosFactura->fecha_docu))}}</span></td>
         <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'FA')@if(!empty($datosFactura->serie)){{'SERIE'.$datosFactura->serie}}@endif{{$datosFactura->documento}}@endif</span></td>
-        <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->control_fact==0)N/A @else{{$datosFactura->control_fact}}@endif</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->control_fact=='0')N/A @else{{$datosFactura->control_fact}}@endif</span></td>
         <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'ND'){{$datosFactura->documento}}@endif </span></td> <!-- nota debito -->
         <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'NC'){{$datosFactura->documento}}@endif </span></td> <!-- nota credito -->
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->tipo_trans}}</span></td>

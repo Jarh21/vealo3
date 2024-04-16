@@ -8,18 +8,23 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Models\Parametro;
 use App\Models\Empresa;
+use Illuminate\Support\Facades\Auth;
 
 class HabladoresController extends Controller
 {
     private $herramientas='';
-    function __construct(){
-        
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return redirect()->route('inicioSesion');
+            }
+
+            return $next($request);
+        });
         $this->herramientas = new HerramientasController();
     }
-        /* $herramientas = new HerramientasController();
-    	$conexionSQL = $herramientas->conexionDinamicaBD($empresa[1]); 
-        $registros = $conexionSQL->select("SELECT * from cxp where codorigen=2000 and documento=:nfactura and year(fecha)>=:anioAnterior order by keycodigo",[$nFactura,$anioAnterior]);*/
-        
+    
     
     public function index(){        
     	

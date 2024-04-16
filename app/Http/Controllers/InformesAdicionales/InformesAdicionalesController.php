@@ -9,9 +9,20 @@ use Illuminate\Support\Facades\DB;
 use App\Models\FacturasPorPagar;
 use App\Models\Empresa;
 use App\Models\ParametroCalculoComision;
+use Illuminate\Support\Facades\Auth;
 
 class InformesAdicionalesController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return redirect()->route('inicioSesion');
+            }
+
+            return $next($request);
+        });
+    }
     public function index(){
         $herramientas = new HerramientasController();
         return view("informesAdicionales.index",['empresas'=>$herramientas->listarEmpresas()]);

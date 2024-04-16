@@ -6,8 +6,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ParametroCalculoComision;
 use App\Http\Controllers\Herramientas\HerramientasController;
+use Illuminate\Support\Facades\Auth;
 class VendedorComisionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return redirect()->route('inicioSesion');
+            }
+
+            return $next($request);
+        });
+    }
+    
     public function index(){
         if(empty(session('empresaRif'))){
             return view('informesAdicionales.vendedores.comisionPorVendedor',['empresas'=>$herramientas->listarEmpresas()]);

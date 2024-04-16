@@ -6,8 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Herramientas\HerramientasController;
+use Illuminate\Support\Facades\Auth;
 class OperacionesDivisasCustodioController extends Controller
 {
+	public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return redirect()->route('inicioSesion');
+            }
+
+            return $next($request);
+        });
+    }
     public function index(){
 		$herramientas = new HerramientasController();
 		return view('divisasCustodio.listarOperacionesDivisas',['empresas'=>$herramientas->listarEmpresas()]);

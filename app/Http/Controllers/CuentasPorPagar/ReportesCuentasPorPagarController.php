@@ -14,9 +14,20 @@ use App\Models\FacturasPorPagar;
 use App\Models\Empresa;
 use App\Models\Retencion;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ReportesCuentasPorPagarController extends Controller
 {
+	public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!Auth::check()) {
+                return redirect()->route('inicioSesion');
+            }
+
+            return $next($request);
+        });
+    }
     public function reporteRelacionPagosPorEmpresa(){
 		if(empty(session('empresaRif')) or empty(session('modoPago'))){
     		
