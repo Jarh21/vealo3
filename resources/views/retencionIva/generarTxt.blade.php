@@ -81,7 +81,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $contador=1; ?>
+                <?php $contador=1; $suma=0;?>
                 @foreach($detalleTxt as $detalle)
                     <tr @if($detalle->tipo_docu!='FA') style="background:#F8F1A2" @endif @if($detalle->estatus_retencion=='A') style="background:#F95656" @endif>
                         <td>{{$contador}}</td>
@@ -101,9 +101,13 @@
                         <td>{{$detalle->iva_retenido}}</td>
                         <td>{{$detalle->porc_alic}}</td>
                         <td>0</td>
-                        <?php $contador++; ?>
+                        <?php $contador++; $suma=$suma+$detalle->iva_retenido; ?>
                     </tr>
                 @endforeach
+                <tr>
+                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                    <td></td><td></td><td></td><td></td><td></td><td><b>Total</b></td><td><b>{{$suma}}</b></td><td></td><td></td>
+                </tr>
             </tbody>
         </table>
         
