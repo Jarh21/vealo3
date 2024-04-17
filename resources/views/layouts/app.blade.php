@@ -4,7 +4,7 @@
     
     //use App\User;
     use App\Http\Controllers\HerramientasController;
-    $version = '3.2';
+    $version = '3.2.14';
 ?>
 <head>
     <meta charset="utf-8">
@@ -71,7 +71,7 @@
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
                      
-                    <span class="brand-text font-weight-light h4">Vealo {{$version}} SAN-FDO</span>
+                    <span class="brand-text font-weight-light h4">Vealo {{$version}}</span>
                 </a>
 
                 <!-- Sidebar -->
