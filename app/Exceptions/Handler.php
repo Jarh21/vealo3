@@ -32,18 +32,18 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-   /*  public function register()
+    public function register()
     {
         $this->reportable(function (Throwable $e) {
             //
         });
-    } */
+    }
 
-    public function register()
+    /* public function register()
     {
         $this->renderable(function (Throwable $e, $request) {
             return redirect()->route('inicioSesion')->withErrors('La sesión ha expirado. Por favor, inicia sesión de nuevo.');
         });
-    }
+    } */
     
 }

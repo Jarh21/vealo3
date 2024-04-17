@@ -136,10 +136,12 @@
             </tr>
         </thead>
         <tbody>
+            
             @foreach($retenciones_dat as $retencion)
-                <tr @if($retencion->estatus_retencion=='A') style="background:#F95656" @endif>
+                
+                <tr @if($retencion->estatus_retencion=='A') style="background:#FFCACA" @endif>
                     
-                    <td>{{$retencion->fecha_docu}}</td>
+                    <td>{{$retencion->fecha}}</td>
                     <td style="width: 300px">{{$retencion->nom_retenido}}</td>
                     <td>
                         @if($retencion->tipo_docu=='FA')
@@ -154,9 +156,9 @@
                         
                     </td>
                     <td>{{$retencion->rif_retenido}}</td>
-                    <td>{{$retencion->documento}}</td>
+                    <td>{{$retencion->documentos}}</td>
                     <td>{{$retencion->comprobante}}</td>
-                    <td>{{$retencion->iva_retenido}}</td>
+                    <td>{{$retencion->total}}</td>
                     <td>
                         @if($retencion->estatus_retencion=='N')
                         <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-secondary btn-sm' title="descargar PDF" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i></a>
@@ -169,6 +171,7 @@
                         
                     </td>
                 </tr>
+               
             @endforeach
         </tbody>
     </table>
