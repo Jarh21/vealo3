@@ -95,24 +95,24 @@ date_default_timezone_set("America/Caracas");
 
       <tr align="center">
         <td colspan="10" bgcolor="#FFFFFF">&nbsp;</td>
-        <td colspan="5" bgcolor="#CCCCCC"><span class="Estilo1">COMPRAS INTERNAS O IMPORTACIONES</span></td>
+        <td colspan="5" bgcolor="#FFFFFF"><span class="Estilo1">COMPRAS INTERNAS O IMPORTACIONES</span></td>
         </tr>
       <tr align="center">
-        <td bgcolor="#CCCCCC"  width="15"><span class="Estilo1">Nro.<br /> Operac</span></td>
-        <td bgcolor="#CCCCCC" width="40"><span class="Estilo1">Fecha<br />de la Factura</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Numero de <br />Factura</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Nro. Control <br />de Factura</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Nro. Nota <br />Debito</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Nro. Nota <br />Credito</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Tipo de  <br />Transaccion</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Nro. Factura <br /> Afectada</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Total compras <br />incluyendo IVA</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Compras sin<br />derecho a Credito</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Base <br />Imponible</span></td>
-        <td bgcolor="#CCCCCC" width="15"><span class="Estilo1">% <br />Alicuota</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">Impuesto <br />IVA</span></td>
-        <td bgcolor="#CCCCCC"><span class="Estilo1">IVA <br />RETENIDO</span></td>
-        <td bgcolor="#CCCCCC" width="20"><span class="Estilo1">% <br />Retencion</span></td>
+        <td bgcolor="#FFFFFF"  width="15"><span class="Estilo1">Nro.<br /> Operac</span></td>
+        <td bgcolor="#FFFFFF" width="40"><span class="Estilo1">Fecha<br />de la Factura</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Numero de <br />Factura</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Nro. Control <br />de Factura</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Nro. Nota <br />Debito</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Nro. Nota <br />Credito</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Tipo de  <br />Transaccion</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Nro. Factura <br /> Afectada</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Total compras <br />incluyendo IVA</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Compras sin<br />derecho a Credito</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Base <br />Imponible</span></td>
+        <td bgcolor="#FFFFFF" width="15"><span class="Estilo1">% <br />Alicuota</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">Impuesto <br />IVA</span></td>
+        <td bgcolor="#FFFFFF"><span class="Estilo1">IVA <br />RETENIDO</span></td>
+        <td bgcolor="#FFFFFF" width="20"><span class="Estilo1">% <br />Retencion</span></td>
       </tr>
       <?php 
         //contadore de totales
