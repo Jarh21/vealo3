@@ -1,9 +1,10 @@
 <template>
-    <div>
+    <div class=" d-inline">
         <button class="btn btn-success btn-sm" @click="enviarCorreoRetencion()" :disabled="cargando">
             Correo 
             <i :class="{'fas fa-spinner': cargando, 'fas fa-check-circle text-warning': enviado}"></i>
-            <i class='fas fa-paper-plane text-warning' title="Correo enviado" v-if="this.datos.correo_enviado == 1"></i>
+            <i class='fas fa-check-circle text-warning' title="Correo enviado" v-if="this.datos.correo_enviado == 1"></i>
+            <span v-if="enviado"> Enviado</span> <!-- Muestra "Enviado" si la variable 'enviado' es verdadera -->
         </button>       
     </div>
   </template>
@@ -33,6 +34,7 @@
             this.cargando = true; 
             let resultado = await axios.get("evio-email-retencion-iva/"+comprobante+"/"+rifAgente);           
             this.cargando = false;
+            this.enviado = true; // Establecer la variable 'enviado' como verdadera
            
             
         },

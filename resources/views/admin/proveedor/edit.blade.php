@@ -83,7 +83,7 @@
 		  </div>
 		  <div class="form-group">
 			<label for="">Correo Electronico</label>
-			<input type="email" name="correo" id="" class="form-control" value="{{$proveedor->correo}}">
+			<input type="text" name="correo" id="" class="form-control" value="{{$proveedor->correo}}" placeholder="puede ingresar varios correos separados por coma(,)">
 		  </div>
 		  <div class="form-group">
 		    <label for="direccion">Direccion</label>

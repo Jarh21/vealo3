@@ -156,19 +156,27 @@
                         
                     </td>
                     <td>{{$retencion->rif_retenido}}</td>
-                    <td>{{$retencion->documentos}}</td>
+                    <td style="width: 100px"> <div> {{$retencion->documentos}}</td></div>
                     <td>{{$retencion->comprobante}}</td>
                     <td>{{$retencion->total}}</td>
                     <td>
+                        
                         @if($retencion->estatus_retencion=='N')
-                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-secondary btn-sm' title="descargar PDF" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i></a>
-                        <a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente,'firma'])}}" class='btn btn-secondary btn-sm' title="descargar PDF con Firma" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i>+<i class="fas fa-marker"></i></a>
-                        @can('retencion.iva.editar_retencion')<a href="{{route('retencion.iva.editar_retencion',$retencion->comprobante)}}" class='btn btn-warning btn-sm'><i class="fas fa-edit" title="Editar"></i></a>@endcan
-                        <enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}'}"></enviar-correo-retencion>
+                            <div class="d-inline"><a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-light  btn-sm text-danger' title="descargar PDF" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i></a></div>
+                            <div class="d-inline"><a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente,'firma'])}}" class='btn btn-light btn-sm text-danger' title="descargar PDF con Firma" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i>+<i class="fas fa-marker text-primary"></i></a></div>
+                            
+                            @can('retencion.iva.editar_retencion')<a href="{{route('retencion.iva.editar_retencion',$retencion->comprobante)}}" class='btn btn-warning btn-sm'><i class="fas fa-edit" title="Editar"></i></a>@endcan
+                            @if(isset($retencion->correo))
+                                <div class="d-inline"><enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}'}"></enviar-correo-retencion></div>                               
+                                
+                            @else
+                                <div class="d-inline "><a href="{{route('proveedor.edit',$retencion->proveedorId)}}"class="btn btn-secondary btn-sm" title="Registrar el correor del proveedor">Sin Correo</a></div>
+                                
+                            @endif
                         @else
                             Anulada
                         @endif
-                        
+                        </div>
                     </td>
                 </tr>
                

@@ -35,12 +35,24 @@ class EmailController extends Controller
 		$facturas = implode(',',$facturasArray); */
 
         //buscamos el correo del proveedor
+        $correos ='';
         $proveedor = Proveedor::where('rif',$datosRetencion->rif_retenido)->select('correo')->first();
         if(!empty($proveedor->correo)){
-            
-            $response = Mail::to($proveedor->correo)->cc('gfdpagos@gmail.com')->send(new Notification($nomRetenido,$comprobante,$nomAgente));
-            //actualizamos la bandera de correo enviado en la tabla retenciones_dat
-            RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);
+
+            $correos = explode(',',$proveedor->correo);
+            foreach($correos as $correo){
+                //validamos que el correo este bien escrito
+                if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                    $response = Mail::to($correo)->cc('gfdpagos@gmail.com')->send(new Notification($nomRetenido,$comprobante,$nomAgente));
+                    //actualizamos la bandera de correo enviado en la tabla retenciones_dat
+                    RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);
+                    
+                }else{
+                    \Session::flash('message', 'El correo '.$correo.' no se envio por no ser un correo valido por favor verifiquelo en el proveedor '.$nomRetenido);
+			        \Session::flash('alert','alert-warning');
+                }
+            }
+           
             return 1;
         }else{
             return 0;
