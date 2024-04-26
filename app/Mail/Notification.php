@@ -15,17 +15,21 @@ class Notification extends Mailable
     public $nombre;
     public $comprobante;
     public $nomAgente;
+    public $facturas;
+    public $archivoAdjunto;
+
     
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($nombre,$comprobante,$nomAgente)
+    public function __construct($nombre,$comprobante,$nomAgente,$archivoAdjunto)
     {
         $this->nombre = $nombre;
         $this->comprobante = $comprobante;
         $this->nomAgente = $nomAgente;
+        $this->archivoAdjunto = $archivoAdjunto;
         
     }
 
@@ -36,18 +40,33 @@ class Notification extends Mailable
      */
     public function build()
     {
+        
         $rutaDirectorio = storage_path('app/pdf/'); // Ruta del directorio donde se encuentra el archivo
         $valoresBusqueda = [$this->comprobante]; // Valores a buscar en el nombre del archivo
-
         $patron = implode('*', $valoresBusqueda) . '.pdf'; // Patrón de búsqueda con los valores y la extensión del archivo
-
         $archivosEncontrados = glob($rutaDirectorio . '*' . $patron);//comparamos el parametro con la ruta del directorio
 
         if (!empty($archivosEncontrados)) {
             $archivo = $archivosEncontrados[0]; // Tomamos el primer archivo encontrado
-
             $nombreArchivo = basename($archivo); // Obtenemos el nombre del archivo           
-            return $this->view('email.retencionIva')->from("admivent.jarh.deli@gmail.com",$this->nomAgente)->subject("Retencion IVA GFD")->attachFromStorage('pdf/'.$nombreArchivo);
+                
+            // cuando hay archivos adjuntos adicionales
+            $email = $this->view('email.retencionIva')
+                ->from("admivent.jarh.deli@gmail.com", $this->nomAgente)
+                ->subject("Retencion IVA GFD");
+            // Adjuntar el primer archivo almacenado en el servidor que es la retencion de iva
+            $email->attachFromStorage('pdf/' . $nombreArchivo);
+
+            //si hay archivos adicionales se adjunta
+            if(!empty($this->archivoAdjunto)){
+                // Adjuntar los demás archivos del array $archivoAdjunto
+                foreach ($this->archivoAdjunto as $archivo) {
+                    $email->attach($archivo);
+                }
+            }
+            return $email;
+                    
+            
         } else {
             echo "No se encontraron archivos que coincidan con los valores proporcionados.";
         }   

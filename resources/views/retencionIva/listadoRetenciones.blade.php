@@ -167,6 +167,7 @@
                             
                             @can('retencion.iva.editar_retencion')<a href="{{route('retencion.iva.editar_retencion',$retencion->comprobante)}}" class='btn btn-warning btn-sm'><i class="fas fa-edit" title="Editar"></i></a>@endcan
                             @if(isset($retencion->correo))
+                            
                                 <div class="d-inline"><enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}'}"></enviar-correo-retencion></div>                               
                                 
                             @else

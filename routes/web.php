@@ -376,6 +376,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/retencion-iva/buscar-registros-txt',[RetencionIvaController::class,'buscarRegistrosParaElTxt'])->name('retencion.iva.buscarregistrosparatxt');
     Route::get('/retencion-iva/descargar-txt/{archivo?}/{nombreArcivo?}',[RetencionIvaController::class,'descargarTxt'])->name('retencion.iva.descargarTxt');
     Route::get('/retencion-iva/evio-email-retencion-iva/{comprobante?}/{empresaRif?}',[EmailController::class,'enviarEmailRetencionIva'])->name('retencion.iva.envioemail');
+    Route::post('/retencion-iva/evio-email-retencion-iva-post',[EmailController::class,'enviarEmailRetencionIvaPost'])->name('retencion.iva.envioemailpost');
     Route::get('/retencion-iva/anular-comprobante/{comprobante?}/{empresaRif?}',[RetencionIvaController::class,'anularComprobante'])->name('retencion.iva.anularcomprobante');
     Route::get('/retencion-iva/eliminar-comprobante/{comprobante?}/{empresaRif?}',[RetencionIvaController::class,'eliminarComprobante'])->name('retencion.iva.eliminarcomprobante');
 
