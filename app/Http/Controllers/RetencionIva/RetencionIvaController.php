@@ -500,6 +500,33 @@ class RetencionIvaController extends Controller
 
 	}
 
+	public function pruebaEnvioCorreo(){
+		//esto se debe eliminar una vez el envio de correo este solucionado
+		$herramientas = new HerramientasController();
+		$cantidad=0;
+		$limite = 100;
+		
+			
+			$condicion = array();
+			$condicion[]="retenciones_dat.estatus='C'";
+			$condicion[]="retenciones_dat.rif_agente='".session('empresaRif')."'";
+			$condicion[]="retenciones_dat.comprobante <> '0.00'";
+			$condicion[]="retenciones_dat.comprobante = retenciones.comprobante";
+			$condicion[]="retenciones_dat.rif_agente = retenciones.rif_agente";
+			$condicion[]=" proveedors.rif = retenciones.rif_retenido ";
+			if(!empty(session('comprobanteIva'))){$condicion[]="retenciones_dat.comprobante =".session('comprobanteIva');}
+			if(!empty(session('proveedorIva'))){ $condicion[]="retenciones_dat.nom_retenido like '%".session('proveedorIva')."%'";}
+			if(!empty(session('fecha_desdeIva'))){ $condicion[]=" retenciones_dat.fecha_docu >='".session('fecha_desdeIva')."'"; }
+			if(!empty(session('fecha_hastaIva'))){ $condicion[]=" retenciones_dat.fecha_docu <='".session('fecha_hastaIva')."'";}
+			if(!empty(session('documentoIva'))){ $condicion[] = " retenciones_dat.documento in(".session('documentoIva').")";}
+			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
+			
+			$retenciones_dat = DB::select( "select GROUP_CONCAT(retenciones_dat.documento SEPARATOR ', ')as documentos,  retenciones_dat.*,retenciones.estatus as estatus_retencion, retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId from retenciones_dat,retenciones,proveedors  where ". $whereClause." group by retenciones_dat.comprobante ORDER BY retenciones.keycodigo DESC limit ".$limite);	
+			$cantidad = count($retenciones_dat);
+			
+		return view('retencionIva.envioDeCorreo',['retenciones_dat'=>$retenciones_dat,'cantidad'=>$cantidad]);	
+	}
+
 	public function listarRetencionesIva(){
 		$herramientas = new HerramientasController();
 		$cantidad=0;

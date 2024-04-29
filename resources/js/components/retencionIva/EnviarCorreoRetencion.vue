@@ -12,15 +12,15 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <label for="">Archivo Adjunto: </label> Retencion IVA del comprobante {{ this.datos.comprobante }}.pdf
+                        <label for="">Archivo Adjunto: </label> <b>Retencion IVA </b>del comprobante <b>{{ this.datos.comprobante }}.pdf</b>
                         <label for="">Para adjuntar otros archivos haga click en Elegir archivos</label>
                         <input type="file" @change="handleFileChange" ref="fileInput" multiple class="form-control">
                         <div v-if="formulario.archivo.length > 0">
-                        <h5>Archivos seleccionados:</h5>
+                        <label>Archivos seleccionados:</label>
                         <ul>
                             <li v-for="(file, index) in formulario.archivo" :key="index">
                             {{ file.name }}
-                            <button @click.prevent="removerArchivo(index)">Eliminar</button>
+                            <button @click.prevent="removerArchivo(index)" class="btn btn-danger btn-sm">Eliminar</button>
                             </li>
                         </ul>
                         </div>

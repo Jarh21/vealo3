@@ -43,7 +43,7 @@ class Notification extends Mailable
         
         $rutaDirectorio = storage_path('app/pdf/'); // Ruta del directorio donde se encuentra el archivo
         $valoresBusqueda = [$this->comprobante]; // Valores a buscar en el nombre del archivo
-        $patron = implode('*', $valoresBusqueda) . '.pdf'; // Patrón de búsqueda con los valores y la extensión del archivo
+        $patron = implode('*', $valoresBusqueda) . '.pdf'; // Patrón de búsqueda con los valores y la extensión del archivo        
         $archivosEncontrados = glob($rutaDirectorio . '*' . $patron);//comparamos el parametro con la ruta del directorio
 
         if (!empty($archivosEncontrados)) {

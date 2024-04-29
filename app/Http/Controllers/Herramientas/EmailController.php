@@ -71,7 +71,9 @@ class EmailController extends Controller
         $nomRetenido='';
         $nomAgente ='';
         $objRetencion = new RetencionIvaController();
-        //$retencion = $objRetencion->mostrarComprobanteRetencionIva($comprobante,$empresaRif,$firma='firma');
+        //generamos el archivo de retencion de iva
+        $retencion = $objRetencion->mostrarComprobanteRetencionIva($comprobante,$empresaRif,$firma='firma');
+        //consultamos los datos del proveedor retenido
         $datosRetencion = $objRetencion->consultarRetencionIva($comprobante,$empresaRif);
         $nomRetenido = $datosRetencion->nom_retenido;
         $nomAgente = $datosRetencion->nom_agente;
@@ -90,7 +92,7 @@ class EmailController extends Controller
 
         }        
 
-
+        
         //si queremos enviar  los numeros de facturas por el correo
         /* $facturasArray =array();
 		$facturas ='';
@@ -121,12 +123,21 @@ class EmailController extends Controller
                     //actualizamos la bandera de correo enviado en la tabla retenciones_dat
                     RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);
                     
+
                 }else{
                     \Session::flash('message', 'El correo '.$correo.' no se envio por no ser un correo valido por favor verifiquelo en el proveedor '.$nomRetenido);
 			        \Session::flash('alert','alert-warning');
                 }
             }
-           
+            //eliminar los archivos basura, los que ya se enviaron al correo
+            if(!empty($archivoAdjunto)){
+                foreach($archivoAdjunto as $archivoEliminar){
+                    if(file_exists($archivoEliminar)){
+                        unlink($archivoEliminar);
+                    }
+                    
+                }
+            }
             return 1;
         }else{
             return 0;
