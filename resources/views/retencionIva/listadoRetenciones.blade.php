@@ -117,7 +117,7 @@
 		@endif
     </div>
     <div>      
-        <a href="{{route('retencion.iva.pruebaenviocorreo')}}">Prueba envio de correo</a>
+        <!-- <a href="{{--route('retencion.iva.pruebaenviocorreo')--}}">Prueba envio de correo</a> -->
         Resultado: {{$cantidad}} Registros
         
     </div>
