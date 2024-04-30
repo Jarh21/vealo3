@@ -2,7 +2,7 @@
     <div class=" d-inline">
         <!-- Modal Editar cantidades-->
         <div class="modal fade" :id="`editarPedido-${datos.comprobante}`" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg modal-scrollable">
                 <form enctype="multipart/form-data">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -11,19 +11,32 @@
                         <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <label for="">Archivo Adjunto: </label> <b>Retencion IVA </b>del comprobante <b>{{ this.datos.comprobante }}.pdf</b>
-                        <label for="">Para adjuntar otros archivos haga click en Elegir archivos</label>
-                        <input type="file" @change="handleFileChange" ref="fileInput" multiple class="form-control">
-                        <div v-if="formulario.archivo.length > 0">
-                        <label>Archivos seleccionados:</label>
-                        <ul>
-                            <li v-for="(file, index) in formulario.archivo" :key="index">
-                            {{ file.name }}
-                            <button @click.prevent="removerArchivo(index)" class="btn btn-danger btn-sm">Eliminar</button>
-                            </li>
-                        </ul>
-                        </div>
+                    <div class="modal-body">                       
+                        
+                        
+                        <div class="row">
+                            <div class="col">
+                                <label>Archivos seleccionados:</label>
+                                <ul class="list-group">
+                                    <li class="list-group-item"><a href="#" @click.prevent="showPreview(file)"><b>Retencion IVA </b>del comprobante <b>{{ this.datos.comprobante }}.pdf</b></a></li>
+                                    <div v-if="formulario.archivo.length > 0">
+                                        <li class="list-group-item" v-for="(file, index) in formulario.archivo" :key="index">
+                                            <a href="#" @click.prevent="showPreview(file)">{{ file.name }}</a>
+                                        <button @click.prevent="removerArchivo(index)" class="close"><span aria-hidden="true">&times;</span></button>
+                                        </li>
+                                    </div>
+                                </ul>
+                                <input type="file" @change="handleFileChange" ref="fileInput" multiple class="form-control-file">
+                            </div>
+                            <div class="col">
+                                <label>Vista Previa:</label>
+                                <div v-if="formulario.archivo.length > 0">
+                                    <img width="400px" :src="previewImage" alt="Vista previa del archivo" v-if="previewImage">
+                                </div>
+                            </div>
+                        </div>                        
+                        
+                        
                         
                     </div>
                     <div class="modal-footer">
@@ -70,9 +83,14 @@
                 rifAgente:'',
                 archivo:[],
             },
+            previewImage: null,
         }
     },
     methods:{
+        showPreview(file) {
+            // Crea una URL de objeto para la imagen
+            this.previewImage = URL.createObjectURL(file);
+        },
         
         async enviarCorreoRetencion(){
             let comprobante = this.datos.comprobante;
@@ -114,6 +132,7 @@
         },
         removerArchivo(index) {
             this.formulario.archivo.splice(index, 1);
+            this.$refs.fileInput.value = "";
         },
         
         handleFileChange(event) {
