@@ -47,6 +47,10 @@ class RetencionIvaController extends Controller
 		return RetencionIvaDetalle::find($keycodigo);
 	}
 
+	public function buscarFacturaPorComprobanteEmpresa($comprobante,$rifAgente){
+		return RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$rifAgente)->select('documento')->get();
+	}
+
 	public function editarFactura($keycodigo){
 		$iva = Parametro::buscarVariable('poriva');
 		$documento = self::buscarFactura($keycodigo);

@@ -24,13 +24,13 @@ class Notification extends Mailable
      *
      * @return void
      */
-    public function __construct($nombre,$comprobante,$nomAgente,$archivoAdjunto)
+    public function __construct($nombre,$comprobante,$nomAgente,$archivoAdjunto,$facturas)
     {
         $this->nombre = $nombre;
         $this->comprobante = $comprobante;
         $this->nomAgente = $nomAgente;
         $this->archivoAdjunto = $archivoAdjunto;
-        
+        $this->facturas = $facturas;
     }
 
     /**
@@ -48,12 +48,16 @@ class Notification extends Mailable
 
         if (!empty($archivosEncontrados)) {
             $archivo = $archivosEncontrados[0]; // Tomamos el primer archivo encontrado
-            $nombreArchivo = basename($archivo); // Obtenemos el nombre del archivo           
+            $nombreArchivo = basename($archivo); // Obtenemos el nombre del archivo  
+            
+                 
                 
             // cuando hay archivos adjuntos adicionales
-            $email = $this->view('email.retencionIva')
-                ->from("admivent.jarh.deli@gmail.com", $this->nomAgente)
-                ->subject("Retencion IVA GFD");
+            $email = $this->view('email.retencionIva',['facturas'=>$this->facturas])
+                //->from("admivent.jarh.deli@gmail.com",$this->nomAgente)
+                ->replyTo("admivent.jarh.deli@gmail.com", $this->nomAgente)
+                ->subject("Retencion IVA GFD");          
+
             // Adjuntar el primer archivo almacenado en el servidor que es la retencion de iva
             $email->attachFromStorage('pdf/' . $nombreArchivo);
 
@@ -64,6 +68,7 @@ class Notification extends Mailable
                     $email->attach($archivo);
                 }
             }
+            
             return $email;
                     
             

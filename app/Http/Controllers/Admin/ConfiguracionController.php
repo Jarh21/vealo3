@@ -98,26 +98,17 @@ class ConfiguracionController extends Controller
     }
 
     public function configuracionGeneral(){
-        $nombreEmpresa = Parametro::buscarVariable('nombre_general_empresa');
-        $logoEmpresa = Parametro::buscarVariable('logo_empresa');
+        $correo_del_sistema = Parametro::buscarVariable('correo_del_sistema');
+        $password_correo_del_sistema = Parametro::buscarVariable('password_correo_del_sistema');
         
-        return view('admin.configuraciones.confGeneral',['nombreEmpresa'=>$nombreEmpresa,'logoEmpresa'=>$logoEmpresa]);
+        return view('admin.configuraciones.confGeneral',['correo_del_sistema'=>$correo_del_sistema,'password_correo_del_sistema'=>$password_correo_del_sistema]);
     }
 
     public function guardarConfiguracionGeneral(Request $request){
 
-        Parametro::actualizarVariable('nombre_general_empresa',$request->nombre_general_empresa);
-        //si hay una imagen
-        if($request->hasfile('logo_empresa')){
-
-			$file = $request->file('logo_empresa');
-			$destinatinoPath ='imagen/';
-			$filename = time().'-'.$file->getClientOriginalName();
-			$uploadsuccess = $request->file('logo_empresa')->move($destinatinoPath,$filename);    
-			
-            Parametro::actualizarVariable('logo_empresa',$destinatinoPath.$filename);
-
-		}
+        Parametro::actualizarVariable('correo_del_sistema',$request->correo_del_sistema);
+        Parametro::actualizarVariable('password_correo_del_sistema',$request->password_correo_del_sistema);
+		
         return self::configuracionGeneral();
     }
 
