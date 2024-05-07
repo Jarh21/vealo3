@@ -779,7 +779,7 @@ class RetencionIvaController extends Controller
 		//preparar el nombre del archivo
 		$anio = substr($periodo, 0, 4);
 		$mes = substr($periodo,4,2);
-		
+		$monthName ="";
 		//nombre del mes
 
 			if($mes == '01'){
