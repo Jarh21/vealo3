@@ -171,7 +171,7 @@
                                 <div class="d-inline"><enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}'}"></enviar-correo-retencion></div>                              
                                 
                             @else
-                                <div class="d-inline "><a href="{{route('proveedor.edit',$retencion->proveedorId)}}"class="btn btn-secondary btn-sm" title="Registrar el correor del proveedor">Sin Correo</a></div>
+                                <div class="d-inline "><a href="{{route('proveedor.edit',$retencion->rif_retenido)}}"class="btn btn-secondary btn-sm" title="Registrar el correor del proveedor">Sin Correo</a></div>
                                 
                             @endif
                         @else
