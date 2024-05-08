@@ -512,8 +512,8 @@
 	</script>
 
 <script>
-	function centeredPopup(url, winName, w, h) {
-		/*centar la ventana pop up*/
+	/* function centeredPopup(url, winName, w, h) {
+		//centar la ventana pop up
 		const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screen.left;
 		const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screen.top;
 
@@ -528,7 +528,7 @@
 		if (window.focus) {
 			newWindow.focus();
 		}
-	}
+	} */
 </script>
 
 @endsection

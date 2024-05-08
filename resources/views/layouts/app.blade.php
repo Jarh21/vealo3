@@ -4,7 +4,7 @@
     
     //use App\User;
     use App\Http\Controllers\HerramientasController;
-    $version = '3.2.18';
+    
 ?>
 <head>
     <meta charset="utf-8">
@@ -12,7 +12,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Vealo {{$version}}</title>    <!-- Scripts -->
+    <title>Vealo {{ config('app.app_version') }}</title>    <!-- Scripts -->
 
 
 
@@ -71,7 +71,7 @@
                 <!-- Brand Logo -->
                 <a href="{{ url('/') }}" class="brand-link">
                      
-                    <span class="brand-text font-weight-light h4">Vealo {{$version}}</span>
+                    <span class="brand-text font-weight-light h4">Vealo {{ config('app.app_version') }}</span>
                 </a>
 
                 <!-- Sidebar -->
@@ -127,7 +127,7 @@
                                 <ul class="nav nav-pills nav-treeview flex-column" data-widget="treeview" role="menu" data-accordion="true">
                                     
                                     <li class="nav-item">
-                                        <a href="{{ route('cuentasporpagar.inicio')}}" class="{{ Request::path() === 'cuentasporpagar/inicio' ? 'nav-link active' : 'nav-link' }}">
+                                        <a href="{{ route('cuentasporpagar.inicio')}}" class="{{ Request::path() === 'cuentasporpagar/inicio' ? 'nav-link active' : 'nav-link' }}" onclick="centeredPopup(this.href, 'myWindow', 700, 400); return false;">
                                             <!-- <i class="nav-icon fas fa-home"></i> -->
                                             <i class="nav-icon fas fa-hand-holding-usd"></i>
                                             Modos de Pago

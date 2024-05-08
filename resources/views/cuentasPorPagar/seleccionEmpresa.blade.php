@@ -1,8 +1,8 @@
-@extends('layouts.app')
+<link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
-@section('content')
+<div id="app" class="container-fluid">
 	<div class="container">
-		<div class="card">
+		<div class="card my-3">
 			<div class="card-header">
 				<h4>Sucursales</h4>
 			</div>
@@ -34,28 +34,5 @@
 			</div>
 		</div>
 	</div>
-@endsection
-@section('js')
-
-
-<script type="text/javascript">
-	// select 2
-	$(document).ready(function() {
-	    $('.js-example-basic-single').select2({
-	    	placeholder: 'Seleccione el proveedor',    	
-	    	maximumSelectionLength:1,
-	    });
-	});
-
-	$(document).ready(function() {	
-		
-		$('#articulos').DataTable({
-		
-	    scrollY: 400,
-	    select: true,
-	    searching: true,
-	    paging: false
-		});	
-    } );
-</script>
-@endsection
+</div>	
+<script src="{{ asset('js/app.js')}}"></script>
