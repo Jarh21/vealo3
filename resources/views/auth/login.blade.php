@@ -21,7 +21,7 @@
 <body class="antialiased">
 <div class="container-fluid"> 
     <div class="alert alert-warning">
-        <h4> <span>Vealo {{ config('app.app_version') }}</span> <span class="font-weight-light">Sistema de Gestion Administrativo.</span></h4>
+        <h4> <span>Vealo </span> <span class="font-weight-light">Sistema de Gestion Administrativo.</span></h4>
     </div>
 </div>
 <div class="container mt-5">

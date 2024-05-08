@@ -46,18 +46,18 @@ class CuentasPorPagarController extends Controller
 		$monedaBase = $herramientas->consultarMonedaBase();
         session(['empresaNombre'=>$empresa[1],'empresaRif'=>$empresa[0],'codTipoMoneda'=>$modoPago[0],'modoPago'=>$modoPago[1],'basedata'=>$empresa[2],'logo_empresa'=>$empresa[3],'monedaBase'=>$monedaBase]);
        
-		/* if(empty($rutaSolicitante)){
-			return self::facturasPorPagar();
+		if(empty($rutaSolicitante)){
+			?>
+			<script>
+				//recargar la pagina despues de enviar datos de la ventana pop up
+				window.opener.location.reload()
+				window.close();
+			</script>
+			<?php
 		}else{
 			return redirect()->route($rutaSolicitante);
-		} */
-		?>
-		<script>
-			//recargar la pagina despues de enviar datos de la ventana pop up
-			window.opener.location.reload()
-			window.close();
-		</script>
-		<?php
+		} 
+		
 		
     }
 
