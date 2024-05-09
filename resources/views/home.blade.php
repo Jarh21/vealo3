@@ -34,7 +34,7 @@
                 <div class="row-col m-3">
                     <h4 class="card-title font-weight-bold text-primary float-right">CUENTAS POR PAGAR</h4>
                     <p class="card-text text-dark text-center">Registro y control de cuentas por pagar, {{session('nombre_general_empresa')}}</p>
-                    <a href="{{route('cuentasporpagar.inicio')}}" class="btn btn-primary d-flex justify-content-center">Ir al modulo<i class="fas fa-arrow-circle-right ml-2 mt-1"></i></a>
+                    <a href="{{route('cuentasporpagar.facturasPorPagar')}}" class="btn btn-primary d-flex justify-content-center">Ir al modulo<i class="fas fa-arrow-circle-right ml-2 mt-1"></i></a>
                 </div>
             </div>
         </div>
