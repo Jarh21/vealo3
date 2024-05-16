@@ -93,6 +93,7 @@
 		      </td>		      
 		      <td width=10%>
 		      	<a href="{{route('islr.view',$islr['id'])}}" class="btn btn-secondary btn-sm"title="Ver"><i class="fa fa-search" aria-hidden="true"></i></a>
+				<a href="{{route('islr.viewPdf',$islr['id'])}}" class='btn btn-light  btn-sm text-danger' title="descargar PDF" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i></a>
 		      	<a href="{{route('islr.edit',[$islr['id'],'edit'])}}" class="btn btn-primary btn-sm" title="Editar"><i class="fa fa-pencil-alt" aria-hidden="true"></i></a>
 		      	
 		      </td>		      

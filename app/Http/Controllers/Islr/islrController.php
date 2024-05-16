@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Islr;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use App\Models\Empresa;
 use App\Models\Islr;
 use App\Models\Retencion;
@@ -17,6 +19,7 @@ use App\Http\Controllers\Admin\ProveedorController;
 use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Http\Controllers\Islr\xmlController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 class islrController extends Controller
 {
     public function index(){
@@ -556,9 +559,56 @@ class islrController extends Controller
 		
 		$islr=islrController::buscar($id);
 		//buscamos los detalles de retencion de las retenciones
-			$detalleRetenciones = self::buscarDetalleRetencion($id);
+		$detalleRetenciones = self::buscarDetalleRetencion($id);
 		return view('islr.islr.show',['islr'=>$islr,'detalleRetenciones'=>$detalleRetenciones]);
 		
+	}
+
+	public function viewPdf($id){
+
+		$islr=islrController::buscar($id);
+		//buscamos los detalles de retencion de las retenciones
+		$detalleRetenciones = self::buscarDetalleRetencion($id);
+		$datosEmpresa = Empresa::select('direccion','logo','firma')->where('rif',session('empresaRif'))->first();
+		$pdf = new Dompdf();
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+		$pdf->setPaper('letter','portrait'); // Establecer la orientación a horizontal
+        $pdf->setOptions($options);
+        $html = view('islr.islr.comprobantePdf', ['islr'=>$islr,'detalleRetenciones'=>$detalleRetenciones,'datosEmpresa'=>$datosEmpresa])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
+        $pdf->loadHtml($html);
+        $pdf->render();
+
+
+		
+
+		///codigo de chat GPT3
+		//guardamos el documento en storage de laravel
+		$nombreArchivo = 'ISLR-'.$islr[0]->empresa.'-'.$islr[0]->proveedor.'-'.$islr[0]->nControl.'.pdf';
+		$nombreArchivo = str_replace(' ','_',$nombreArchivo);
+
+		//eliminar los archivos de la carpeta storage
+		// Verificar si el directorio existe		
+		$rutaDirectorio='pdf/'.$nombreArchivo;
+		$archivos = Storage::files($rutaDirectorio);
+		if (!empty($archivos)) {
+			foreach ($archivos as $archivo) {
+				// Eliminar cada archivo individualmente
+				Storage::delete($archivo);
+			}			
+		}
+		
+		$rutaArchivo = 'pdf/' . $nombreArchivo; // Ruta donde se guardará el archivo dentro de la carpeta storage
+
+		Storage::put($rutaArchivo, $pdf->output()); // Guardar el archivo PDF en la carpeta storage
+		//retornamos el archivo pdf
+		return response()->stream(function () use ($pdf) {
+			echo $pdf->output();
+		}, 200, [
+			'Content-Type' => 'application/pdf',
+			'Content-Disposition' => 'inline; filename="' . $nombreArchivo . '"'
+		]);//fin codigo GPT3
 	}
 
 

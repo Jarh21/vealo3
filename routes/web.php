@@ -199,6 +199,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/regisretenciones/create-detalle',	[islrController::class,'registroIslr'])->name('islr.save');
     Route::PUT('/regisretenciones/create-detalle2/{idislr?}',[islrController::class,'saveMontoServicios'])->name('islr.savedetalle');
     Route::get('/regisretenciones/view/{id}/{vista?}',[islrController::class,'view'])->name('islr.view');
+    Route::get('/regisretenciones/viewPdf/{id}/{vista?}',[islrController::class,'viewPdf'])->name('islr.viewPdf');
     Route::get('/regisretenciones/edit/{id}/{accion}/{idxml?}/{fechaIniFin?}',[islrController::class,'edit'])->name('islr.edit');
     Route::put('/regisretenciones/edit/{id}',[islrController::class,'update'])->name('islr.update');
     Route::get('/regisretenciones/excel',[islrController::class,'index'])->name('islr.export.excel');
