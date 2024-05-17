@@ -105,7 +105,7 @@ class HerramientasController extends Controller
 		//dd($dolar,$fecha,'herramientas controller 42');
 		if(empty($dolar) or $dolar==0.000){
 			
-			\Session::flash('message', 'No se pudo optener el valor de la Tasa del Dolar a la fecha '.$fecha);
+			\Session::flash('message', 'No se pudo obtener el valor de la Tasa del Dolar a la fecha '.$fecha);
 			\Session::flash('alert','alert-warning');
 			return 1;
 		}else{
@@ -135,7 +135,7 @@ class HerramientasController extends Controller
 		//dd($dolar,$fecha,'herramientas controller 42');
 		if(empty($dolar) or $dolar==0.000){
 			
-			\Session::flash('message', 'No se pudo optener el valor de la Tasa del Dolar a la fecha ');
+			\Session::flash('message', 'No se pudo obtener el valor de la Tasa del Dolar a la fecha ');
 			return 1;
 		}else{
 			return $dolar;
@@ -171,7 +171,7 @@ class HerramientasController extends Controller
 			//dd($dolar,$fecha,'herramientas controller 42');
 			if(empty($dolar) or $dolar==0.000){
 				
-				\Session::flash('message', 'No se pudo optener el valor de la Tasa del Dolar');
+				\Session::flash('message', 'No se pudo obtener el valor de la Tasa del Dolar');
 				return 1;
 			}else{
 				return $dolar[0];
