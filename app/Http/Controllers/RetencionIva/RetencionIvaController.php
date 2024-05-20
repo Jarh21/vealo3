@@ -258,12 +258,25 @@ class RetencionIvaController extends Controller
 		$proveedor = explode('|',$request->proveedorRif);
 		$proveedorRif = $proveedor[0];
 		$montoIva =0;
+		$comprasmasiva=0;
+		$sincredito =0;
+		$base_impon =0;
+		$iva =0;
 		$proveedorDato = Proveedor::where('rif',$proveedorRif)->first();
 		//si el tipo de documento es nota de credito el monto a retener se debe guardar en negativo para que lo reste en el txt
 		if($request->tipo_docu=='NC'){
 			$montoIva = '-'.$request->iva_retenido;
+			$comprasmasiva= '-'.$request->comprasmasiva;
+			if(!empty($request->sincredito)){
+				$sincredito ='-'.$request->sincredito;
+			}			
+			$base_impon ='-'.$request->base_impon;
+			$iva ='-'.$request->iva;
 		}else{
-			$montoIva = $request->iva_retenido;
+			$montoIva = $request->iva_retenido;			
+			$comprasmasiva= $request->comprasmasiva;
+			$base_impon =$request->base_impon;
+			$iva =$request->iva;
 		}
 		
 		//registro de facturas Manualmente
@@ -278,11 +291,11 @@ class RetencionIvaController extends Controller
 			'control_fact'=>$request->control_fact,
 			'tipo_trans'=>$request->tipo_trans,
 			'fact_afectada'=>$request->fact_afectada,
-			'comprasmasiva'=>$request->comprasmasiva,
-			'sincredito'=>$request->sincredito,
-			'base_impon'=>$request->base_impon,
+			'comprasmasiva'=>$comprasmasiva,
+			'sincredito'=>$sincredito,
+			'base_impon'=>$base_impon,
 			'porc_alic'=>$request->porc_alic,
-			'iva'=>$request->iva,
+			'iva'=>$iva,
 			'iva_retenido'=>$montoIva,
 			'porc_reten'=>$proveedorDato->porcentaje_retener,
 			'rif_agente'=>session('empresaRif'),
