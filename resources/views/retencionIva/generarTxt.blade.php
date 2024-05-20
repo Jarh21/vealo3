@@ -106,7 +106,7 @@
                 @endforeach
                 <tr>
                     <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td><b>Total</b></td><td><b>{{$suma}}</b></td><td></td><td></td>
+                    <td></td><td></td><td></td><td></td><td></td><td><b>Total</b></td><td><b>{{number_format($suma,2,',','.')}}</b></td><td></td><td></td>
                 </tr>
             </tbody>
         </table>

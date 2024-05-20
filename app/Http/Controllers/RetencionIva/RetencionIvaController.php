@@ -257,8 +257,14 @@ class RetencionIvaController extends Controller
 		//rif del proveedor y porcentaje de retencion
 		$proveedor = explode('|',$request->proveedorRif);
 		$proveedorRif = $proveedor[0];
-
+		$montoIva =0;
 		$proveedorDato = Proveedor::where('rif',$proveedorRif)->first();
+		//si el tipo de documento es nota de credito el monto a retener se debe guardar en negativo para que lo reste en el txt
+		if($request->tipo_docu=='NC'){
+			$montoIva = '-'.$request->iva_retenido;
+		}else{
+			$montoIva = $request->iva_retenido;
+		}
 		
 		//registro de facturas Manualmente
 		$datos = array(
@@ -277,7 +283,7 @@ class RetencionIvaController extends Controller
 			'base_impon'=>$request->base_impon,
 			'porc_alic'=>$request->porc_alic,
 			'iva'=>$request->iva,
-			'iva_retenido'=>$request->iva_retenido,
+			'iva_retenido'=>$montoIva,
 			'porc_reten'=>$proveedorDato->porcentaje_retener,
 			'rif_agente'=>session('empresaRif'),
 			'nom_agente'=>session('empresaNombre'),

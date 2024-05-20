@@ -85,7 +85,7 @@
 		</form>
 		</div>
 		@if(Session::has('message'))
-			<div class="alert alert-danger">
+			<div class="alert {{ Session::get('alert') ?? 'alert-danger'}} ">
 				{!! Session::get('message') !!}
 			</div>
    			
