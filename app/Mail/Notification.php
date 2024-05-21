@@ -17,20 +17,21 @@ class Notification extends Mailable
     public $nomAgente;
     public $facturas;
     public $archivoAdjunto;
-
+    public $asunto;
     
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($nombre,$comprobante,$nomAgente,$archivoAdjunto,$facturas)
+    public function __construct($nombre,$comprobante,$nomAgente,$archivoAdjunto,$facturas,$asunto)
     {
         $this->nombre = $nombre;
         $this->comprobante = $comprobante;
         $this->nomAgente = $nomAgente;
         $this->archivoAdjunto = $archivoAdjunto;
         $this->facturas = $facturas;
+        $this->asunto = $asunto;
     }
 
     /**
@@ -53,7 +54,7 @@ class Notification extends Mailable
                  
                 
             // cuando hay archivos adjuntos adicionales
-            $email = $this->view('email.retencionIva',['facturas'=>$this->facturas])
+            $email = $this->view('email.retencionIva',['facturas'=>$this->facturas,'asunto'=>$this->asunto])
                 //->from("admivent.jarh.deli@gmail.com",$this->nomAgente)
                 ->replyTo("admivent.jarh.deli@gmail.com", $this->nomAgente)
                 ->subject("Retencion IVA GFD");          

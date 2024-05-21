@@ -26,7 +26,8 @@
                                         </li>
                                     </div>
                                 </ul>
-                                <input type="file" @change="handleFileChange" ref="fileInput" multiple class="form-control-file">
+                                <input type="file" @change="handleFileChange" ref="fileInput" multiple class="form-control-file my-2">
+                                <input type="text" v-model="asunto" class="form-control my-2" placeholder="Asunto" disabled>
                             </div>
                             <div class="col">
                                 <label>Vista Previa:</label>
@@ -81,6 +82,7 @@
             formulario:{
                 comprobante:'',
                 rifAgente:'',
+                asunto:'',
                 archivo:[],
             },
             previewImage: null,

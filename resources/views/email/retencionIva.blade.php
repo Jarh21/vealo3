@@ -7,7 +7,8 @@
 </head>
 <body>
     <H1>Saludos,{{$nombre ?? ''}}</H1>
-    <p>A continuación envio adjunto la retencion de IVA correspondiente a las facturas: {{$facturas}}</p>
+    <p>{{$asunto}}.</p>
+    <p>Adjunto la retencion de IVA correspondiente a las facturas: {{$facturas}}</p>
    
 </body>
 </html>

@@ -21,6 +21,7 @@ class EmailController extends Controller
         //return new Notification("Jose Rivero"); copia al: gfdpagos@gmail.com
         $comprobante=$request->comprobante;
         $empresaRif= $request->rifAgente;
+        $asunto = $request->asunto;
         $archivoAdjunto =array();
         $nomRetenido='';
         $nomAgente ='';
@@ -42,6 +43,7 @@ class EmailController extends Controller
             config([
                 'mail.mailers.smtp.username' => $correo_del_sistema,
                 'mail.mailers.smtp.password' => $password_correo_del_sistema,
+                'mail.from.address'=>$correo_del_sistema,
             ]);        
         }        
 
@@ -54,7 +56,7 @@ class EmailController extends Controller
                 $uploadsuccess = $archivo->move($destinatinoPath,$filename);    
                 $archivoAdjunto[]= $destinatinoPath.$filename;
             }
-        }
+        }//fin de cargar el nuevo archivo
 
         //si queremos enviar  los numeros de facturas por el correo
         $datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->select('documento')->get();
@@ -83,7 +85,7 @@ class EmailController extends Controller
                     $response = Mail::mailer("smtp")
                         ->to($correo)
                         //->cc('gfdpagos@gmail.com')                        
-                        ->send(new Notification($nomRetenido,$comprobante,$nomAgente,$archivoAdjunto,$facturas));
+                        ->send(new Notification($nomRetenido,$comprobante,$nomAgente,$archivoAdjunto,$facturas,$asunto));
                     
                     //actualizamos la bandera de correo enviado en la tabla retenciones_dat
                     RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);                    

@@ -122,8 +122,13 @@ date_default_timezone_set("America/Caracas");
         $totalBase=0;
         $totalIva=0;
         $totalIvaRetener=0;
+        $debitoCredito ='';
       ?>
       @foreach($datosFacturas as $datosFactura)
+      @php 
+        if($datosFactura->tipo_docu=='NC'){
+          $debitoCredito ='-';
+        } @endphp
       <tr align="center">
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$contador}}</span></td>
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{date("d-m-Y", strtotime($datosFactura->fecha_docu))}}</span></td>
@@ -133,12 +138,12 @@ date_default_timezone_set("America/Caracas");
         <td bgcolor="#FFFFFF"><span class="Estilo2">@if($datosFactura->tipo_docu == 'NC'){{$datosFactura->documento}}@endif </span></td> <!-- nota credito -->
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->tipo_trans}}</span></td>
         <td bgcolor="#FFFFFF"><span class="Estilo2">{{$datosFactura->fact_afectada ?? ''}}</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->comprasmasiva,2,',','.')}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->sincredito,2,',','.')}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->base_impon,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$debitoCredito}}{{number_format($datosFactura->comprasmasiva,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$debitoCredito}}{{number_format($datosFactura->sincredito,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$debitoCredito}}{{number_format($datosFactura->base_impon,2,',','.')}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$datosFactura->porc_alic}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->iva,2,',','.')}}&nbsp;</span></td>
-        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->iva_retenido,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$debitoCredito}}{{number_format($datosFactura->iva,2,',','.')}}&nbsp;</span></td>
+        <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{$debitoCredito}}{{number_format($datosFactura->iva_retenido,2,',','.')}}&nbsp;</span></td>
         <td align="right" bgcolor="#FFFFFF"><span class="Estilo2">&nbsp;{{number_format($datosFactura->porc_reten,2,',','.')}}&nbsp;</span></td>
       </tr>   
       <?php 
@@ -152,12 +157,12 @@ date_default_timezone_set("America/Caracas");
       @endforeach
 	<tr align="center" bgcolor="#FFFFFF">
         <td colspan="8" align="right"><span class="Estilo1">T O T A L E S&nbsp;&nbsp;&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalCompras,2,',','.')}}&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalSinCredito,2,',','.')}}&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalBase,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{$debitoCredito}}{{number_format($totalCompras,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{$debitoCredito}}{{number_format($totalSinCredito,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{$debitoCredito}}{{number_format($totalBase,2,',','.')}}&nbsp;</span></td>
         <td>&nbsp;</td>
-        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalIva,2,',','.')}}&nbsp;</span></td>
-        <td align="right"><span class="Estilo1">&nbsp;{{number_format($totalIvaRetener,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{$debitoCredito}}{{number_format($totalIva,2,',','.')}}&nbsp;</span></td>
+        <td align="right"><span class="Estilo1">&nbsp;{{$debitoCredito}}{{number_format($totalIvaRetener,2,',','.')}}&nbsp;</span></td>
         <td>&nbsp;</td>
       </tr>
     </table></td>
