@@ -34,7 +34,7 @@ class EmailController extends Controller
         $nomAgente = $datosRetencion->nom_agente;
 
         //buscamos los parametros del corre del sistema vealo para enviarla
-        $correo_del_sistema = Parametro::buscarVariable('correo_del_sistema');
+       /*  $correo_del_sistema = Parametro::buscarVariable('correo_del_sistema');
         $password_correo_del_sistema = Parametro::buscarVariable('password_correo_del_sistema');
 
         //si en configuracion general esta registrado el correo y la clave de aplicaciones de gmail usamos eso de lo contrario usamos los del archivo .env
@@ -45,7 +45,7 @@ class EmailController extends Controller
                 'mail.mailers.smtp.password' => $password_correo_del_sistema,
                 'mail.from.address'=>$correo_del_sistema,
             ]);        
-        }        
+        }  */       
 
         //cargar el nuevo archivo       
         if($request->hasfile('archivo')){

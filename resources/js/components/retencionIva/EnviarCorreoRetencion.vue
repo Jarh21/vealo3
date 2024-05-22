@@ -27,7 +27,7 @@
                                     </div>
                                 </ul>
                                 <input type="file" @change="handleFileChange" ref="fileInput" multiple class="form-control-file my-2">
-                                <input type="text" v-model="asunto" class="form-control my-2" placeholder="Asunto" disabled>
+                                <input type="text" v-model="formulario.asunto" class="form-control my-2" placeholder="Asunto">
                             </div>
                             <div class="col">
                                 <label>Vista Previa:</label>
@@ -123,7 +123,7 @@
             this.formulario.archivo.forEach(file => {
                 formData.append('archivo[]', file);
             });
-            //formData.append('archivo[]', this.formulario.archivo);
+            formData.append('asunto', this.formulario.asunto);
             this.cerrarModal();
             this.cargando = true;
             let respuesta = await axios.post("evio-email-retencion-iva-post", formData);

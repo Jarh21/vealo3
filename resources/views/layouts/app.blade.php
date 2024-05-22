@@ -4,7 +4,7 @@
     
     //use App\User;
     use App\Http\Controllers\HerramientasController;    
-    $version = '3.2.28';
+    $version = '3.2.29';
 ?>
 <head>
     <meta charset="utf-8">
