@@ -12,6 +12,12 @@
                     <div class="col">
                         <input type="text" name="correo_del_sistema" class="form-control" value="{{$correo_del_sistema ?? ''}}" >               
                     </div>
+                    <div class="col">
+                        <label for="correo_del_sistema">Con Copia de Correo electronico</label>
+                    </div>
+                    <div class="col">
+                        <input type="text" name="cc_correo_del_sistema" class="form-control" value="{{$cc_correo_del_sistema ?? ''}}" >               
+                    </div>
                 </div>
                 <div class="row my-3">
                     <div class="col-4">

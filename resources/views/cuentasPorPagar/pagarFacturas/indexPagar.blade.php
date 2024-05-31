@@ -7,24 +7,40 @@
 	@endphp
 	<div class="container-fluid">
 		<h3>Pagar Facturas {{session('empresaNombre')}} {{session('empresaRif')}} <!-- <a href="{{--route('cuentasporpagar.facturasPorPagar')--}}" class="btn btn-warning btn-sm float-right"><i class="fa fa-step-backward"></i> Regresar</a> --></h3><hr>
-		<p>Modo de Pago 
-			@if(session('modoPago') == 'bolivares')
-				<span class="right badge badge-primary">
-					{{session('modoPago')}}</td>
-				</span>
-			@else
-				<span class="right badge badge-success">
-					{{session('modoPago')}}</td>
-				</span>
+		<div>
+			<span>
+				Modo de Pago 
+				@if(session('modoPago') == 'bolivares')
+					<span class="right badge badge-primary">
+						{{session('modoPago')}}</td>
+					</span>
+				@else
+					<span class="right badge badge-success">
+						{{session('modoPago')}}</td>
+					</span>
+				@endif
+				Tipo Moneda:<b>{{' '.$monedaBase}}</b>
+			</span>
+			@if(!empty($notasDeCredito))
+				<?php
+					$proveedorRif = $cuentas[0]['proveedor_rif'];
+					$factura_id = $cuentas[0]['factura_id'];
+				?>
+				<!-- si hay notas de credito pendientes por aplicar aqui se notifica -->
+				<a href="{{route('cuentasporpagar.notasCreditoPorDescontar',[$proveedorRif,$factura_id,$codigo_relacion_pago])}}" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;" class="btn btn-warning float-right mb-3"><b class="text-danger">{{$notasDeCredito}}</b> Nota de Credito Pendientes por utilizar</a>
 			@endif
-			Tipo Moneda:<b>{{' '.$monedaBase}}</b>
-		</p>
-		@if(Session::has('message'))
-			<div class="alert alert-danger">
-				{!! Session::get('message') !!}
-			</div>
-   			
-		@endif
+		</div>
+		
+
+		<div class="my-4">
+			@if(Session::has('message'))
+				<div class="alert alert-danger">
+					{!! Session::get('message') !!}
+				</div>
+				
+			@endif
+		</div>
+		
 		
 		<form action="{{route('guardarPagarFacturas')}}" method="post">
 			@csrf
@@ -39,6 +55,7 @@
 				<thead>
 					<tr>
 						<th>Facturas</th>
+						<th>Fecha</th>
 						<th>Proveedo</th>
 						<th>Concepto</th>
 						<th>Debitos</th>
@@ -68,6 +85,9 @@
 							<tr style="background-color: {{$cuenta['color']}}">
 								<td><!--Facturas -->
 									{{$registro->documento}}
+								</td>
+								<td>
+									{{$registro->cierre}}
 								</td>
 								<td><!--Proveedo -->
 									@if($registro->concepto=='FAC')

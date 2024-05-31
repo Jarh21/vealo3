@@ -149,7 +149,8 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/cuentasporpagar/desvincular/{id?}/{codigo?}',[CuentasPorPagarController::class,'desvincularAsientoCuentasPorPagar'])->name('desvincularAsientoCuentasPorPagar');
     Route::get('/cuentasporpagar/desvincular_bolivares/{id?}/{codigo?}',[CuentasPorPagarController::class,'desvincularAsientoCuentasPorPagarBolivares'])->name('desvincularAsientoCuentasPorPagarBolivares');
     Route::get('/cuentasporpagar/cuentaspagadas',[CuentasPorPagarController::class,'litarCunetasPagadas'])->name('listarcuentaspagadas.index');
-
+    Route::get('/cuentasporpagar/notasDeCredito/{proveedorRif}/{facturaId}/{codigorelacion?}',[CuentasPorPagarController::class,'notasDeCreditoPorDescontar'])->name('cuentasporpagar.notasCreditoPorDescontar');
+    Route::get('/cuentasPorPagar/agregarNotaCreditoPorDescontar/{id}/{facturaId}/{codigorelacion?}',[CuentasPorPagarController::class,'agregarNotaCreditoPorDescontar'])->name('cuentasporpagar.agregarNotaCreditoPorDescontar');
     Route::get('/cuentasporpagar/eliminarporpagar/{id}/{urlRetorno?}',[CuentasPorPagarController::class,'eliminarFacturasPorPagar'])->name('eliminarFacturaPorPagar');
     Route::get('/cuentasporpagar/editarFacturasCargadasporpagar/{id}/{urlRetorno?}',[CuentasPorPagarController::class,'editarFacturasPorPagar'])->name('editarFacturasPorPagar');
     Route::put('/cuentasporpagar/editarFacturasCargadasporpagar/{id}',[CuentasPorPagarController::class,'updateFacturasPorPagar'])->name('updateFacturasPorPagar');

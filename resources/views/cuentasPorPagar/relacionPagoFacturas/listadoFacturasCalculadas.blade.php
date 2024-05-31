@@ -86,11 +86,12 @@
 					<th>Proveedor</th>
 					<th>N Factura</th>					
 					<th>FECH Factura</th>
-					<th class="d-print-none">Monto</th>							
+					<th class="d-print-none">Monto Factura</th>							
 					<th class="d-print-none">RetIva</th>
 					<th class="d-print-none">RetISLR</th>					
-					<th class="d-print-none">Monto Fac.</th>				
-					<th class="d-print-none">Monto pagar.</th>				
+					<th class="d-print-none">Monto Pagar</th>				
+					<th class="d-print-none">Monto <span class="text-danger">-Descuento</span></th>
+					<th class="d-print-none">Abonado</th>				
 					<th>Tasa</th>
 					<th>IGTF</th>							
 					<th>Divisas</th>
@@ -204,14 +205,22 @@
 								
 								@if($cuenta->porcentaje_descuento > 0.00)
 								<span  class="d-print-none">{{number_format($pagoBolivares,2,'.',',').'Bs.'}}</span>
-								<span  class="d-print-none">{{'-'.$cuenta->porcentaje_descuento.'%'}}</span>
-								<span>{{number_format($pagoBolivaresMenosDescuento,2).'Bs'}}</span>
+								<span  class="d-print-none text-danger">{{'-'.$cuenta->porcentaje_descuento.'%Desc'}}</span>
+								<span class="text-danger">{{number_format($pagoBolivaresMenosDescuento,2).'Bs'}}</span>
 								@else
 								<span>{{number_format($pagoBolivares,2,'.',',').'Bs.'}}</span>
 								@endif
 								
 							</td>
 							<td class="d-print-none">{{number_format($cuenta->resto,2)}}</td> <!-- Monto pagar.	 -->					
+							<td class="d-print-none"><!-- Restante por pagar Abonado.	 -->
+								@if($cuenta->restantePorPagar > 0.01)		
+								<span class="text-primary">+{{number_format($cuenta->resto-$cuenta->restantePorPagar,2)}}</span>
+								<span class="text-danger">-{{number_format($cuenta->restantePorPagar,2)}}</span>	
+								@else
+								<span class="text-danger">0.00</span>
+								@endif
+							</td> 					
 							<td>{{$cuenta->moneda_secundaria}}</td><!-- TASA -->
 							<td>{{number_format($cuenta->igtf,2,'.',',')}}</td><!-- IGTF -->
 							<td>{{number_format($pagoTotal,2)}}</td> <!-- pago en Divisas -->
@@ -275,12 +284,13 @@
 						    $sumaTotalDivisas = $sumaTotalDivisas + $sumaPagoTotalFecha;
 						?>
 						
-						<td colspan="13">
+						<td colspan="14">
 							<b class="float-right">{{$dia}} {{date('d-m-Y',strtotime($fechaFactura->fechaPagoAcordado))}} Pago Total {{number_format($sumaPagoTotalFecha,2)}}</b>
 							@if($sumaNotasDebitos > 0.00)
 								<p class="float-right text-danger d-print-none">Excedente en Bs por Aumento Tasa {{number_format($sumaNotasDebitos,2).'Bs. '}}</p>
 							@endif
 						</td>
+						<td  style="display: none;"></td>
 						<td  style="display: none;"></td>
 						<td  style="display: none;"></td>
 						<td  style="display: none;"></td>
@@ -306,7 +316,7 @@
 			</tbody>
 			<tfoot>
 	            <tr>
-	                <th colspan="13" style="text-align:right">Total </th>
+	                <th colspan="14" style="text-align:right">Total </th>
 	               
 	            </tr>
     		</tfoot>
@@ -371,7 +381,7 @@
 	 
 	            // Total over this page
 	            pageTotal = api
-	                .column( 11, { page: 'current'} )
+	                .column( 12, { page: 'current'} )
 	                .data()
 	                .reduce( function (a, b) {
 	                    return intVal(a) + intVal(b);

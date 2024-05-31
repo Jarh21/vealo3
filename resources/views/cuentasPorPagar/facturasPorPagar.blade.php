@@ -97,7 +97,7 @@
     		<h4><i class="fa fa-exclamation-triangle"></i>{{$mensaje['texto']}}</h4>
     	</div>
     	@endif	
-    	<table id="articulos" class="table table-bordered" data-page-length='25'>
+    	<table id="articulos" class="table table-bordered table-sm" data-page-length='25'>
     		<thead>
     			<tr>    				
     				<th>Nº</th>    				
@@ -256,7 +256,7 @@
 		$(function () {
 			//data table
 			$('#articulos').DataTable({
-			scrollY: 400,
+			scrollY: 350,
 			select: true,
 			paging: false,
 			searching: true,

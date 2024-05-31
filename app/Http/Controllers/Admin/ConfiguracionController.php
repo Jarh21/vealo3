@@ -99,14 +99,16 @@ class ConfiguracionController extends Controller
 
     public function configuracionGeneral(){
         $correo_del_sistema = Parametro::buscarVariable('correo_del_sistema');
+        $cc_correo_del_sistema = Parametro::buscarVariable('cc_correo_del_sistema');
         $password_correo_del_sistema = Parametro::buscarVariable('password_correo_del_sistema');
         
-        return view('admin.configuraciones.confGeneral',['correo_del_sistema'=>$correo_del_sistema,'password_correo_del_sistema'=>$password_correo_del_sistema]);
+        return view('admin.configuraciones.confGeneral',['correo_del_sistema'=>$correo_del_sistema,'cc_correo_del_sistema'=>$cc_correo_del_sistema,'password_correo_del_sistema'=>$password_correo_del_sistema]);
     }
 
     public function guardarConfiguracionGeneral(Request $request){
 
         Parametro::actualizarVariable('correo_del_sistema',$request->correo_del_sistema);
+        Parametro::actualizarVariable('cc_correo_del_sistema',$request->cc_correo_del_sistema);
         Parametro::actualizarVariable('password_correo_del_sistema',$request->password_correo_del_sistema);
 		
         return self::configuracionGeneral();

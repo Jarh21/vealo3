@@ -35,6 +35,7 @@ class EmailController extends Controller
 
         //buscamos los parametros del corre del sistema vealo para enviarla
         $correo_del_sistema = Parametro::buscarVariable('correo_del_sistema');
+        $cc_correo_del_sistema = Parametro::buscarVariable('cc_correo_del_sistema');
         $password_correo_del_sistema = Parametro::buscarVariable('password_correo_del_sistema');
 
         //si en configuracion general esta registrado el correo y la clave de aplicaciones de gmail usamos eso de lo contrario usamos los del archivo .env
@@ -82,10 +83,18 @@ class EmailController extends Controller
                     //en to() se puede agregar una coleccion de email 
                     //mailer('smtp') el smtp es el por defecto del archivo .env pero este esta en config/email, si en config/email tienes varios servidor de correos configurado puedes seleccionarlo en vez de smtp https://www.youtube.com/watch?v=uYEL36fGFiM
                     
-                    $response = Mail::mailer("smtp")
+                    //verificamos si los correo se envian con copia a otro correo de la empresa
+                    if(empty($cc_correo_del_sistema)){
+                        $response = Mail::mailer("smtp")
                         ->to($correo)
-                        //->cc('gfdpagos@gmail.com')                        
                         ->send(new Notification($nomRetenido,$comprobante,$nomAgente,$archivoAdjunto,$facturas,$asunto));
+                    }else{
+                        $response = Mail::mailer("smtp")
+                        ->to($correo)
+                        ->cc($cc_correo_del_sistema)                        
+                        ->send(new Notification($nomRetenido,$comprobante,$nomAgente,$archivoAdjunto,$facturas,$asunto));
+                    }// //fin verificamos si los correo se envian con copia a otro correo de la empresa y envio del correo
+                    
                     
                     //actualizamos la bandera de correo enviado en la tabla retenciones_dat
                     RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);                    

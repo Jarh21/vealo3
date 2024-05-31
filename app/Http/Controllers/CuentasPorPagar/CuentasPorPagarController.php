@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Banco;
 use App\Models\Proveedor;
 use App\Models\CuentasPorPagar;
+use App\Models\CxpNotasDeCredito;
 use App\Models\Parametro;
 use App\Models\FacturasPorPagar;
 use App\Models\Empresa;
@@ -461,11 +462,7 @@ class CuentasPorPagarController extends Controller
 						$agregarIslr = $datos->agregar_islr;
 						$diasCreditoProveedor = $datos->dias_credito;
 					}//fin buscar porcentaje de retencion	
-					
-					//verificar si el proveedor esta registrado en vealo
-					/* if(empty($porcentajeRetencionIva)){
-						dd($proveedorRif,'proveedor no se encuentra registrado, registrelo para continuar');
-					} */
+											
 
 		    		$facturaPorPagar = new FacturasPorPagar;
 		    		$facturaPorPagar->empresa_rif = $empresa[0];
@@ -569,11 +566,10 @@ class CuentasPorPagarController extends Controller
 			    			} ////fin buscar retencion de iva
 	    				}//fin si es agente retencion de impuestos
 
-		    			//////////si la factura tiene DESCUENTO se agrega en cxp ////////////////////
-		    			$monto = 0;
-		    			$descuento =0;
+		    			//////////si la factura tiene DESCUENTO se agrega en cxp ////////////////////		    			
 		    			if(!empty($porcDescuento)){
-
+							$monto = 0;
+		    				$descuento =0;	
 		    				$monto = $facturaPorPagar->debitos;
 
 		    				if($porcDescuento > 0.0){
@@ -586,31 +582,35 @@ class CuentasPorPagarController extends Controller
 		    				$arrayRegistro['cod_concepto'] = 4;
 		    				$arrayRegistro['concepto'] = 'DESC';
 		    				$arrayRegistro['concepto_descripcion']='DESCUENTO DEL '.$porcDescuento.'%';
-		    				$arrayRegistro['factura_id']=$facturaPorPagar->id;
-		    				
+		    				$arrayRegistro['factura_id']=$facturaPorPagar->id;		    				
 		    				self::guardarEnCuentasPorPagar($arrayRegistro);
 		    			}///FIN SI LA FACTURA TIENE DESCUENTO
-
-						/////COMPARAMOS SI EL PROVEEDOR TIENE HABILITADO DESCONTAR NOTA DE CREDITO
-						if($descontarNotaCredito == 1){
-							/////BUSCAR SI LA FACTURA TIENE NOTA DE CREDITO
-							$notacreditos = $conexionSQL->select("SELECT SUM(creditos+montoiva)AS credito FROM notacredito WHERE codfact=:keycodigoFac GROUP BY codfact",['keycodigoFac'=>$registro->keycodigo]);
-							foreach($notacreditos as $notacredito){
-								$credito = floatval($notacredito->credito);
-							}
-							//si la nota credito es mayor a 0 creamos el asiento
-							if($credito > 0.00){
-								$arrayRegistro['debitos'] = 0;
-								$arrayRegistro['montoiva'] = 0;
-								$arrayRegistro['creditos'] = $credito;
-								$arrayRegistro['cod_concepto'] = 5;
-								$arrayRegistro['concepto'] = 'NCP';
-								$arrayRegistro['concepto_descripcion']='NOTA DE CREDITO';
-								$arrayRegistro['factura_id']=$facturaPorPagar->id;
-								
+						
+						
+						/////BUSCAR SI LA FACTURA TIENE NOTA DE CREDITO DE TENERLAS SE REGISTRA EN CXP O EN CXP_NOTAS_DE_CREDITOS
+						$notacreditos = $conexionSQL->select("SELECT SUM(creditos+montoiva)AS credito FROM notacredito WHERE codfact=:keycodigoFac GROUP BY codfact",['keycodigoFac'=>$registro->keycodigo]);
+						foreach($notacreditos as $notacredito){
+							$credito = floatval($notacredito->credito);
+						}
+						//si la nota credito es mayor a 0 creamos el asiento
+						if($credito > 0.00){
+							$arrayRegistro['debitos'] = 0;
+							$arrayRegistro['montoiva'] = 0;
+							$arrayRegistro['creditos'] = $credito;
+							$arrayRegistro['cod_concepto'] = 5;
+							$arrayRegistro['concepto'] = 'NCP';
+							$arrayRegistro['concepto_descripcion']='NOTA DE CREDITO';
+							$arrayRegistro['factura_id']=$facturaPorPagar->id;
+							/////COMPARAMOS SI EL PROVEEDOR TIENE HABILITADO DESCONTAR NOTA DE CREDITO PARA REGISTRAR EN CXP
+							if($descontarNotaCredito == 1){
 								self::guardarEnCuentasPorPagar($arrayRegistro);
-							}//FIN NOTA CREDITO		
-						}////FIN DE COMPARAR SI EL PROVEEDOR TIENE HABILITADO DESCONTAR NOTA DE CREDITO	
+							}else{
+								//SI NO SE DESCUENTA NOTA DE CREDITO GUARDAMOS LA NOTA DE CREDITO PARA FUTUROS PAGOS EN CXP_NOTAS_DE_CREDITOS
+								//GUARDAMOS EN
+								self::guardarEnCuentasPorPagar($arrayRegistro,'cxp_notas_de_creditos'); 			
+							}////FIN DE COMPARAR SI EL PROVEEDOR TIENE HABILITADO DESCONTAR NOTA DE CREDITO	
+						}//FIN NOTA CREDITO
+						
 	    			}//fin si es factura
 	    		
 	    			$mensaje['texto']="Factura ".$nFactura." importada con exito";
@@ -834,20 +834,36 @@ class CuentasPorPagarController extends Controller
 		}	
     }
 
-    public function guardarEnCuentasPorPagar($registro){
+    public function guardarEnCuentasPorPagar($registro,$tabla_a_registrar="cuentas_por_pagars"){
     	/*
     	*funcion inserta los datos de las facturas al ser añadidas
     	*en la tabla fasturas por pagar y asi poder trabajarlas mas facil al registrar los pagos o deducciones 
     	*/
-    	$cuentasPagar = new CuentasPorPagar();
+		if($tabla_a_registrar=="cuentas_por_pagars"){
+			//si tabla_a_registrar es cuentas por pagar se guarda en esa table
+			$cuentasPagar = new CuentasPorPagar();
+		}
+    	if($tabla_a_registrar=="cxp_notas_de_creditos"){
+			// si la tabla es cxp_notas_de_creditos se guarda en esa tabla
+			$cuentasPagar = new CxpNotasDeCredito();
+		}
     	if(isset($registro['empresaRif'])){
     		$cuentasPagar->empresa_rif = $registro['empresaRif'];
+    	}
+		if(isset($registro['empresa_rif'])){
+    		$cuentasPagar->empresa_rif = $registro['empresa_rif'];
     	}
     	if(isset($registro['ncontrol'])){
     		$cuentasPagar->n_control = $registro['ncontrol'];
     	}
 		if(isset($registro['cierre'])){
 			$cuentasPagar->cierre = $registro['cierre'];
+		}
+		if(isset($registro['proveedor_rif'])){
+			$cuentasPagar->proveedor_rif = $registro['proveedor_rif'];
+		}
+		if(isset($registro['proveedor_nombre'])){
+			$cuentasPagar->proveedor_nombre = $registro['proveedor_nombre'];
 		}
 		if(isset($registro['proveedorRif'])){
 		$cuentasPagar->proveedor_rif = $registro['proveedorRif'];
@@ -938,68 +954,68 @@ class CuentasPorPagarController extends Controller
     public function vistaPagarFacturas(Request $request){
     	$modoPago = session('modoPago');
     	$bancos = Banco::all();
-    	$facturas = $request->facturasPorPagar;    	
+    	$facturas = $request->facturasPorPagar;   
+		$notasDeCredito =''; 	
     	$codigoUnico = uniqid();//genera un codigo unico en php
     	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
+		//buscamos si el proveedor tiene notas de credito por utilizar en proximos pagos y asi poder descontarlos 
+		foreach($todosRegistros as $cuenta){
+			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('nc_descontada',0)->count();
+		}
+		
 		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
 		$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');     	
-    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
-
+    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco,'notasDeCredito'=>$notasDeCredito]);
     }
 
     public function retornarVistaPagarFacturas($facturas='',$codigoUnico=''){
     	$modoPago = session('modoPago');
     	$bancos = Banco::all();    	
-    	//$codigoUnico = uniqid();//genera un codigo unico en php
-    	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas); 
+    	$notasDeCredito='';
+    	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
+		//buscamos si el proveedor tiene notas de credito por utilizar en proximos pagos y asi poder descontarlos 
+		foreach($todosRegistros as $cuenta){
+			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('nc_descontada',0)->count();
+		} 
 		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
 		$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');     	
-    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
-
+    	return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco,'notasDeCredito'=>$notasDeCredito]);
     }
 
     public function verVistaPagarFacturas($codigoUnico=0,$facturaId=0){
     	//abre la vista de pagar facturas ya calculadas con el codigo de relacion
     	$modoPago = session('modoPago');
-    	$bancos = Banco::all();    
-
-
-			$facturas = array();
-			$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
-
-    		//optenemos los id de las facturas para retornar
-			foreach($todosRegistros as $registro){
-				$facturas[]=$registro['factura_id'];
-			}
-		if(empty($facturas)){
-			
+    	$bancos = Banco::all(); 
+		$facturas = array();
+		$notasDeCredito ='';
+		$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
+		//buscamos si el proveedor tiene notas de credito por utilizar en proximos pagos y asi poder descontarlos 
+		foreach($todosRegistros as $cuenta){
+			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('nc_descontada',0)->count();
+		}
+		//optenemos los id de las facturas para retornar
+		foreach($todosRegistros as $registro){
+			$facturas[]=$registro['factura_id'];
+		}
+		if(empty($facturas)){			
 			$mensaje['texto']="ocurrio un erro, vuelva a editar el registro de pagos anterior";
 			$mensaje['tipo']="alert-info";
 			return self::facturasPorPagar($mensaje);
 		}else{
 			//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
 			$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');  
-    		return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco]);
-		}
-			
-		
-    	
-    	    	
-		
+    		return view('cuentasPorPagar.pagarFacturas.indexPagar',['bancos'=>$bancos,'modoPagoSelect'=>$modoPago,'cuentas'=>$todosRegistros,'id_facturas'=>$facturas,'codigo_relacion_pago'=>$codigoUnico,'isActivarBanco'=>$isActivarBanco,'notasDeCredito'=>$notasDeCredito]);
+		}	
     }
 
     public function prepararPagarFacturas($codigoUnico,$facturasId){
     	//Si facturaId esta vacia y codigo unico no, buscamos los id de las facturas con el codigo unico    	
     	
-    	if(empty($facturasId) and !empty($codigoUnico)){
-    		
-    		$resulatdoRelacion = FacturasPorPagar::where('codigo_relacion_pago',$codigoUnico)->select('id')->get();
-    		
-    		foreach($resulatdoRelacion as $datosFactura){
-    			
+    	if(empty($facturasId) and !empty($codigoUnico)){    		
+    		$resulatdoRelacion = FacturasPorPagar::where('codigo_relacion_pago',$codigoUnico)->select('id')->get();    		
+    		foreach($resulatdoRelacion as $datosFactura){    			
     			$facturasId[]=$datosFactura->id;
-    		}
-    		
+    		}    		
     	}
     	
 		//buscamos el valor de la tasa del dia
@@ -1082,11 +1098,7 @@ class CuentasPorPagarController extends Controller
 			$tipoTasa = $request->tasa_manual;
 		}else{
 			$tipoTasa = $seleccionTasaFormulario[0];
-		}
-		
-		
-
-		
+		}	
     
     	$valorCero=0.01;//esto indica si al cancelar la factura los debitos - creditos cuando se considera pago
     	$tipoRegistro = $request->tipo_registro;
@@ -1507,7 +1519,7 @@ class CuentasPorPagarController extends Controller
 							if($montoBs > $montoPagoIngresado and $montoPagoIngresado>0.00 and $datosFactura->pago_efectuado==0 and $modoPago=='bolivares'){
 								//el monto registrado es el abonado del saldo que quedo para pagar
 								//caso 3.2
-								dd('linea 1459');
+								
 								//$montoBs = ($montoPagoIngresado) * $tasa;
 								$cuentasPorPagar['observacion'] =  $request->observacion;//'caso 3.2 fac:'.$montoBs.' extranje pag:'.$montoPagoIngresado;
 								$cuentasPorPagar['concepto'] = $tipoRegistro;
@@ -1603,7 +1615,7 @@ class CuentasPorPagarController extends Controller
 						//validamos si se inserta una nota de debito o credito va en la monedaBase	
 						//caso 6
 							if($idFacturaNotaCreditoDebito==0 and $montoPagoIngresado > $valorCero){
-								//dd('estoy linea 1497',$tipoTasa);
+								
 								//si no seleccionaron ninguna factura pero seleccionaron todas las facturas
 								//se reparte el monto de la nota de credito o debito entre las facturas
 								$montoGuardar=0;
@@ -1772,6 +1784,31 @@ class CuentasPorPagarController extends Controller
 		    	
     	return self::retornarVistaPagarFacturas($idFacturasPorPagar,$codigoRelacionPago);
     }
+
+	public function notasDeCreditoPorDescontar($proveedorRif,$factura_id,$codigoRelacion=''){
+		$notasDeCreditos = CxpNotasDeCredito::where('proveedor_rif',$proveedorRif)->where('nc_descontada',0)->get();
+		return view('cuentasPorPagar.pagarFacturas.notasDeCredito',['notasDeCreditos'=>$notasDeCreditos,'factura_id'=>$factura_id,'codigoRelacion'=>$codigoRelacion]);
+	}
+
+	public function agregarNotaCreditoPorDescontar($id,$factura_id,$codigoRelacion=''){
+		$notaDeCredito = CxpNotasDeCredito::find($id);//buscamos la nota de credito
+		$notaDeCredito->nc_descontada = 1;//la marcamos para no volver a mostrarla
+		$notaDeCredito->codigo_relacion_pago=$codigoRelacion;//le agregamos de una vez el codigo de relacion 
+		$notaDeCredito->factura_id = $factura_id;//se edita el codigo de relacion y la factura_id para poder ubicarla en cxp_notas_de_creditos como ya descontada y no salga mas en los listados
+		$notaDeCredito->update();
+		$array = $notaDeCredito->toArray();//convertimos el resultado en un array
+		$array['codigo_relacion_pago']=$codigoRelacion; //le agregamos el codigo de relacion que corresponde a las facturas que se van a cancelar		
+		$array['factura_id']=$factura_id;		
+		self::guardarEnCuentasPorPagar($array,'cuentas_por_pagars');//guardamos en cuentas_por_pagars
+		
+		?>
+		<script>
+			/* reiniciamos la pagina y cerramos la ventana popup */
+			window.opener.location.reload()
+			window.close();
+		</script>
+		<?php
+	}
 
     private function datosEmpresa($rif){
     	return DB::select('select * from empresas where rif=:rif',[$rif]);
@@ -1952,6 +1989,10 @@ class CuentasPorPagarController extends Controller
 		if($eliminarAsiento->cod_concepto==4){
 			//si el registro a leiminar es descuento(cod_concepto==4) buscamos en facturas por pagar y editamos el campo de % desceunto a 0
 			facturasPorPagar::where('id',$eliminarAsiento->factura_id)->update(['porcentaje_descuento'=>0.00]);
+		}
+		if($eliminarAsiento->cod_concepto==5){
+			//si el registro a leiminar es descuento(cod_concepto==5) es una nota de credito y buscamos si tambien esta en la tabla notas de credito y la habilitamos en nc_descontada=1
+			CxpNotasDeCredito::where('factura_id',$eliminarAsiento->factura_id)->where('documento',$eliminarAsiento->documento)->update(['nc_descontada'=>0]);
 		}		   	
     	$eliminarAsiento->delete();//eliminamos en cuentas por pagar
 		
@@ -2130,6 +2171,9 @@ class CuentasPorPagarController extends Controller
     	if(empty(session('empresaRif')) or empty(session('modoPago'))){
     		return self::seleccionarEmpresa('listadoFacturasCalculadas');
     	}
+		$totalCancelar = '';
+		$notasDebitoAumentoTasa = '';
+		$restantePorPagar ='';
     	$fechaini='';
     	$fechafin='';
 		$banderaFacturaSiaceEncontrada = 0;
@@ -2148,7 +2192,7 @@ class CuentasPorPagarController extends Controller
 		}
 
 		//buscamos en cuentas por pagars el total a cancelar
-    	//$totalCancelar = CuentasPorPagar::debitosMenosCredito($facturaPorPagar->id);
+    	
     	if(session('fecha_ini_relacion_pago')<> null){
     		$facturasCalculadas = new FacturasPorPagar();
 	    	$fechasPagos = $facturasCalculadas->fechasPagoFacturasApartadas($fechaini,$fechafin);
@@ -2161,6 +2205,7 @@ class CuentasPorPagarController extends Controller
 	    			//buscamos en cuentas por pagars el total a cancelar
     				$totalCancelar = CuentasPorPagar::debitosMenosCreditoSoloDeuda($facturaPorPagar->id);
 					$notasDebitoAumentoTasa = CuentasPorPagar::sumaDebitosPorAumentoTasa($facturaPorPagar->id);
+					$restantePorPagar = CuentasPorPagar::debitosMenosCredito($facturaPorPagar->id);//
 					$totalFactutrasPorProveedor = $facturasCalculadas->contarFacturasDelProveedorPorRangoDeFechaCalculada($facturaPorPagar->fecha_real_pago,$facturaPorPagar->proveedor_rif);
 					
 					//verificar si hay que verificar la factura y buscar en el siace
@@ -2195,6 +2240,7 @@ class CuentasPorPagarController extends Controller
 		              'debitos'=>$facturaPorPagar->debitos,
 		              'creditos'=>$facturaPorPagar->creditos,  
 		              'resto'=>$totalCancelar->resto,
+					  'restantePorPagar'=>$restantePorPagar->resto,
 					  'ndebAumentoTasa'=>$notasDebitoAumentoTasa,
 		              'concepto'=>$facturaPorPagar->concepto,
 		              'codigo_relacion_pago'=>$facturaPorPagar->codigo_relacion_pago,
@@ -2224,9 +2270,8 @@ class CuentasPorPagarController extends Controller
     				$listadoFacturasPorPagar[]=(object)$factura;
 					
 	    		}
-	    		$facturas='';
-				
-	    		//dd($listadoFacturasPorPagar);
+	    		$facturas='';				
+	    	
 	    		$arrayFacturas['fechaPagoAcordado']=$fechaPago->fecha_real_pago;
 	    		$arrayFacturas['montoPagar']=$fechaPago->monto;
 	    		$arrayFacturas['facturas'] = $listadoFacturasPorPagar;
