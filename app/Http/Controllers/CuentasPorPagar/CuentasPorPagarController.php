@@ -960,7 +960,7 @@ class CuentasPorPagarController extends Controller
     	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
 		//buscamos si el proveedor tiene notas de credito por utilizar en proximos pagos y asi poder descontarlos 
 		foreach($todosRegistros as $cuenta){
-			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('nc_descontada',0)->count();
+			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('tipo_moneda',session('modoPago'))->where('nc_descontada',0)->count();
 		}
 		
 		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
@@ -975,7 +975,7 @@ class CuentasPorPagarController extends Controller
     	$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
 		//buscamos si el proveedor tiene notas de credito por utilizar en proximos pagos y asi poder descontarlos 
 		foreach($todosRegistros as $cuenta){
-			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('nc_descontada',0)->count();
+			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('tipo_moneda',session('modoPago'))->where('nc_descontada',0)->count();
 		} 
 		//buscamos parametros de configuracion, si se puede seleccionar el banco cuando esta en modo pago divisas
 		$isActivarBanco = Parametro::buscarVariable('select_banco_desde_modo_pago_divisa');     	
@@ -991,7 +991,7 @@ class CuentasPorPagarController extends Controller
 		$todosRegistros = self::prepararPagarFacturas($codigoUnico,$facturas);
 		//buscamos si el proveedor tiene notas de credito por utilizar en proximos pagos y asi poder descontarlos 
 		foreach($todosRegistros as $cuenta){
-			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('nc_descontada',0)->count();
+			$notasDeCredito = CxpNotasDeCredito::where('proveedor_rif',$cuenta['proveedor_rif'])->where('tipo_moneda',session('modoPago'))->where('nc_descontada',0)->count();
 		}
 		//optenemos los id de las facturas para retornar
 		foreach($todosRegistros as $registro){
@@ -1786,7 +1786,7 @@ class CuentasPorPagarController extends Controller
     }
 
 	public function notasDeCreditoPorDescontar($proveedorRif,$factura_id,$codigoRelacion=''){
-		$notasDeCreditos = CxpNotasDeCredito::where('proveedor_rif',$proveedorRif)->where('nc_descontada',0)->get();
+		$notasDeCreditos = CxpNotasDeCredito::where('proveedor_rif',$proveedorRif)->where('nc_descontada',0)->where('tipo_moneda',session('modoPago'))->get();
 		return view('cuentasPorPagar.pagarFacturas.notasDeCredito',['notasDeCreditos'=>$notasDeCreditos,'factura_id'=>$factura_id,'codigoRelacion'=>$codigoRelacion]);
 	}
 
