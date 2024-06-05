@@ -579,8 +579,8 @@ class RetencionIvaController extends Controller
 			$condicion[]=" proveedors.rif = retenciones.rif_retenido ";
 			if(!empty(session('comprobanteIva'))){$condicion[]="retenciones_dat.comprobante =".session('comprobanteIva');}
 			if(!empty(session('proveedorIva'))){ $condicion[]="retenciones_dat.nom_retenido like '%".session('proveedorIva')."%'";}
-			if(!empty(session('fecha_desdeIva'))){ $condicion[]=" retenciones_dat.fecha_docu >='".session('fecha_desdeIva')."'"; }
-			if(!empty(session('fecha_hastaIva'))){ $condicion[]=" retenciones_dat.fecha_docu <='".session('fecha_hastaIva')."'";}
+			if(!empty(session('fecha_desdeIva'))){ $condicion[]=" retenciones.fecha >='".session('fecha_desdeIva')."'"; }
+			if(!empty(session('fecha_hastaIva'))){ $condicion[]=" retenciones.fecha <='".session('fecha_hastaIva')."'";}
 			if(!empty(session('documentoIva'))){ $condicion[] = " retenciones_dat.documento in(".session('documentoIva').")";}
 			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 			
