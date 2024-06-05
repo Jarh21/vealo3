@@ -151,11 +151,18 @@ import axios from 'axios';
             this.$refs.fileInput.value = "";
         },
         async buscarRetencionIslr(){
-            let empresaRif = this.datos.rifAgente;
-            let proveedorRif = this.datos.rifRetenido;
-            let facturas = this.datos.facturas;
-            let respuesta = await axios.get("../regisretenciones/buscar/"+empresaRif+"/"+proveedorRif+"/"+facturas);
-            this.retencionIslr = respuesta.data;
+            
+            if(this.datos.tipo_proveedor=='servicios'){
+                let empresaRif = this.datos.rifAgente;
+                let proveedorRif = this.datos.rifRetenido;
+                let facturas = this.datos.facturas;
+                let respuesta = await axios.get("../regisretenciones/buscar/"+empresaRif+"/"+proveedorRif+"/"+facturas);
+                this.retencionIslr = respuesta.data;
+            }else{
+                this.retencionIslr = 0;
+
+            }
+            
         },
 
         handleFileChange(event) {

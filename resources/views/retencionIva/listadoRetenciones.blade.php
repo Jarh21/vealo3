@@ -168,7 +168,7 @@
                             @can('retencion.iva.editar_retencion')<a href="{{route('retencion.iva.editar_retencion',$retencion->comprobante)}}" class='btn btn-warning btn-sm'><i class="fas fa-edit" title="Editar"></i></a>@endcan
                             @if(isset($retencion->correo))
                             
-                                <div class="d-inline"><enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}',rifRetenido:'{{$retencion->rif_retenido}}',facturas:'{{str_replace(' ','',$retencion->documentos)}}'}"></enviar-correo-retencion></div>                              
+                                <div class="d-inline"><enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}',rifRetenido:'{{$retencion->rif_retenido}}',facturas:'{{str_replace(' ','',$retencion->documentos)}}',tipo_proveedor:'{{$retencion->tipo_proveedor}}'}"></enviar-correo-retencion></div>                              
                                 
                             @else
                                 <div class="d-inline "><a href="{{route('proveedor.edit',$retencion->rif_retenido)}}"class="btn btn-secondary btn-sm" title="Registrar el correor del proveedor">Sin Correo</a></div>
