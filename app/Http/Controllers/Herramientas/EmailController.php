@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Mail\Notification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\RetencionIva\RetencionIvaController;
+use App\Http\Controllers\Islr\islrController;
 use App\Models\Proveedor;
 use App\Models\RetencionIvaDetalle;
 use App\Models\Parametro;
+use App\Models\Islr;
 
 class EmailController extends Controller
 {
@@ -26,12 +29,16 @@ class EmailController extends Controller
         $nomRetenido='';
         $nomAgente ='';
         $objRetencion = new RetencionIvaController();
-        //generamos el archivo de retencion de iva
-        $retencion = $objRetencion->mostrarComprobanteRetencionIva($comprobante,$empresaRif,$firma='firma');
-        //consultamos los datos del proveedor retenido
         $datosRetencion = $objRetencion->consultarRetencionIva($comprobante,$empresaRif);
         $nomRetenido = $datosRetencion->nom_retenido;
         $nomAgente = $datosRetencion->nom_agente;
+        //generamos el archivo de retencion de iva
+        $retencion = $objRetencion->mostrarComprobanteRetencionIva($comprobante,$empresaRif,$firma='firma');
+
+        //consultamos los datos del proveedor retenido
+        $proveedor = Proveedor::where('rif',$datosRetencion->rif_retenido)->select('correo','tipo_proveedor','ultimo_porcentaje_retener_islr')->first();
+        
+        
 
         //buscamos los parametros del corre del sistema vealo para enviarla
         $correo_del_sistema = Parametro::buscarVariable('correo_del_sistema');
@@ -63,22 +70,48 @@ class EmailController extends Controller
         $datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->select('documento')->get();
         $facturasArray =array();
 		$facturas ='';
+
 		//extraemos los numero de facturas de datos de factura
 		foreach($datosFacturas as $factura){
 			$facturasArray[] = $factura->documento;
 		}
-		$facturas = implode(', ',$facturasArray);
-        //fin concatenar numeros de facturas       
+		$facturas ='"'. implode('","',$facturasArray).'"';
+        //fin concatenar numeros de facturas 
+        
+        //UNA VEZ QUE TENEMOS LOS NUMEROS DE FACTURAS BUSQUEMOS LA RETENCION DE ISLR
+        //si el proveedor es de servicio y tiene porcentaje_retener_islr generamos el pdf de islr
+        if($proveedor->tipo_proveedor=='servicios' && $proveedor->ultimo_porcentaje_retener_islr >0){
+            //generamos el pdf de la retencion de islr
+            //buscamos el id de esa retencion con los datos que poseemos
+            $sql="SELECT            
+            islrs.id,
+            islrs.proveedor_rif,
+            islrs.empresa_rif
+          FROM
+            islr_detalles,
+            islrs
+          WHERE SUBSTRING_INDEX (islr_detalles.nFactura, '/', 1) in( ".$facturas." )
+            AND islr_detalles.`islr_id` = islrs.id
+            AND islrs.`proveedor_rif` ='".$datosRetencion->rif_retenido."'
+            AND islrs.`empresa_rif` ='".$empresaRif."'";
+            
+            $datosislr = DB::select($sql);
+            
+            $objRetencionIslr = new islrController();
+            foreach($datosislr as $islr){
+                $pdfRetencionIslr = $objRetencionIslr->viewPdf($islr->id,$comprobante);
+            }
+        }
 
         //buscamos el correo del proveedor
         $correos ='';
-        $proveedor = Proveedor::where('rif',$datosRetencion->rif_retenido)->select('correo')->first();
+        
         if(!empty($proveedor->correo)){
             //si son varios correos lo repetimos y enviamos la cantivad de veces que tenga correo
             $correos = explode(',',$proveedor->correo);
             foreach($correos as $correo){
                 //validamos que el correo este bien escrito
-                if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+              //  if (filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                     
                     //en to() se puede agregar una coleccion de email 
                     //mailer('smtp') el smtp es el por defecto del archivo .env pero este esta en config/email, si en config/email tienes varios servidor de correos configurado puedes seleccionarlo en vez de smtp https://www.youtube.com/watch?v=uYEL36fGFiM
@@ -99,10 +132,10 @@ class EmailController extends Controller
                     //actualizamos la bandera de correo enviado en la tabla retenciones_dat
                     RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['correo_enviado'=>1]);                    
 
-                }else{
+            /*  }else{
                     \Session::flash('message', 'El correo '.$correo.' no se envio por no ser un correo valido por favor verifiquelo en el proveedor '.$nomRetenido);
 			        \Session::flash('alert','alert-warning');
-                }
+                }*/
             }
             //eliminar los archivos basura, los que ya se enviaron al correo
             if(!empty($archivoAdjunto)){

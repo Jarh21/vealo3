@@ -121,7 +121,7 @@
         Resultado: {{$cantidad}} Registros
         
     </div>
-    <table class='table table-sm'>
+    <table class='table table-hover table-sm'>
         <thead>
             <tr>
                 
@@ -155,7 +155,7 @@
                         @endif
                         
                     </td>
-                    <td>{{$retencion->rif_retenido}}</td>
+                    <td>{{$retencion->rif_retenido}}@if($retencion->tipo_proveedor=='servicios')<br><span class="badge badge-danger">{{$retencion->tipo_proveedor}}</span>@endif</td>
                     <td style="width: 100px"> <div> {{$retencion->documentos}}</td></div>
                     <td>{{$retencion->comprobante}}</td>
                     <td>{{$retencion->total}}</td>
@@ -168,7 +168,7 @@
                             @can('retencion.iva.editar_retencion')<a href="{{route('retencion.iva.editar_retencion',$retencion->comprobante)}}" class='btn btn-warning btn-sm'><i class="fas fa-edit" title="Editar"></i></a>@endcan
                             @if(isset($retencion->correo))
                             
-                                <div class="d-inline"><enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}'}"></enviar-correo-retencion></div>                              
+                                <div class="d-inline"><enviar-correo-retencion :datos="{comprobante:'{{$retencion->comprobante}}',rifAgente:'{{$retencion->rif_agente}}',correo_enviado:'{{$retencion->correo_enviado}}',rifRetenido:'{{$retencion->rif_retenido}}',facturas:'{{str_replace(' ','',$retencion->documentos)}}'}"></enviar-correo-retencion></div>                              
                                 
                             @else
                                 <div class="d-inline "><a href="{{route('proveedor.edit',$retencion->rif_retenido)}}"class="btn btn-secondary btn-sm" title="Registrar el correor del proveedor">Sin Correo</a></div>

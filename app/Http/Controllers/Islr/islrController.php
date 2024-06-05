@@ -552,8 +552,7 @@ class islrController extends Controller
 			
 			return view('islr.islr.montoServicios',['porcentajeRetencion'=>$porcentajeRetencion,'datosRetenciones'=>$datosRetencion,'detalleRetenciones'=>$detalleRetenciones,'idRetencion'=>$idRetencion]);
 		}
-	}
-
+	}	
 
 	public function view($id){
 		
@@ -564,8 +563,9 @@ class islrController extends Controller
 		
 	}
 
-	public function viewPdf($id){
-
+	public function viewPdf($id,$comprobante=''){
+		//generamos el archivo pdf y retornamos el objeto pdf y el nombre del archivo
+		$nComprobante='';
 		$islr=islrController::buscar($id);
 		//buscamos los detalles de retencion de las retenciones
 		$detalleRetenciones = self::buscarDetalleRetencion($id);
@@ -578,14 +578,18 @@ class islrController extends Controller
         $pdf->setOptions($options);
         $html = view('islr.islr.comprobantePdf', ['islr'=>$islr,'detalleRetenciones'=>$detalleRetenciones,'datosEmpresa'=>$datosEmpresa])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
         $pdf->loadHtml($html);
-        $pdf->render();
-
-
-		
+        $pdf->render();		
 
 		///codigo de chat GPT3
 		//guardamos el documento en storage de laravel
-		$nombreArchivo = 'ISLR-'.$islr[0]->empresa.'-'.$islr[0]->proveedor.'-'.$islr[0]->nControl.'.pdf';
+		if(empty($comprobante)){
+			//si se crea el comprobante desde retencion de islr se le agrega su propio comprobante
+			//pero si es de retencion de iva se coloca el comprobante de retencion de iva para poder adjuntar ambos archivos.
+			$nComprobante = $islr[0]->nControl;
+		}else{
+			$nComprobante = $comprobante;
+		}
+		$nombreArchivo = 'ISLR-'.$islr[0]->empresa.'-'.$islr[0]->proveedor.'-'.$nComprobante.'.pdf';
 		$nombreArchivo = str_replace(' ','_',$nombreArchivo);
 
 		//eliminar los archivos de la carpeta storage
@@ -607,11 +611,36 @@ class islrController extends Controller
 			echo $pdf->output();
 		}, 200, [
 			'Content-Type' => 'application/pdf',
-			'Content-Disposition' => 'inline; filename="' . $nombreArchivo . '"'
-		]);//fin codigo GPT3
+			'Content-Disposition' => 'inline; filename="' . $nombreArchivo. '"'
+		]);//fin codigo GPT3	
 	}
 
-
+	public function buscarRetencionPorDocumento($empresaRif,$proveedorRif,$facturas){
+		$facturas = explode(',',$facturas);
+		foreach($facturas as $factura){
+			$facturasArray[] = $factura;
+		}
+        $facturasFormat ='"'. implode('","',$facturasArray).'"';
+		
+        //BUSCAMOS LA RETENCION CON LOS DATOS EMPRESA, PROVEEDOR, FACTURAS(0012,0013)        
+        
+        $sql="SELECT            
+            islrs.id,
+			islrs.nControl,
+            islrs.proveedor_rif,
+            islrs.empresa_rif
+          FROM
+            islr_detalles,
+            islrs
+          WHERE SUBSTRING_INDEX (islr_detalles.nFactura, '/', 1) in( ".$facturasFormat." )
+            AND islr_detalles.`islr_id` = islrs.id
+            AND islrs.`proveedor_rif` ='".$proveedorRif."'
+            AND islrs.`empresa_rif` ='".$empresaRif."' limit 1";
+            
+            $datosislr = DB::select($sql);
+            
+         return $datosislr;   
+	}
 
 	public function edit($id,$accion,$encabezadoId=0,$fechaIniFin=''){
 

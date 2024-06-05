@@ -17,24 +17,36 @@
                         <div class="row">
                             <div class="col">
                                 <label>Archivos seleccionados:</label>
-                                <ul class="list-group">
+                                <ul class="list-group my-1">
                                     <li class="list-group-item"><a href="#" @click.prevent="showPreview(file)"><b>Retencion IVA </b>del comprobante <b>{{ this.datos.comprobante }}.pdf</b></a></li>
-                                    <div v-if="formulario.archivo.length > 0">
-                                        <li class="list-group-item" v-for="(file, index) in formulario.archivo" :key="index">
-                                            <a href="#" @click.prevent="showPreview(file)">{{ file.name }}</a>
-                                        <button @click.prevent="removerArchivo(index)" class="close"><span aria-hidden="true">&times;</span></button>
-                                        </li>
-                                    </div>
+                                    
+                                    
+                                </ul>
+                                
+                                <ul class="list-group my-1" v-if="retencionIslr.length == ''">
+                                    <li class="list-group-item text-danger">No posee ISLR</li>
+                                </ul>
+                                <ul class="list-group my-1" v-else>
+                                    <li class="list-group-item bg-danger text-white" v-for="registro in retencionIslr" :key="registro.id">
+                                        <a href="#" @click.prevent="showPreview(file)"><b>Retencion ISLR </b>del comprobante <b>{{ registro.nControl }}.pdf</b></a>
+                                    </li>
+                                </ul>
+                                <ul class="list-group my-1" v-if="formulario.archivo.length > 0">
+                                    <li class="list-group-item" v-for="(file, index) in formulario.archivo" :key="index">
+                                        <a href="#" @click.prevent="showPreview(file)">{{ file.name }}</a>
+                                    <button @click.prevent="removerArchivo(index)" class="close"><span aria-hidden="true">&times;</span></button>
+                                    </li>
                                 </ul>
                                 <input type="file" @change="handleFileChange" ref="fileInput" multiple class="form-control-file my-2">
-                                <input type="text" v-model="formulario.asunto" class="form-control my-2" placeholder="Asunto">
+                                
                             </div>
                             <div class="col">
-                                <label>Vista Previa:</label>
-                                <div v-if="formulario.archivo.length > 0">
+                                <label>Vista Previa de imagenes:</label>
+                                <div v-if="formulario.archivo.length > 0">                                    
                                     <img width="400px" :src="previewImage" alt="Vista previa del archivo" v-if="previewImage">
                                 </div>
                             </div>
+                            <input type="text" v-model="formulario.asunto" class="form-control my-2" placeholder="Asunto">
                         </div>                        
                         
                         
@@ -61,6 +73,8 @@
   </template>
   
   <script>
+import axios from 'axios';
+
 
   export default {
     props: {
@@ -85,6 +99,7 @@
                 asunto:'',
                 archivo:[],
             },
+            retencionIslr:[],
             previewImage: null,
         }
     },
@@ -106,10 +121,9 @@
         },
         abrirModal(){
             this.formulario.comprobante = this.datos.comprobante;
-            this.formulario.rifAgente = this.datos.rifAgente;
-            $(`#editarPedido-${this.datos.comprobante}`).modal('show');
-                                    
-            
+            this.formulario.rifAgente = this.datos.rifAgente;            
+            $(`#editarPedido-${this.datos.comprobante}`).modal('show');                                    
+            this.buscarRetencionIslr();//buscamos si tiene retencion de islr
         },
         cerrarModal(){
             $(`#editarPedido-${this.datos.comprobante}`).modal('hide');
@@ -136,7 +150,14 @@
             this.formulario.archivo.splice(index, 1);
             this.$refs.fileInput.value = "";
         },
-        
+        async buscarRetencionIslr(){
+            let empresaRif = this.datos.rifAgente;
+            let proveedorRif = this.datos.rifRetenido;
+            let facturas = this.datos.facturas;
+            let respuesta = await axios.get("../regisretenciones/buscar/"+empresaRif+"/"+proveedorRif+"/"+facturas);
+            this.retencionIslr = respuesta.data;
+        },
+
         handleFileChange(event) {
             //este metodo se usa para utilizar el input tipo file
             

@@ -200,7 +200,7 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/regisretenciones/create-detalle',	[islrController::class,'registroIslr'])->name('islr.save');
     Route::PUT('/regisretenciones/create-detalle2/{idislr?}',[islrController::class,'saveMontoServicios'])->name('islr.savedetalle');
     Route::get('/regisretenciones/view/{id}/{vista?}',[islrController::class,'view'])->name('islr.view');
-    Route::get('/regisretenciones/viewPdf/{id}/{vista?}',[islrController::class,'viewPdf'])->name('islr.viewPdf');
+    Route::get('/regisretenciones/viewPdf/{id}/{comprobante?}',[islrController::class,'viewPdf'])->name('islr.viewPdf');
     Route::get('/regisretenciones/edit/{id}/{accion}/{idxml?}/{fechaIniFin?}',[islrController::class,'edit'])->name('islr.edit');
     Route::put('/regisretenciones/edit/{id}',[islrController::class,'update'])->name('islr.update');
     Route::get('/regisretenciones/excel',[islrController::class,'index'])->name('islr.export.excel');
@@ -209,6 +209,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/regisretenciones/monto-servicios/{idRetencion?}/{ultimoPorcentajeProveedor?}',[islrController::class,'montoServicios'])->name('islr.montoServicios');
     Route::get('/regisretenciones/editDetalle/{id}/{idRetencion}',[islrController::class,'editDetalles'])->name('islr.detalle.edit');
     Route::get('/regisretenciones/delete/{id}/{ncontrol?}/{rifempresa?}',[islrController::class,'eliminarIslr'])->name('islr.delete');
+    Route::get('/regisretenciones/buscar/{empresaRfi}/{proveedorRif}/{facturas}',[islrController::class,'buscarRetencionPorDocumento'])->name('islr.buscar.retencion');
     /*FIN Registro de las retenciones*/
 
 
@@ -219,7 +220,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/regisretenciones/xmlVer/{fecha?}/{rif?}/{xmlid?}/{fechasPeriodo?}',[xmlController::class,'xmlVer'])->name('islr.xml.ver');
     Route::get('/regisretenciones/xmlDow/{rif}/{periodo}',[xmlController::class,'descargarXml'])->name('islr.descargarXml');
     Route::put('/regisretenciones/xmlEdit/{id}/{empresa}/{fecha}/{xmlid}',[xmlController::class,'xmlUpdate'])->name('xml.update');
-    Route::get('regisretenciones/xmlNew/{encabezadoid}',[xmlController::class,'xmlNew'])->name('xml.new');
+    Route::get('/regisretenciones/xmlNew/{encabezadoid}',[xmlController::class,'xmlNew'])->name('xml.new');
     Route::get('/regisretenciones/xmlDelete/{id}',[xmlController::class,'xmlDelete'])->name('xml.delete');
 
     /* FINRegistro de Retenciones elaboracion del archivo XML*/

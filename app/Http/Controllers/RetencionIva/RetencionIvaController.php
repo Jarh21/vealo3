@@ -566,7 +566,7 @@ class RetencionIvaController extends Controller
 			$limite = (session('limite'));
 		}
 		if(empty(session('comprobanteIva')) and empty(session('proveedorIva')) and empty(session('fecha_desdeIva')) and empty(session('fecha_hastaIva')) and empty(session('documentoIva'))){
-			$retenciones_dat = DB::select( "select GROUP_CONCAT(d.documento SEPARATOR ', ')as documentos,  d.*,r.estatus as estatus_retencion, r.fecha,r.total, p.correo,p.id as proveedorId from retenciones_dat d,retenciones r,proveedors p where p.rif = r.rif_retenido and d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente group by d.comprobante ORDER BY r.keycodigo DESC limit 100",['rifAgente'=>session('empresaRif')]);
+			$retenciones_dat = DB::select( "select GROUP_CONCAT(d.documento SEPARATOR ', ')as documentos,  d.*,r.estatus as estatus_retencion, r.fecha,r.total, p.correo,p.id as proveedorId,p.tipo_proveedor from retenciones_dat d,retenciones r,proveedors p where p.rif = r.rif_retenido and d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente group by d.comprobante ORDER BY r.keycodigo DESC limit 100",['rifAgente'=>session('empresaRif')]);
 			
 		}else{
 			
@@ -584,7 +584,7 @@ class RetencionIvaController extends Controller
 			if(!empty(session('documentoIva'))){ $condicion[] = " retenciones_dat.documento in(".session('documentoIva').")";}
 			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 			
-			$retenciones_dat = DB::select( "select GROUP_CONCAT(retenciones_dat.documento SEPARATOR ', ')as documentos,  retenciones_dat.*,retenciones.estatus as estatus_retencion, retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId from retenciones_dat,retenciones,proveedors  where ". $whereClause." group by retenciones_dat.comprobante ORDER BY retenciones.keycodigo DESC limit ".$limite);	
+			$retenciones_dat = DB::select( "select GROUP_CONCAT(retenciones_dat.documento SEPARATOR ', ')as documentos,  retenciones_dat.*,retenciones.estatus as estatus_retencion, retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId, p.tipo_proveedor from retenciones_dat,retenciones,proveedors  where ". $whereClause." group by retenciones_dat.comprobante ORDER BY retenciones.keycodigo DESC limit ".$limite);	
 			$cantidad = count($retenciones_dat);
 		}	
 		
@@ -644,7 +644,7 @@ class RetencionIvaController extends Controller
 		$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 
 		$herramientas = new HerramientasController();
-		$retenciones_dat = DB::select( "select GROUP_CONCAT(retenciones_dat.documento SEPARATOR ', ')as documentos,retenciones_dat.*,retenciones.estatus as estatus_retencion,retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId from retenciones_dat,retenciones,proveedors where  ". $whereClause." group by retenciones_dat.comprobante ORDER BY retenciones.keycodigo DESC limit ".$limite);			
+		$retenciones_dat = DB::select( "select GROUP_CONCAT(retenciones_dat.documento SEPARATOR ', ')as documentos,retenciones_dat.*,retenciones.estatus as estatus_retencion,retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId,proveedors.tipo_proveedors from retenciones_dat,retenciones,proveedors where  ". $whereClause." group by retenciones_dat.comprobante ORDER BY retenciones.keycodigo DESC limit ".$limite);			
 		$cantidad = count($retenciones_dat);
 		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas(),'cantidad'=>$cantidad]);
 	}

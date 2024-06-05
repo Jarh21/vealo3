@@ -61,6 +61,11 @@ class Notification extends Mailable
             // Adjuntar el primer archivo almacenado en el servidor que es la retencion de iva
             $email->attachFromStorage('pdf/' . $nombreArchivo);
 
+            //si el archivo de retencion de islr existe lo adjunto
+            if(file_exists($rutaDirectorio.'ISLR-'.$nombreArchivo)){
+                $email->attachFromStorage('pdf/' . 'ISLR-'.$nombreArchivo);
+            }
+            
             //si hay archivos adicionales se adjunta
             if(!empty($this->archivoAdjunto)){
                 // Adjuntar los demás archivos del array $archivoAdjunto
