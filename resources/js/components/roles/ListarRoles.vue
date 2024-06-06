@@ -3,7 +3,7 @@
         
             
             <!-- The Modal -->
-            <div class="modal " tabindex="-1" :class="{mostrar:modal}">
+            <div class="modal fade" id="modalRoles" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg ">
                     <div class="modal-content">
 
@@ -18,11 +18,13 @@
                         
                                 <input v-model="formularioRolesPermisos.rol" type="text" class="form-control" placeholder="Escriba el nombre del Rol" >
                                 <div class="d-flex flex-wrap">
-                                    <div class="p-2 bd-highlight" v-for="(permiso, index) in permisos" :key="index">
-                                        
+                                    <div class=" bd-highlight" v-for="(permiso, index) in permisos" :key="index">
+                                        <span class="ml-1">
                                             <input type="checkbox"  v-model="formularioRolesPermisos.selectPermisos" v-bind:value="permiso.name">                         
                                         
                                         <label for="">{{ permiso.name }}</label>
+                                        </span>
+                                            
                                     </div>                                     
                                 </div>
                                                            
@@ -40,7 +42,7 @@
         
         
         <div class="container-fluid">
-            <h3>Roles de Usuarios </h3><a href="#" class="mx-3" @click="modificar=false; abrirModal();"> + Agregar Nuevo Rol</a>
+            <h3>Roles de Usuarios </h3><a  class="btn btn-primary mx-3" @click="modificar=false; abrirModal();"> + Agregar Nuevo Rol</a>
             <div class="card">
                 <div class="card-body">
                     <table class="table table-striped">
@@ -130,7 +132,7 @@
           },          
           
           abrirModal(data={}){
-            this.modal=1;            
+            $('#modalRoles').modal('show')           
             if(this.modificar== true){                   
                 this.tituloModal="Modificar Rol";
                 this.formularioRolesPermisos.rol=data.name;
@@ -140,10 +142,12 @@
                 this.tituloModal="Crear Rol";
                 this.formularioRolesPermisos.rol='';
             }
+            
+            
           },
 
           cerrarModal(){
-            this.modal=0;
+            $('#modalRoles').modal('hide');
           },
           
           

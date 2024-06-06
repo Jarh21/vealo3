@@ -383,6 +383,7 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/retencion-iva/anular-comprobante/{comprobante?}/{empresaRif?}',[RetencionIvaController::class,'anularComprobante'])->name('retencion.iva.anularcomprobante');
     Route::get('/retencion-iva/eliminar-comprobante/{comprobante?}/{empresaRif?}',[RetencionIvaController::class,'eliminarComprobante'])->name('retencion.iva.eliminarcomprobante');
     Route::get('/retencion-iva/prueba-email-retencion-iva-post',[RetencionIvaController::class,'pruebaEnvioCorreo'])->name('retencion.iva.pruebaenviocorreo');//solo prueba
+    Route::get('/retencion-iva/vertodos-txt-generados',[RetencionIvaController::class,'todosTxtGenerados'])->name('retencion.iva.txtGenerados');
 
 });
 //se sacaron del middleware Auth para que no requiere de inicio de sesion al momento de buscar informacion

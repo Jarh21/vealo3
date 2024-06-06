@@ -31,8 +31,13 @@ class InformesAdicionalesController extends Controller
     public function seleccionSucursal($rifEmpresa,$vista=''){
         $empresa = Empresa::where('rif','=',$rifEmpresa)->first();
         session(['empresaNombre'=>$empresa->nombre,'empresaRif'=>$empresa->rif,'codTipoMoneda'=>3,'modoPago'=>'dolares','basedata'=>$empresa->basedata]);
-        return back()->withInput();
-        //return redirect()->back();
+        if(empty($vista)){
+            return back()->withInput();
+        }else{
+            return redirect()->route($vista); 
+        }
+        
+        
     }
 
     public function comisionPorVentas($fechaini='',$fechafin=''){

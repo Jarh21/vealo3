@@ -24,14 +24,15 @@ class islrController extends Controller
 {
     public function index(){
 		
-		
+		$herramientas = new HerramientasController();
         	$empresas = Empresa::all();
         	$registros=[]; 
         	//$total =0;
 			
 			$islr = DB::table('islrs')
 					->join('empresas','islrs.empresa_rif','=','empresas.rif')
-					->join('proveedors','islrs.proveedor_rif','=','proveedors.rif')									
+					->join('proveedors','islrs.proveedor_rif','=','proveedors.rif')
+					->where('islrs.empresa_rif',session('empresaRif'))									
 					->select('islrs.id', 'islrs.nControl','empresas.nombre as empresa','empresas.nom_corto','islrs.fecha','proveedors.nombre as proveedor','proveedors.rif','proveedors.direccion','proveedors.tipo_contribuyente','islrs.concepto','islrs.n_egreso_cheque','islrs.serie','islrs.total_retener','islrs.total_letras')
 					->orderBy('islrs.id','desc')
 					->get();
@@ -61,7 +62,7 @@ class islrController extends Controller
 				$registros[]=$registro;				 
 			}
 			
-		return view('islr.islr.index',['islrs'=>$registros,'empresas'=>$empresas,'paginacion'=>$islr,'total'=>'']);
+		return view('islr.islr.index',['islrs'=>$registros,'empresas'=>$herramientas->listarEmpresas(),'paginacion'=>$islr,'total'=>'']);
 	}
 
 	public function todosRegistrosIslrAjax(){
@@ -109,12 +110,12 @@ class islrController extends Controller
 	public function filtrar(Request $request){
 		$proveedor = $request->get('proveedor');	
 		$registros=[];	
-		$empresas = Empresa::all(); 
+		$herramientas = new HerramientasController(); 
 			$islr = DB::table('islrs')
 					->join('empresas','islrs.empresa_rif','=','empresas.rif')
 					->join('proveedors','islrs.proveedor_id','=','proveedors.id')					
 					->select('islrs.id', 'islrs.nControl','empresas.nombre as empresa','empresas.nom_corto','islrs.fecha','proveedors.nombre as proveedor','proveedors.rif','proveedors.direccion','proveedors.tipo_contribuyente','islrs.concepto','islrs.n_egreso_cheque','islrs.serie','islrs.total_retener','islrs.total_letras')
-					->where('islrs.empresa_rif','=',$request->get('empresa'))
+					->where('islrs.empresa_rif','=',session('empresaRif'))
 					->where('proveedors.nombre','like','%'.$proveedor.'%')
 					->where('islrs.fecha','>=',$request->get('fecha1'))
 					->where('islrs.fecha','<=',$request->get('fecha2'))							
@@ -148,7 +149,7 @@ class islrController extends Controller
 			};		
 		
 			$total=number_format($total,2,',','.');
-		return view('islr.islr.index',['islrs'=>$registros,'empresas'=>$empresas,'paginacion'=>$islr,'total'=>$total]);
+		return view('islr.islr.index',['islrs'=>$registros,'empresas'=>$herramientas->listarEmpresas(),'paginacion'=>$islr,'total'=>$total]);
 	}
 
 
@@ -593,7 +594,14 @@ class islrController extends Controller
 		$nombreArchivo = str_replace(' ','_',$nombreArchivo);
 
 		//eliminar los archivos de la carpeta storage
-		// Verificar si el directorio existe		
+		// Verificar si el directorio existe	
+		if(!file_exists(storage_path('app/pdf/'))){
+			
+			if(!mkdir(storage_path('app/pdf'),0777,true)){
+				dd("la carpeta txtRetencionIva no se pudo crear revise si tiene el proyecto permisos de lectura y escritura");
+			}		
+		}
+
 		$rutaDirectorio='pdf/'.$nombreArchivo;
 		$archivos = Storage::files($rutaDirectorio);
 		if (!empty($archivos)) {

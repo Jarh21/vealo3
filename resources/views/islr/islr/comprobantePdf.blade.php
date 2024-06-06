@@ -125,7 +125,7 @@
 				<div class="col">
 					<div class="text-center Estilo" >
 						@if(!empty($datos->firma))
-							<img id='imagenFirma' src="{{asset($datosEmpresa->firma)}}" style="width:220px">
+							<img id='imagenFirma' src="{{asset($datos->firma)}}" style="width:220px">
 						@else
 							____________________________
 						@endif	

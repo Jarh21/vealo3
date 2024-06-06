@@ -500,6 +500,12 @@ class RetencionIvaController extends Controller
 
 		//eliminar los archivos de la carpeta storage
 		// Verificar si el directorio existe
+		if(!file_exists(storage_path('app/pdf/'))){
+			
+			if(!mkdir(storage_path('app/pdf'),0777,true)){
+				dd("la carpeta pdf no se pudo crear revise si tiene el proyecto permisos de lectura y escritura");
+			}		
+		}
 		
 		$rutaDirectorio='pdf/';
 		$archivos = Storage::files($rutaDirectorio);
@@ -801,8 +807,15 @@ class RetencionIvaController extends Controller
 			}	
 
 		}
-		Storage::disk('local')->put('SENIAT_'.$nomCortoEmpresa->nom_corto.'.txt', $contenido);
-		Storage::disk('local')->put('CONTABLE_'.$nomCortoEmpresa->nom_corto.'.txt', $contenidoContable);
+		//verificamos si existe la carpeta de lo contrario se crea
+		if(!file_exists(storage_path('app/txtRetencionIva/'))){
+			
+			if(!mkdir(storage_path('app/txtRetencionIva'),0777,true)){
+				dd("la carpeta txtRetencionIva no se pudo crear revise si tiene el proyecto permisos de lectura y escritura");
+			}		
+		}
+		Storage::disk('local')->put('txtRetencionIva/SENIAT_'.$nomCortoEmpresa->nom_corto.'.txt', $contenido);
+		Storage::disk('local')->put('txtRetencionIva/CONTABLE_'.$nomCortoEmpresa->nom_corto.'.txt', $contenidoContable);
 		//preparar el nombre del archivo
 		$anio = substr($periodo, 0, 4);
 		$mes = substr($periodo,4,2);
@@ -869,13 +882,21 @@ class RetencionIvaController extends Controller
 
 	public function descargarTxt($archivo,$newNombre){
 		
-		
-    	$rutaArchivo = storage_path('app/' . $archivo);
+    	$rutaArchivo = storage_path('app/txtRetencionIva/' . $archivo);
 
 		if (Storage::disk('local')->exists($archivo)) {
 			return response()->download($rutaArchivo, $newNombre, ['Content-Type' => 'text/plain']);
 		} else {
 			return response()->json(['error' => 'El archivo no existe'], 404);
+		}
+	}
+
+	public function todosTxtGenerados(){
+		if(file_exists(storage_path('app/txtRetencionIva/'))){
+			dd("Existe");
+		}else{
+			
+			dd("no existe crear");			
 		}
 	}
 

@@ -19,8 +19,35 @@
 @endsection
 @section('content')
 	<div class="container-fluid">
+		<!-- Modal sucursal -->
+		<div class="modal fade" id="modalCambioSucursal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Sucursales</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				</div>
+				<div class="modal-body">
+				@if(isset($empresas))
+					Seleccione la sucursal
+					@foreach($empresas as $empresa)
+						<!-- <option value="{{--$empresa->rif--}}|{{--$empresa->nombre--}}|{{--$empresa->basedata--}}">{{--$empresa->rif--}} {{--$empresa->nombre--}}</option> -->
+						<a href="{{route('seleccionSucursal',[$empresa->rif,'islr.index'])}}" class="dropdown-item dropdown-footer">{{$empresa->rif}} {{$empresa->nombre}}</a>
+						<div class="dropdown-divider"></div>
+					@endforeach
+				@endif
+				</div>
+				<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>				        		        
+				
+				</div>
+			</div>
+			</div>
+		</div>	<!--fin modal-->
 		<h3>Listado de ISLR
-			
+			<a href="#" data-toggle="modal" data-target="#modalCambioSucursal" class="btn btn-outline-primary my-2">Seleccione sucursal ->{{session('empresaRif')}} {{session('empresaNombre') ?? 'No hay sucursal seleccionada'}}</a>
 			<a href="{{route('islr.create')}}">			
                 
 			<button class="btn btn-success float-right"><i class="fa fa-plus mx-1" aria-hidden="true"></i>Agregar Documento</button></a>
@@ -31,14 +58,7 @@
 				@csrf	
 							
                 <div class="input-group input-group-sm">
-
-                	<span class="text-danger">*</span>
-                	<select class="form-control form-control-navbar" name="empresa" required>
-                		<option value="">--Seleccione Empresa--</option>
-                		@foreach($empresas as $empresa)
-                		<option value="{{$empresa->rif}}">{{$empresa->nombre}}</option>
-                		@endforeach
-                	</select>
+                	                	
                     <input class="form-control form-control-navbar mx-1" name="proveedor" type="search" placeholder="proveedor" aria-label="Search">
                     
                     <label class="mx-1"><span class="text-danger">*</span>desde</label>

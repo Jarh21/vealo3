@@ -35,6 +35,7 @@
                     @csrf
                     <div class="card">
                         <div class="card-body">
+                            <p>Para ver los archivos generados has click <a href="{{route('retencion.iva.txtGenerados')}}">Aquí</a> </p>
                             <label for="">Seleccione el rando de Fecha</label>
                             <div class="row">
                                 <div class="col">

@@ -177,6 +177,7 @@ date_default_timezone_set("America/Caracas");
         <td width="390" height="50" valign="bottom" class="Estilo2">RECIBIDO POR: ____________________________ </td>
 
         <td width="390" height="50" valign="bottom">
+          
         @if(!empty($firma))
         <img id='imagenFirma' src="{{asset($datosEmpresa->firma)}}">
         @else
