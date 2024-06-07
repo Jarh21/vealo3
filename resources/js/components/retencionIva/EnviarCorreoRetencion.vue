@@ -18,19 +18,19 @@
                             <div class="col">
                                 <label>Archivos seleccionados:</label>
                                 <ul class="list-group my-1">
-                                    <li class="list-group-item"><a href="#" @click.prevent="showPreview(file)"><b>Retencion IVA </b>del comprobante <b>{{ this.datos.comprobante }}.pdf</b></a></li>
-                                    
-                                    
+                                    <li class="list-group-item"><a href="#" @click.prevent="mostrarPreview(`generar-comprobante/${datos.comprobante}/${datos.rifAgente}/firma`)"><b>Retencion IVA </b>del comprobante <b>{{ this.datos.comprobante }}.pdf</b></a></li>                                   
                                 </ul>
                                 
                                 <ul class="list-group my-1" v-if="retencionIslr.length == ''">
                                     <li class="list-group-item text-danger">No posee ISLR</li>
                                 </ul>
+
                                 <ul class="list-group my-1" v-else>
                                     <li class="list-group-item bg-danger text-white" v-for="registro in retencionIslr" :key="registro.id">
-                                        <a href="#" @click.prevent="showPreview(file)"><b>Retencion ISLR </b>del comprobante <b>{{ registro.nControl }}.pdf</b></a>
+                                        <a href="#" @click.prevent="mostrarPreview(`../regisretenciones/viewPdf/${registro.id}`)"><b>Retencion ISLR </b>del comprobante <b>{{ registro.nControl }}.pdf</b></a>
                                     </li>
                                 </ul>
+
                                 <ul class="list-group my-1" v-if="formulario.archivo.length > 0">
                                     <li class="list-group-item" v-for="(file, index) in formulario.archivo" :key="index">
                                         <a href="#" @click.prevent="showPreview(file)">{{ file.name }}</a>
@@ -42,9 +42,9 @@
                             </div>
                             <div class="col">
                                 <label>Vista Previa de imagenes:</label>
-                                <div v-if="formulario.archivo.length > 0">                                    
-                                    <img width="400px" :src="previewImage" alt="Vista previa del archivo" v-if="previewImage">
-                                </div>
+                                <span class="badge badge-warning ml-2" v-if="cargandoVista">Cargando vista previa ...</span>
+                                <iframe :src="iframeUrl" frameborder="0" width="100%" height="400"></iframe>
+                                
                             </div>
                             <input type="text" v-model="formulario.asunto" class="form-control my-2" placeholder="Asunto">
                         </div>                        
@@ -64,8 +64,8 @@
         <button class="btn btn-success btn-sm" @click="abrirModal()" :disabled="cargando">
             <i class="fas fa-paperclip"></i>
             Correo 
-            <i :class="{'fas fa-spinner': cargando, 'fas fa-check-circle text-warning': enviado}"></i>
-            <i class='fas fa-check-circle text-warning' title="Correo enviado" v-if="this.datos.correo_enviado == 1"></i>
+            <i :class="{'fas fa-check-circle text-warning': enviado}"></i>
+            <i class='fas fa-check-circle' title="Correo enviado" v-if="this.datos.correo_enviado == 1"></i>
             
         </button> 
             
@@ -92,6 +92,7 @@ import axios from 'axios';
         return{
             cargando: false,
             enviado: false,
+            cargandoVista: false,
             tieneCorreo :false,
             formulario:{
                 comprobante:'',
@@ -101,24 +102,18 @@ import axios from 'axios';
             },
             retencionIslr:[],
             previewImage: null,
+            showIframe: false,
+            iframeUrl: '',
         }
     },
     methods:{
         showPreview(file) {
             // Crea una URL de objeto para la imagen
-            this.previewImage = URL.createObjectURL(file);
+            //this.previewImage = URL.createObjectURL(file);
+            this.iframeUrl = URL.createObjectURL(file);
+            this.showIframe = true;
         },
         
-        async enviarCorreoRetencion(){
-            let comprobante = this.datos.comprobante;
-            let rifAgente = this.datos.rifAgente;
-            this.cargando = true; 
-            let resultado = await axios.get("evio-email-retencion-iva/"+comprobante+"/"+rifAgente);           
-            this.cargando = false;
-            this.enviado = true; // Establecer la variable 'enviado' como verdadera
-           
-            
-        },
         abrirModal(){
             this.formulario.comprobante = this.datos.comprobante;
             this.formulario.rifAgente = this.datos.rifAgente;            
@@ -128,6 +123,17 @@ import axios from 'axios';
         cerrarModal(){
             $(`#editarPedido-${this.datos.comprobante}`).modal('hide');
             
+        },
+        mostrarPreview(ruta) {
+            //mostramos por un iframe la vista previa de los pdf
+            this.cargandoVista = true;
+            setTimeout(() => {
+                this.cargandoVista = false
+            }, 3000)
+            this.showIframe = true;            
+            this.iframeUrl = ruta;
+            
+
         },
         async enviarCorreoPost(){
             const formData = new FormData();
@@ -170,9 +176,19 @@ import axios from 'axios';
             
             this.formulario.archivo.push(...event.target.files);
             // Puedes hacer algo con el archivo aquí, como subirlo al servidor
-            
+
+            // Recorre los archivos cargados
+            for (let i = 0; i < event.target.files.length; i++) {
+                const file = event.target.files[i];
+                // Verifica si el archivo es un PDF
+                if (file.type === 'application/pdf') {
+                this.iframeUrl = URL.createObjectURL(file);
+                this.showIframe = true;
+                }
+            }
         },
         
     },
   };
   </script>
+
