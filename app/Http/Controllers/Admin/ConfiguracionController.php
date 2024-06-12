@@ -101,8 +101,14 @@ class ConfiguracionController extends Controller
         $correo_del_sistema = Parametro::buscarVariable('correo_del_sistema');
         $cc_correo_del_sistema = Parametro::buscarVariable('cc_correo_del_sistema');
         $password_correo_del_sistema = Parametro::buscarVariable('password_correo_del_sistema');
+        $iva = Parametro::buscarVariable('poriva');
+        $igtf = Parametro::buscarVariable('igtf');
+        $puerto_correo_del_sistema = Parametro::buscarVariable('puerto_correo_del_sistema');
+        $encriptacion_correo_del_sistema = Parametro::buscarVariable('encriptacion_correo_del_sistema');
+
+
         
-        return view('admin.configuraciones.confGeneral',['correo_del_sistema'=>$correo_del_sistema,'cc_correo_del_sistema'=>$cc_correo_del_sistema,'password_correo_del_sistema'=>$password_correo_del_sistema]);
+        return view('admin.configuraciones.confGeneral',['puerto_correo_del_sistema'=>$puerto_correo_del_sistema,'encriptacion_correo_del_sistema'=>$encriptacion_correo_del_sistema,'iva'=>$iva,'igtf'=>$igtf,'correo_del_sistema'=>$correo_del_sistema,'cc_correo_del_sistema'=>$cc_correo_del_sistema,'password_correo_del_sistema'=>$password_correo_del_sistema]);
     }
 
     public function guardarConfiguracionGeneral(Request $request){
@@ -110,6 +116,10 @@ class ConfiguracionController extends Controller
         Parametro::actualizarVariable('correo_del_sistema',$request->correo_del_sistema);
         Parametro::actualizarVariable('cc_correo_del_sistema',$request->cc_correo_del_sistema);
         Parametro::actualizarVariable('password_correo_del_sistema',$request->password_correo_del_sistema);
+        Parametro::actualizarVariable('poriva',$request->iva);
+        Parametro::actualizarVariable('igtf',$request->igtf);
+        Parametro::actualizarVariable('puerto_correo_del_sistema',$request->puerto_correo_del_sistema);
+        Parametro::actualizarVariable('encriptacion_correo_del_sistema',$request->encriptacion_correo_del_sistema);
 		
         return self::configuracionGeneral();
     }

@@ -51,6 +51,7 @@
                 <input type="text" name="documento" placeholder='Documento ej:1234,555' title="Numero de documentos en caso de ser varios separar con coma(555,444)" value="{{ session('documentoIva') ?? ''}}">
                 Limite
                 <input type="text" name="limite" value="{{ session('limite') ?? '100'}} " style="width:60px">
+                <label for="anuladas">Anuladas</label><input type="checkbox" name="anuladas" id="anuladas" @if(session('anuladas')=='on')checked @endif>
                 <button type="submit">Buscar</button>
             </form>
            
@@ -156,7 +157,7 @@
                         
                     </td>
                     <td>{{$retencion->rif_retenido}}@if($retencion->tipo_proveedor=='servicios')<br><span class="badge badge-danger">{{$retencion->tipo_proveedor}}</span>@endif</td>
-                    <td style="width: 100px"> <div> {{$retencion->documentos}}</td></div>
+                    <td style="width: 100px"> <div> {{$retencion->documentos ?? ''}}</td></div>
                     <td>{{$retencion->comprobante}}</td>
                     <td>{{$retencion->total}}</td>
                     <td>
@@ -175,7 +176,8 @@
                                 
                             @endif
                         @else
-                            Anulada
+                        <div class="d-inline"><a href="{{route('retencion.iva.generar_comprobante',[$retencion->comprobante,$retencion->rif_agente])}}" class='btn btn-light  btn-sm text-danger' title="descargar PDF" target="popup" onClick="window.open(this.href, this.target, 'width=950,height=650,left=100,top=50');   return false;"><i class="fas fa-file-pdf"></i></a></div>
+
                         @endif
                         </div>
                     </td>

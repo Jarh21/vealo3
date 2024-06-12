@@ -28,6 +28,16 @@
                     </div>
                     
                 </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="puerto_email">Puerto</label>
+                        <input type="text" disabled name="puerto_correo_del_sistema" id="puerto_email" class="form-control"  placeholder="587">
+                    </div>
+                    <div class="col">
+                        <label for="">Encriptacion</label>
+                        <input type="text" disabled name="encriptacion_correo_del_sistema" class="form_control" placeholder="tls">
+                    </div>
+                </div>
                 
                 <h3> Cómo crear y usar contraseñas de aplicaciones </h3>
                 <p>Importante: Para crear una contraseña de la aplicación, necesitas tener activada la Verificación en 2 pasos en tu Cuenta de Google.</p>
@@ -50,6 +60,11 @@
                 Accediste a una cuenta de trabajo, de institución educativa o de otra organización.
                 Tu Cuenta de Google tiene activada la Protección avanzada.
                 Nota: Por lo general, deberás ingresar una contraseña de la aplicación una vez por app o dispositivo.</p>
+                <hr>
+                <label for="">IVA (Impuesto de Valor Agregado)</label>
+                <input type="text" class="form-control" name="iva" value="{{$iva ?? ''}}">
+                <label for="">IGTF (Impuesto a Grandes Transacciones Financieras)</label>
+                <input type="text" class="form-control" name="igtf" value="{{$igtf ?? ''}}">
                 <hr>
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>

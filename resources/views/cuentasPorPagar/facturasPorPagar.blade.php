@@ -84,19 +84,19 @@
 		        
 		</form>
 		</div>
+		
 		@if(Session::has('message'))
-			<div class="alert {{ Session::get('alert') ?? 'alert-danger'}} ">
+			<div class="alert {!! Session::get('alert') !!}" id='alerta'>
+				<button type="button" class="close" id='cerrarAlerta'aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
 				{!! Session::get('message') !!}
-			</div>
-   			
+				
+			</div>  			
 		@endif
     	<form action="{{route('vistaPagarFacturas')}}" method="POST" name="formCuentaPorPagar">
     	
-    	@if(!empty($mensaje))
-    	<div class="alert {{$mensaje['tipo']}}">
-    		<h4><i class="fa fa-exclamation-triangle"></i>{{$mensaje['texto']}}</h4>
-    	</div>
-    	@endif	
+    		
     	<table id="articulos" class="table table-bordered table-sm" data-page-length='25'>
     		<thead>
     			<tr>    				
@@ -269,11 +269,12 @@
 		});
 	</script>
 	<script type="text/javascript">
-		/*function abrirModal(){
-			
-			$('#exampleModal').modal('show');
-			
-		}*/
+		//cerrar el alert
+		$("#cerrarAlerta").click(function(){
+			//cerramos el alerta que indica si un archivo fue cargado o no se cargo			
+			$("#alerta").hide();
+		});
+
 		//mostart y ocultar div
 		jQuery(document).ready(function(){
 		$(".oculto").hide();              
@@ -293,9 +294,6 @@
 	</script>
 
 	<script type="text/javascript">
-	
-
-
 	$(document).ready(function() {
 		//hacer focus en el campo nfacturas del modal
 		
@@ -309,9 +307,6 @@
 	    	placeholder: 'Seleccione el proveedor',    	
 	    	/* maximumSelectionLength:1, */
 	    });
-		
-		   	
-
 	} );
 	</script>
 

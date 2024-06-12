@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 class CuentasPorPagarController extends Controller
 {
 
-	public function __construct()
+/* 	public function __construct()
     {
         $this->middleware(function ($request, $next) {
             if (!Auth::check()) {
@@ -29,7 +29,7 @@ class CuentasPorPagarController extends Controller
 
             return $next($request);
         });
-    }
+    } */
 
     public function seleccionarEmpresa($rutaSolicitante=''){
 		$herramientas  = new HerramientasController();		
@@ -627,8 +627,12 @@ class CuentasPorPagarController extends Controller
 	    if(empty($mensaje)){	    	
 	    	$mensaje['texto']="No se encontro la factura ".$nFactura." en el libro de compras, por favor verifique los datos";
 	    	$mensaje['tipo']="alert-warning";
-	    }	    
-    	return self::facturasPorPagar($mensaje);
+			
+	    }
+		\Session::flash('message', $mensaje['texto']);
+		\Session::flash('alert',$mensaje['tipo']);	    
+    	//return self::facturasPorPagar($mensaje);
+		return redirect()->route('cuentasporpagar.facturasPorPagar');
     }
 
     public function nuevaFacturaPorPagar2(){
@@ -1782,7 +1786,8 @@ class CuentasPorPagarController extends Controller
 			
     	}//fin foreach
 		    	
-    	return self::retornarVistaPagarFacturas($idFacturasPorPagar,$codigoRelacionPago);
+    	//return self::retornarVistaPagarFacturas($idFacturasPorPagar,$codigoRelacionPago);
+		return redirect()->route('verVistaPagarFacturas',$codigoRelacionPago);
     }
 
 	public function notasDeCreditoPorDescontar($proveedorRif,$factura_id,$codigoRelacion=''){
@@ -2004,6 +2009,7 @@ class CuentasPorPagarController extends Controller
 			// aqui se registrara las deducciones de la sra helen 
 		}     	
     	return self::verVistaPagarFacturas($codigoRelacion,$id);
+		//return redirect()->route('')
     }
 
 

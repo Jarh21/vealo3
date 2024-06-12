@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Herramientas\HerramientasController;
 use App\Models\Empresa;
+use App\Models\Parametro;	
 
 class EmpresasController extends Controller
 {
@@ -101,6 +102,10 @@ class EmpresasController extends Controller
 			$empresa->logo= $destinatinoPath.$filename;
 
 		}
+		///se registran los contadores en la tabla parametros de retencion de iva y de islr
+		Parametro::actualizarVariable('contador_retencion_'.$request->rif,1);
+		Parametro::actualizarVariable('contador_reten_iva_'.$request->rif,1);
+
 		if($empresa->save()){
 			return redirect()->route('admin.empresas.index');
 		}else{

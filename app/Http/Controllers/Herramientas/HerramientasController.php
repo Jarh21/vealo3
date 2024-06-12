@@ -332,7 +332,7 @@ class HerramientasController extends Controller
 			
 			return $monedaBase;
 		}
-		dd("Error no se pudo conectar con el siace para determinar la moneda base de dicho sistema, herraminetasController linea 333 de herramientas");
+		dd("Error de herraminetasController linea 333 de herramientas, no se pudo conectar con el siace para determinar la moneda base de dicho sistema, ¡cierre session he intente nuevamente!");
 	}
 	
 	public static function valorAlCambioMonedaSecundaria($monto,$tasa=0){

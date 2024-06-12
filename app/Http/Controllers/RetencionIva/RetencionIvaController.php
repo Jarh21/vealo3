@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use DateTime;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Dompdf\FontMetrics;
 use Illuminate\Http\Request;
 use App\Models\Proveedor;
 use App\Models\RetencionIvaDetalle;
@@ -497,6 +498,23 @@ class RetencionIvaController extends Controller
         $pdf->loadHtml($html);
         $pdf->render();
 
+		if($datosFacturas->isEmpty()){
+			//agregar marca de agua en el documento pdf
+			$canvas = $pdf->getCanvas();  
+			$fontMetrics = new FontMetrics($canvas, $options); 		
+			$w = $canvas->get_width(); 
+			$h = $canvas->get_height(); 		
+			$font = $fontMetrics->getFont('times'); 		
+			$text = "Anulada"; 		
+			$txtHeight = $fontMetrics->getFontHeight($font, 75); 
+			$textWidth = $fontMetrics->getTextWidth($text, $font, 75); 		
+			$canvas->set_opacity(.2); 		
+			$x = (($w-$textWidth)/2); 
+			$y = (($h-$txtHeight)/2); 		
+			$canvas->text($x, $y, $text, $font, 75); 
+			//fin de la marca de agua
+		}
+		
 
 		//eliminar los archivos de la carpeta storage
 		// Verificar si el directorio existe
@@ -571,6 +589,8 @@ class RetencionIvaController extends Controller
 		if(!empty(session('limite'))){
 			$limite = (session('limite'));
 		}
+		session(['anuladas' => '']);
+
 		if(empty(session('comprobanteIva')) and empty(session('proveedorIva')) and empty(session('fecha_desdeIva')) and empty(session('fecha_hastaIva')) and empty(session('documentoIva'))){
 			$retenciones_dat = DB::select( "select GROUP_CONCAT(d.documento SEPARATOR ', ')as documentos,  d.*,r.estatus as estatus_retencion, r.fecha,r.total, p.correo,p.id as proveedorId,p.tipo_proveedor from retenciones_dat d,retenciones r,proveedors p where p.rif = r.rif_retenido and d.comprobante<>'0' and d.rif_agente=:rifAgente and d.comprobante = r.comprobante and d.rif_agente = r.rif_agente group by d.comprobante ORDER BY r.keycodigo DESC limit 100",['rifAgente'=>session('empresaRif')]);
 			
@@ -604,6 +624,8 @@ class RetencionIvaController extends Controller
 		$fechaHasta = $request->fecha_hasta;
 		$documento = $request->documento;
 		$limite = $request->limite;
+		$anuladas = $request->anuladas;
+		
 		 // Guardar los valores en variables de sesión
 		if(!empty($comprobante)) { 
 			session(['comprobanteIva' => $comprobante]);
@@ -635,23 +657,47 @@ class RetencionIvaController extends Controller
 		}else{
 			session(['limite' => '']);
 		}
+		if(!empty($anuladas)) { 
+			session(['anuladas' => $anuladas]);
+		}else{
+			session(['anuladas' => '']);
+		}
 		$condicion = array();
-		$condicion[]="retenciones_dat.estatus='C'";
-		$condicion[]="retenciones_dat.rif_agente='".session('empresaRif')."'";
-		$condicion[]="retenciones_dat.comprobante <> '0.00'";
-		$condicion[]="retenciones_dat.comprobante = retenciones.comprobante";
-		$condicion[]="retenciones_dat.rif_agente = retenciones.rif_agente";
-		$condicion[]="proveedors.rif = retenciones.rif_retenido";
-		if(!empty($comprobante)){$condicion[]="retenciones_dat.comprobante =".$comprobante;}
-		if(!empty($proveedor)){ $condicion[]="retenciones_dat.nom_retenido like '%".$proveedor."%'";}
-		if(!empty($fechaDesde)){ $condicion[]=" retenciones.fecha >='".$fechaDesde."'"; }
-		if(!empty($fechaHasta)){ $condicion[]=" retenciones.fecha <='".$fechaHasta."'";}
-		if(!empty($documento)){ $condicion[] = " retenciones_dat.documento in(".$documento.")";}
-		$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
+		
+		
+		if($anuladas=='on'){
+			//si al buscar una retencion esta tildado las anuladas buscamos solo en la tabla retenciones
+			$condicion[]="retenciones.estatus='A'";
+			
+			$condicion[]="proveedors.rif = retenciones.rif_retenido";
+			if(!empty($comprobante)){$condicion[]="retenciones.comprobante =".$comprobante;}
+			if(!empty($proveedor)){ $condicion[]="retenciones.nom_retenido like '%".$proveedor."%'";}
+			if(!empty($fechaDesde)){ $condicion[]=" retenciones.fecha >='".$fechaDesde."'"; }
+			if(!empty($fechaHasta)){ $condicion[]=" retenciones.fecha <='".$fechaHasta."'";}
+			
+			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
 
-		$herramientas = new HerramientasController();
-		$retenciones_dat = DB::select( "select GROUP_CONCAT(retenciones_dat.documento SEPARATOR ', ')as documentos,retenciones_dat.*,retenciones.estatus as estatus_retencion,retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId,proveedors.tipo_proveedor from retenciones_dat,retenciones,proveedors where  ". $whereClause." group by retenciones_dat.comprobante ORDER BY retenciones.keycodigo DESC limit ".$limite);			
+			$retenciones_dat = DB::select( "select ''as documentos,retenciones.nom_retenido,retenciones.rif_retenido,retenciones.estatus as estatus_retencion,retenciones.comprobante,retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId,proveedors.tipo_proveedor,'anulada' as tipo_docu,rif_agente from retenciones,proveedors where  ". $whereClause." ORDER BY retenciones.keycodigo DESC limit ".$limite);			
+		
+		}else{
+			$condicion[]="retenciones_dat.estatus='C'";
+			$condicion[]="retenciones_dat.rif_agente='".session('empresaRif')."'";
+			$condicion[]="retenciones_dat.comprobante <> '0.00'";
+			$condicion[]="retenciones_dat.comprobante = retenciones.comprobante";
+			$condicion[]="retenciones_dat.rif_agente = retenciones.rif_agente";
+			$condicion[]="proveedors.rif = retenciones.rif_retenido";
+			if(!empty($comprobante)){$condicion[]="retenciones_dat.comprobante =".$comprobante;}
+			if(!empty($proveedor)){ $condicion[]="retenciones_dat.nom_retenido like '%".$proveedor."%'";}
+			if(!empty($fechaDesde)){ $condicion[]=" retenciones.fecha >='".$fechaDesde."'"; }
+			if(!empty($fechaHasta)){ $condicion[]=" retenciones.fecha <='".$fechaHasta."'";}
+			if(!empty($documento)){ $condicion[] = " retenciones_dat.documento in(".$documento.")";}
+			$whereClause = implode(" AND ", $condicion); //se convierte el array en un string añadiendole el AND
+
+			$retenciones_dat = DB::select( "select GROUP_CONCAT(retenciones_dat.documento SEPARATOR ', ')as documentos,retenciones_dat.*,retenciones.estatus as estatus_retencion,retenciones.fecha,retenciones.total,proveedors.correo,proveedors.id as proveedorId,proveedors.tipo_proveedor from retenciones_dat,retenciones,proveedors where  ". $whereClause." group by retenciones_dat.comprobante ORDER BY retenciones.keycodigo DESC limit ".$limite);			
+		
+		}
 		$cantidad = count($retenciones_dat);
+		$herramientas = new HerramientasController();
 		return view('retencionIva.listadoRetenciones',['retenciones_dat'=>$retenciones_dat,'empresas'=>$herramientas->listarEmpresas(),'cantidad'=>$cantidad]);
 	}
 
@@ -905,7 +951,7 @@ class RetencionIvaController extends Controller
 		if(empty($empresaRif)){
 			$empresaRif = session('empresaRif');
 		}
-		
+		RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->delete(); 
 		RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->update(['estatus'=>'A','total'=>0]);
 		return redirect()->route("retencion.iva.listar");
 	}
