@@ -54,12 +54,14 @@
 								<div class="form-check">					
 									<input type="checkbox" id="is_agente_retencion" class="form-check-input" name="is_agente_retencion" >
 									<label  for="is_agente_retencion">Es agente retención de impuestos (IVA)</label>
+									
+									<input type="text" name="providencia" class="form-control" placeholder="Providencia emitida por el seniat">
 								</div>
 							</div>
 							
 						</div>								
 						
-						<div class="row">
+						<div class="row my-2">
 							<div class="col">
 								<div class="form-group">
 									<label>Firma Digital</label>

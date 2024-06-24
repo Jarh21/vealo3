@@ -422,11 +422,14 @@ class RetencionIvaController extends Controller
 
 	public function mostrarComprobanteRetencionIva($comprobante,$empresaRif,$firma=''){
 		//Generamos el comprobante de retencion en PDF
-		
+		$datosProveedor="";
 		$retencionIva = RetencionIva::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->first();
 		$datosFacturas = RetencionIvaDetalle::where('comprobante',$comprobante)->where('rif_agente',$empresaRif)->get();//buscamos los datos de las facturas
-		$datosEmpresa = Empresa::select('direccion','logo','firma')->where('rif',$retencionIva->rif_agente)->first();
+		$datosEmpresa = Empresa::select('direccion','logo','firma','providencia_iva')->where('rif',$retencionIva->rif_agente)->first();
 		$datosModificados=array();
+		$direccion_proveedor_en_comprobante_retencioniva=Parametro::buscarVariable('direccion_proveedor_en_comprobante_retencioniva');
+        $total_a_cancelar_en_comprobante_retencioniva=Parametro::buscarVariable('total_a_cancelar_en_comprobante_retencioniva');
+		$datosProveedor = Proveedor::where('rif',$retencionIva->rif_retenido)->first();
 		
 		//modificamos datos necesarios para el formato de retencion de iva 		
 		$anio = substr($retencionIva->periodo, 0, 4);
@@ -493,7 +496,7 @@ class RetencionIvaController extends Controller
         $options->set('isRemoteEnabled', true);
 		$pdf->setPaper('letter','landscape'); // Establecer la orientación a horizontal
         $pdf->setOptions($options);
-        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa,'datosModificados'=>$datosModificados,'firma'=>$firma])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
+        $html = view('retencionIva.comprobanteRetencionIva', ['retencionIva'=>$retencionIva,'datosFacturas'=>$datosFacturas,'datosEmpresa'=>$datosEmpresa,'datosProveedor'=>$datosProveedor,'datosModificados'=>$datosModificados,'firma'=>$firma,'direccion_proveedor_en_comprobante_retencioniva'=>$direccion_proveedor_en_comprobante_retencioniva,'total_a_cancelar_en_comprobante_retencioniva'=>$total_a_cancelar_en_comprobante_retencioniva])->render(); // Reemplaza 'pdf.example' con el nombre de tu vista
 
         $pdf->loadHtml($html);
         $pdf->render();
@@ -930,7 +933,7 @@ class RetencionIvaController extends Controller
 		
     	$rutaArchivo = storage_path('app/txtRetencionIva/' . $archivo);
 
-		if (Storage::disk('local')->exists($archivo)) {
+		if (Storage::disk('local')->exists('/txtRetencionIva/'.$archivo)) {
 			return response()->download($rutaArchivo, $newNombre, ['Content-Type' => 'text/plain']);
 		} else {
 			return response()->json(['error' => 'El archivo no existe'], 404);
@@ -969,6 +972,4 @@ class RetencionIvaController extends Controller
 		Parametro::actualizarVariable('contador_reten_iva_'.$empresaRif,$contador);//asignamos el valor -1 al contador con esto no hay saltos al eliminar
 		return redirect()->route("retencion.iva.listar");
 	}
-	
-
 }

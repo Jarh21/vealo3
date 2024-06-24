@@ -84,6 +84,7 @@ class EmpresasController extends Controller
 		$empresa->basedata2 = $request->get('basedata2');
 		$empresa->is_agente_retencion = $agenteRetencion;
 		$empresa->is_sincronizacion_remota = $sincronizacion;
+		$empresa->providencia_iva = $request->providencia;
 		if($request->hasfile('firma')){
 
 			$file = $request->file('firma');
@@ -151,6 +152,8 @@ class EmpresasController extends Controller
 		$empresa->nomusua2 = $request->get('nomusua2');
 		$empresa->clave2 = $request->get('clave2');
 		$empresa->basedata2 = $request->get('basedata2');
+		$empresa->providencia_iva = $request->providencia;
+
 		//copiar el archivo a la carpeta storage/app/imagen
     /*    if($request->hasFile('firma')){
             $request->file('firma')->store('imagen');        

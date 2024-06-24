@@ -324,13 +324,15 @@ class ConfiguracionController extends Controller
         $porceRetencionIva = self::consultarPorcentajeRetencionIva();
         //determina si la retencion iva aplica a una compra o una venta
         $tipoOperacion = Parametro::buscarVariable('reten_iva_modo_operacion');
+        $direccion_proveedor_en_comprobante_retencioniva=Parametro::buscarVariable('direccion_proveedor_en_comprobante_retencioniva');
+        $total_a_cancelar_en_comprobante_retencioniva=Parametro::buscarVariable('total_a_cancelar_en_comprobante_retencioniva');
         if (empty($tipoOperacion)){
             //donde C= Compra y V = venta
             Parametro::actualizarVariable('reten_iva_modo_operacion','C');
             $tipoOperacion = Parametro::buscarVariable('reten_iva_modo_operacion');
         }
         
-        return view('admin.configuraciones.confRetencionIva',['porceRetencionIva'=>$porceRetencionIva,'tipoOperacion'=>$tipoOperacion]);
+        return view('admin.configuraciones.confRetencionIva',['porceRetencionIva'=>$porceRetencionIva,'tipoOperacion'=>$tipoOperacion,'direccion_proveedor_en_comprobante_retencioniva'=>$direccion_proveedor_en_comprobante_retencioniva,'total_a_cancelar_en_comprobante_retencioniva'=>$total_a_cancelar_en_comprobante_retencioniva]);
     }
 
     public function guardarPorcentajeRetencionIva(Request $request){
@@ -338,6 +340,12 @@ class ConfiguracionController extends Controller
             DB::insert("INSERT INTO porcentaje_retencion_iva (porcentaje) VALUES (?)",[$request->porcentaje]);
         }
         Parametro::actualizarVariable('reten_iva_modo_operacion',$request->compra_venta);
+        
+        Parametro::actualizarVariable('direccion_proveedor_en_comprobante_retencioniva',$request->direccion_proveedor_en_comprobante_retencioniva);
+        
+        Parametro::actualizarVariable('total_a_cancelar_en_comprobante_retencioniva',$request->total_a_cancelar_en_comprobante_retencioniva);
+        
+        
         return redirect()->route('indexConfiguracionRetencionIva');
     }
 

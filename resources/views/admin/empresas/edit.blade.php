@@ -59,6 +59,7 @@
 										<div class="form-check">					
 											<input type="checkbox" id="is_agente_retencion" class="form-check-input" name="is_agente_retencion" @if($empresa->is_agente_retencion==1) checked @endif>
 											<label  for="is_agente_retencion">Es agente retención de impuestos (IVA)</label>
+											<input type="text" name="providencia" value="{{$empresa->providencia_iva}}" class="form-control" placeholder="Providencia emitida por el seniat">
 										</div>
 									</div>
 									
