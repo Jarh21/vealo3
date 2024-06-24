@@ -10,7 +10,7 @@ use App\Http\Controllers\islrController;
 use App\Models\ReporteXml;
 use App\Models\EncabezadoXml;
 use App\Http\Controllers\ProveedorController;
-use App\Http\Controllers\HerramientasController;
+use App\Http\Controllers\Herramientas\HerramientasController;
 use Illuminate\Support\Facades\DB;
 use XMLWriter; /*para usar la clase nativa de xml en php*/
 
@@ -64,9 +64,9 @@ class xmlController extends Controller
 	//////////////////////////////////////////////////////
 	public function xml(){
 		//vista principal	
-				
-		$empresas = Empresa::all();
-		return view('islr.xml.xmlcrear',['empresas'=>$empresas]);
+		$herramientas = new HerramientasController();		
+		//$empresas = Empresa::all();
+		return view('islr.xml.xmlcrear',['empresas'=>$herramientas->listarEmpresas()]);
 			
 	}
 
@@ -123,7 +123,7 @@ class xmlController extends Controller
 	public function xmlCrear(Request $request){
 		//vista secundaria donde recibe los dato como espresa y fecha
 		//obtenemos los meses de las dos fecha y si hay diferencias envia un error
-
+		$empresaRif = session('empresaRif');
 		$fecha1 = date('m',strtotime($request->get('fechaIni')));
 		$fecha2 = date('m',strtotime($request->get('fechaFin')));
 		$month    = date('Y-m',strtotime($request->get('fechaFin')));
@@ -138,11 +138,11 @@ class xmlController extends Controller
 		if(($fecha1==$fecha2) and ($request->get('fechaIni')<$request->get('fechaFin')) ){
 
 			//****esta funcion obtiene los resultados de las FACTURAS que van para el xml ****
-			$xmlFacturas=self::buscarFecha($request->get('fechaIni'),$request->get('fechaFin'),$request->get('empresaRif'));
+			$xmlFacturas=self::buscarFecha($request->get('fechaIni'),$request->get('fechaFin'),$empresaRif);
 			
 			//****esta funcion obtiene los resultados de los EMPLEADOS que van para el xml ****
 			$ultimaFechaMes = self::ultimaFechaMes($request->get('fechaFin'));
-			$xmlEmpleados=self::buscarEmpleados($request->get('empresaRif'),$ultimaFechaMes);
+			$xmlEmpleados=self::buscarEmpleados($empresaRif,$ultimaFechaMes);
 
 			//unimos los dos arreglos en uno solo
 			$xml=array_merge($xmlFacturas,$xmlEmpleados);
@@ -286,8 +286,9 @@ class xmlController extends Controller
 
 	public function xmlListar(){
 		
-		$listadoxml = EncabezadoXml::orderBy('id', 'desc')->get();
-		return view('islr.xml.xmlLista',['listadoxml'=>$listadoxml]);
+		$listadoxml = EncabezadoXml::where('rif_empresa',session('empresaRif'))->orderBy('id', 'desc')->get();
+		$herramientas = new HerramientasController();
+		return view('islr.xml.xmlLista',['listadoxml'=>$listadoxml,'empresas' =>$herramientas->listarEmpresas()]);
 	}
 
 

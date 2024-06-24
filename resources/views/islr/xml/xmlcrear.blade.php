@@ -1,7 +1,34 @@
 @extends('layouts.app')
 @section('content')
 <div class="container">
-	<h3>Crear retgistros para el XML <a href="{{route('islr.xml.listar')}}" class="btn btn-warning float-right">Regresar</a></h3><hr>
+	<!-- Modal sucursal -->
+	<div class="modal fade" id="modalCambioSucursal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Sucursales</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				</div>
+				<div class="modal-body">
+				@if(isset($empresas))
+					Seleccione la sucursal
+					@foreach($empresas as $empresa)
+						<!-- <option value="{{--$empresa->rif--}}|{{--$empresa->nombre--}}|{{--$empresa->basedata--}}">{{--$empresa->rif--}} {{--$empresa->nombre--}}</option> -->
+						<a href="{{route('seleccionSucursal',[$empresa->rif,'islr.xml.create'])}}" class="dropdown-item dropdown-footer">{{$empresa->rif}} {{$empresa->nombre}}</a>
+						<div class="dropdown-divider"></div>
+					@endforeach
+				@endif
+				</div>
+				<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>				        		        
+				
+				</div>
+			</div>
+			</div>
+		</div>	<!--fin modal-->
+	<h3>Crear retgistros para el XML <a href="#" data-toggle="modal" data-target="#modalCambioSucursal" class="btn btn-outline-primary my-2">Seleccione sucursal ->{{session('empresaRif')}} {{session('empresaNombre') ?? 'No hay sucursal seleccionada'}}</a><a href="{{route('islr.xml.listar')}}" class="btn btn-warning float-right">Regresar</a></h3><hr>
 	<div  class="row">
 		<div class="col-6">
 			<form action="{{route('islr.xmlCrear')}}" method="POST">
@@ -25,13 +52,7 @@
 					</div>
 				@endif
 				<label>Empresa</label>
-				<select name="empresaRif" class="form-control" required>
-					<option value="">--Seleccione--</option>
-					@foreach($empresas as $empresa)
-					<option value="{{$empresa->rif}}">{{$empresa->nombre}}</option>
-					@endforeach
-				</select>
-			
+							
 				<label for="name">Fecha Inicio</label>
 				<input type="date" name="fechaIni" class="form-control" value="{{old('fechaIni')}}" required>
 			
