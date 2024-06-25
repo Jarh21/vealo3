@@ -671,7 +671,7 @@ class RetencionIvaController extends Controller
 		if($anuladas=='on'){
 			//si al buscar una retencion esta tildado las anuladas buscamos solo en la tabla retenciones
 			$condicion[]="retenciones.estatus='A'";
-			
+			$condicion[]="retenciones.rif_agente='".session('empresaRif')."'";
 			$condicion[]="proveedors.rif = retenciones.rif_retenido";
 			if(!empty($comprobante)){$condicion[]="retenciones.comprobante =".$comprobante;}
 			if(!empty($proveedor)){ $condicion[]="retenciones.nom_retenido like '%".$proveedor."%'";}
