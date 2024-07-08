@@ -72,6 +72,7 @@
 	    					@else
 	    					{{$cuenta->porcentaje_retencion_iva ?? '0'}}%
 	    					@endif
+							<span class="text-secondary" style="font-size:11px">(Creado {{$cuenta->creado}} por {{$cuenta->usuario}})</span>
 	    				</td>
 	    				<td>{{$cuenta->documento}}</td>    					    				   				
 	    				<td>{{number_format($cuenta->debitos,2,',','.')}}</td>	    				

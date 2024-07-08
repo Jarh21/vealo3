@@ -50,6 +50,7 @@ class FacturasPorPagar extends Model
               'facturas_por_pagars.monto',
               'facturas_por_pagars.origen',
               'facturas_por_pagars.is_factura_revisada',
+              'facturas_por_pagars.created_at',
               'facturas_por_pagars.monto_divisa')
             ->where('facturas_por_pagars.pago_efectuado',0)
             ->where('facturas_por_pagars.modo_pago',session('modoPago'))                        

@@ -31,7 +31,7 @@ date_default_timezone_set("America/Caracas");
     <td>
       <table width="755" border="0" cellspacing="0" cellpadding="0">
         <tr>
-          <td><img src="{{ url($datosEmpresa->logo) }}"></td>
+          <td><img src="{{ asset($datosEmpresa->logo) }}"></td>
           <td align="center" valign="bottom"><span class="Estilo1">NRO. DE COMPROBANTE </span></td>
           <td align="center" valign="bottom"><span class="Estilo1">FECHA DE EMISION </span></td>
         </tr>
@@ -211,7 +211,7 @@ date_default_timezone_set("America/Caracas");
         <td width="390" height="50" valign="bottom">
           
         @if(!empty($firma))
-        <img id='imagenFirma' src="{{asset($datosEmpresa->firma)}}">
+        <img id='imagenFirma' width="230px" src="{{asset($datosEmpresa->firma)}}">
         @else
           <span class="Estilo2">AGENTE DE RETENCION: ____________________________ </span>
         @endif  

@@ -198,6 +198,7 @@ class CuentasPorPagarController extends Controller
 		              'igtf'=>$facturaPorPagar->igtf,
 					  'banderaFacturaSiaceEncontrada'=>$banderaFacturaSiaceEncontrada,
 		              'usuario'=>$facturaPorPagar->usuario,
+					  'creado'=>$facturaPorPagar->created_at,
 		              'porcentaje_retencion_iva'=>$porcentajeRetencionIva,
 		              'montoOrigenFactura'=>$montoOrigenFactura,
     				);
