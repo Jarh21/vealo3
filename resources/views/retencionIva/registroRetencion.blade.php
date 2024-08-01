@@ -22,7 +22,7 @@
                 <div class="row">
                     <div class="col">
                         <label for="">Fecha</label>
-                        <input type="date" class='form-control' name='fecha' required>
+                        <input type="date" class='form-control' name='fecha' required min="{{$ultimoComprobante[0]->ultima_fecha ?? '0'}}">
                         <label for="">Nº Comprobante</label>
                         <input type="text" class='form-control' name='comprobante' value='{{$contador}}' readonly>
                         <label for="">Nº Referencia Bancaria</label>
@@ -35,7 +35,8 @@
                                 
                             </div>
                             <div class="card-body">
-                                {{$ultimoComprobante[0]->comprobante ?? '0'}}
+                                <p>Comprobante: {{$ultimoComprobante[0]->comprobante ?? '0'}}</p>
+                                <p>Fecha: {{$ultimoComprobante[0]->ultima_fecha ?? '0'}}</p>
                             </div>
                         </div>
                         <input type="checkbox" name="firma_digital" id="firma_digital" value='firma'><label for="firma_digital">Firma Digital</label>

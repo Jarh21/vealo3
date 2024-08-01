@@ -135,7 +135,7 @@ class RetencionIvaController extends Controller
 			}
 		}
 		//buscar solo por rango de fechas
-    	if(!empty($fechaIni) or !empty($fechaFin)){
+    	/* if(!empty($fechaIni) or !empty($fechaFin)){
 			try {	
     			$registros = $conexionSQL->select("SELECT keycodigo, rif AS rif_retenido,nomprov AS nom_retenido,fecha AS fecha_docu,'FA' AS tipo_docu,documento,ncontrol AS control_fact,debitos AS comprasmasiva,exento AS sincredito,baseimp AS base_impon,poriva AS porc_alic,montoiva AS iva FROM (SELECT keycodigo, REPLACE(rif, '-', '') AS rif, nomprov, fecha, 'FA' AS tipo_docu, documento, ncontrol, debitos, exento, baseimp, poriva, montoiva,codorigen FROM cxp)facturas WHERE codorigen=2000 and cierre>=:fechaIni and cierre<=:fechaFin and year(fecha)>=:anioAnterior",[$fechaIni,$fechaFin,$anioAnterior]);
 			} catch (\Illuminate\Database\QueryException $e) {
@@ -143,7 +143,7 @@ class RetencionIvaController extends Controller
 				\Session::flash('alert','alert-danger');
 				return response();
 			}
-		}
+		} */
 		//buscar con codigo de factura y rif del proveedor
     	if(empty($fechaIni) and empty($fechaFin) and !empty($proveedorRif) and !empty($nfactura)){
 			try {
@@ -372,7 +372,7 @@ class RetencionIvaController extends Controller
 			$contador=str_pad($valor, 8, "0", STR_PAD_LEFT);
 			
 			//BUSCAMOS EL ULTIMO COMPROBANTE DE RETENCION
-			$ultimoComprobante = DB::select("SELECT comprobante FROM retenciones WHERE rif_agente=:empresaRif ORDER BY keycodigo DESC LIMIT 1",['empresaRif'=>session('empresaRif')]);
+			$ultimoComprobante = DB::select("SELECT comprobante,fecha as ultima_fecha FROM retenciones WHERE rif_agente=:empresaRif ORDER BY keycodigo DESC LIMIT 1",['empresaRif'=>session('empresaRif')]);
 			return view('retencionIva.registroRetencion',['datosFacturas'=>$datosFacturas,'contador'=>$contador,'rif_agente'=>$proveedorRif,'nom_agente'=>$proveedorNombre,'ultimoComprobante'=>$ultimoComprobante]);
 			
 		}else{
@@ -809,14 +809,14 @@ class RetencionIvaController extends Controller
 		SELECT r.rif_agente,r.fecha,d.comprobante,r.periodo,r.estatus as estatus_retencion,d.fecha_docu,d.estatus,d.rif_retenido,d.nom_retenido,d.tipo_docu,d.documento,d.control_fact,d.comprasmasiva,d.base_impon,d.iva,d.iva_retenido,d.fact_afectada,d.sincredito,d.porc_alic,d.porc_reten 
 		FROM 
 		retenciones_dat d
-		INNER JOIN retenciones r ON d.comprobante = r.comprobante
+		INNER JOIN retenciones r ON d.comprobante = r.comprobante AND r.rif_agente = d.rif_agente
 		WHERE
 		(
 		(d.tipo_docu='FA' AND (r.fecha BETWEEN :fechaini_fa AND :fechafin_fa) AND r.estatus in('N'))
 		OR 
 		(d.tipo_docu<>'FA' AND (r.fecha BETWEEN :fechaini_nc AND :fechafin_nc) AND r.estatus='N' AND (d.`fact_afectada` IN(SELECT det.documento FROM retenciones_dat det,retenciones ret WHERE ret.comprobante = det.comprobante AND (ret.fecha BETWEEN :fechaini_afec AND :fechafin_afec) AND ret.rif_agente= :empresaRif_afec)))
 		)  
-		AND d.rif_agente= :empresaRif
+		AND r.rif_agente= :empresaRif
 		",['fechaini_fa'=>$fechaini,'fechafin_fa'=>$fechafin,'fechaini_nc'=>$fechaini,'fechafin_nc'=>$fechafin,'fechaini_afec'=>$fechaini,'fechafin_afec'=>$fechafin,'empresaRif_afec'=>$empresaRif,'empresaRif'=>$empresaRif]); 
 		$contenido ='';
 		$contenidoContable ='';
